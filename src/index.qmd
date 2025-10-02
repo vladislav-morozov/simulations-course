@@ -8,7 +8,7 @@ open-graph:
 
 
 
-<img src="images/00201-3654134141.png" alt="Simulations" style="width: 100%;  border-radius: 15px; margin-bottom: 6px;">
+<img src="images/sim-header.png" alt="Simulations" style="width: 100%;  border-radius: 15px; margin-bottom: 6px;">
 
  
 
@@ -19,7 +19,7 @@ open-graph:
 **Office Location:** Adenauerallee 24-42, IFS, Statistics Section\
 **Office Hours:** Virtual, by appointment\
 **Course Website:** eCampus and this website\
-**Meeting times:** Room 0.042: 14:00-16:00, Wednesdays; 08:30-10:00, Fridays
+**Meeting times:** Room 0.042: 14:00-16:00, Wednesdays; 08:30-10:00, Fridays \
 **Schedule Changes and Holidays**: See eCampus and BASIS\
 <!-- **DOI**: [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.15463535-gold)](https://doi.org/10.5281/zenodo.15463535) -->
 
