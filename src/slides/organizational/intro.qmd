@@ -63,7 +63,7 @@ Evaluating and using new statistical methods involves questions like
 - How well does a new causal inference method estimate the effect of interest? 
 - Does an ML algorithm generalize well?
 - Is hypothesis test A more powerful than test B?
-- What is the real coverage of a nominally 95% confidence interval? 
+- What is the real coverage of a given nominally 95% confidence interval? 
 
 </div>
 
@@ -76,6 +76,8 @@ Sometimes can answer theoretically using some combination of
 
 . . .
 
+<br>
+
 But theory often not satisfactory (loose bounds, restrictive assumptions, intractable math)
 
 #### Place of Simulations
@@ -83,28 +85,36 @@ But theory often not satisfactory (loose bounds, restrictive assumptions, intrac
 
 <div class="rounded-box">
 
-Simulations offer the next best thing: can check every aspect of performance in controlled "lab" setting
+<span class="highlight">Simulations offer the next best thing</span>: can check every aspect of performance in controlled "lab" settings
 
 </div>
 
 
 - Using synthetic data: can control every part of data generating process
-- Synthetic data $\Rightarrow$ full knowledge of target quantities (esp. critical for causal methods)
+- Synthetic data $\Rightarrow$ full knowledge of target quantities, unlike with real data — esp. critical for causal methods
 
 
 
-If data-generating process is chosen "well", informative about performance on real data
+If data-generating process is chosen "well", <span class="highlight">informative</span> about performance on real data
  
 
 
+#### Course Contents
 
+Course covers essentials you need to write your own simulations:
+
+- Metrics for evaluating estimators (causal and predictive), tests, confidence sets
+- Structuring code
+- Selecting DGPs
+
+After end of lectures: putting things in practice with a project
 
 #### This Course and the Research Module
 
 This course — part of <span class="highlight">Research Module in Econometrics and Statistics</span>
 
 - Preparation for writing a successful master's thesis in DS-adjacent topics (and beyond)
-- At Bonn Econ a "typical" MSc thesis in DS involves  simulations: critically evaluating an existing method (or a new method for more advanced theses)
+- At Bonn Econ a "typical" MSc thesis in DS involves simulations: critically evaluating an existing method (or a new method for more advanced theses)
 
 
 <div class="left-color">
@@ -116,8 +126,6 @@ Need to know how to write simulations
 
 
   
-#### Course Contents
-
 
 ## Course Logistics {background="#00100F"}
 
