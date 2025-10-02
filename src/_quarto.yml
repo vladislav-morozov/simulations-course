@@ -1,0 +1,50 @@
+project:
+  type: website
+  output-dir: ../docs/
+
+html-math-method: mathjax
+
+filters:
+  - diagram  
+  - reveal-header
+diagram:
+  engine:
+    tikz:
+      execpath: pdflatex
+      header-includes:
+        - '\usepackage{adjustbox}'
+        - '\usetikzlibrary{arrows,shapes.arrows,shapes.geometric,shapes.multipart,decorations.pathmorphing,positioning,swigs}' 
+
+website:
+  title: "Simulations"
+  favicon: themes/favicon.ico
+  site-url: https://vladislav-morozov.github.io/simulations-course/
+  repo-url: https://github.com/vladislav-morozov/simulations-course/
+  repo-subdir: "src" 
+  repo-actions: [edit, issue]
+  sidebar:
+    style: "floating"
+    search: true 
+    tools:
+      - icon: person-arms-up
+        href: https://vladislav-morozov.github.io/
+      - icon: github
+        href: https://github.com/vladislav-morozov/
+      - icon: linkedin
+        href: https://www.linkedin.com/in/vladislavvmorozov/
+    contents: 
+      - section: "Course Info"
+        contents: 
+        - slides/organizational/intro.qmd  
+
+execute:
+  freeze: auto  # re-render only when source changes
+
+format:
+  html:
+    include-in-header: themes/mathjax.html
+    theme:
+      light: [themes/ws_light.scss, themes/block.scss]
+      dark: [themes/ws_dark.scss, themes/block.scss]  
+
+bibliography: eco.bib
