@@ -16,7 +16,7 @@ $presentation-heading-color: $body-color !default;
 $presentation-heading-font-weight: 1000 !default;
 $presentation-heading-text-shadow: 500 !default;
 $body-bg: #ffffff !default;
-$link-color: #39225e !default;
+$link-color: #3c165c !default;
 $accent: $link-color !default;
 $selection-bg: #FFD700 !default;
 .title-slide h2 {
@@ -110,6 +110,12 @@ $presentation-title-slide-text-align: left;
   padding: 9px;
   border-radius: 15px;
   margin-bottom: 10px;
+}
+
+.left-color {
+  border-left: 6px solid $accent;
+  padding-left: 20px; 
+  margin-top: 15px;
 }
 
 // lists
