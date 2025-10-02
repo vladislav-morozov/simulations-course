@@ -1,0 +1,83 @@
+---
+title: "Course Introduction"
+subtitle: "Research Module in Econometrics and Statistics: Simulations"
+author: Vladislav Morozov  
+format:
+  revealjs:
+    include-in-header: 
+      text: |
+        <meta name="description" content="Course introduction (lecture notes slides)."/> 
+    width: 1150
+    slide-number: true
+    sc-sb-title: true
+    incremental: true   
+    logo: ../../themes/favicon.ico
+    footer: "Course Introduction"
+    footer-logo-link: "https://vladislav-morozov.github.io/econometrics-2/"
+    theme: ../../themes/slides_theme.scss
+    toc: TRUE
+    toc-depth: 2
+    toc-title: Contents
+    transition: convex
+    transition-speed: fast
+slide-level: 4
+title-slide-attributes:
+    data-background-color: "#39225eff"
+    data-footer: " "
+filters:
+  - reveal-header 
+embed-resources: true
+include-in-header: ../../themes/mathjax.html 
+highlight-style: tango
+open-graph:
+    description: "Course introduction " 
+---
+
+
+
+
+
+
+## Content and Motivation {background="#00100F"}
+
+#### About Me
+ 
+**Instructor**: JProf. Dr. Vladislav Morozov
+
+- Institute of Finance and Statistics
+- Email: <p style="font-family: 'Courier New', Courier, monospace;">morozov@uni-bonn.de</p>
+- I work on practical statistical methods with a focus on unobserved heterogeneity
+
+
+### This Course:   {background="#43464B"}
+
+
+#### Why Simulate?
+
+#### What Do Simulations Involve?
+
+#### What You Have to Decide
+
+## Content and Motivation {background="#00100F"}
+
+
+### Organization and Evaluations {background="#43464B"}
+
+#### Projects
+
+
+### Materials {background="#43464B"}
+
+#### 
+
+Not many good books on Monte Carlo
+
+#### Python References
+
+
+#### For Project Inspiration
+ 
+#### References {.allowframebreaks visibility="uncounted"}
+
+::: {#refs}
+:::

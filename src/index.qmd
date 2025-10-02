@@ -1,0 +1,74 @@
+---
+description: "This course covers the basics of writing and evaluating Monte Carlo simulations in data science: best practices, Python implementations"
+open-graph:
+    description: "This course covers the basics of writing and evaluating Monte Carlo simulations in data science: best practices, Python implementations" 
+---
+
+# Fundamentals of Simulations in Data Science
+
+
+
+<img src="images/00201-3654134141.png" alt="Simulations" style="width: 100%;  border-radius: 15px; margin-bottom: 6px;">
+
+ 
+
+## Course Information
+  
+**Instructor:** Vladislav Morozov\
+**Email:** [morozov [at] uni-bonn.de](mailto:morozov@uni-bonn.de)\
+**Office Location:** Adenauerallee 24-42, IFS, Statistics Section\
+**Office Hours:** Virtual, by appointment\
+**Course Website:** eCampus and this website\
+**Meeting times:** Room 0.042: 14:00-16:00, Wednesdays; 08:30-10:00, Fridays
+**Schedule Changes and Holidays**: See eCampus and BASIS\
+<!-- **DOI**: [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.15463535-gold)](https://doi.org/10.5281/zenodo.15463535) -->
+
+**Level:** master's
+**Prerequisites:** coursework in econometrics and statistics
+
+**Course source code:** [![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?style=flat&logo=github&logoColor=white)](https://github.com/vladislav-morozov/simulations-course) \
+**Simulations in:** [![Python](https://img.shields.io/badge/python-ffdd54?style=flat&logo=python&logoColor=3776AB)](https://www.python.org/)
+
+### In Slide Form
+ 
+
+{{< revealjs file="slides/organizational/intro.html" height="500px" class="ratio ratio-16x9" >}}
+
+
+## Course Content
+ 
+  
+### Content 
+
+The course is structured as follows: 
+ 
+---
+ 
+
+## Course Materials
+
+
+ 
+## Course Policies
+
+
+### Grading and Evaluation
+
+The final grade for this course is based on
+ 
+### Policies and Additional Information
+
+**Attendance and Participation:**\
+Regular attendance and active participation are strongly encouraged.  
+
+
+**Academic Integrity:**\
+Students must adhere to the university’s policies on academic integrity and plagiarism. Any violations will be subject to disciplinary action.
+
+**Accommodations:**\
+If you require any accommodations due to a disability or other circumstances, please contact the relevant office as soon as possible.
+ 
+
+
+
+ 
