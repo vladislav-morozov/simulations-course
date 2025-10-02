@@ -1,6 +1,6 @@
 ---
 title: "Course Introduction"
-subtitle: "Research Module in Econometrics and Statistics: Simulations"
+subtitle: "Fundamentals of Simulations in Data Science (Part of Research Module in Econometrics and Statistics)"
 author: Vladislav Morozov  
 format:
   revealjs:
@@ -22,7 +22,7 @@ format:
     transition-speed: fast
 slide-level: 4
 title-slide-attributes:
-    data-background-color: "#39225eff"
+    data-background-color: "#3c165cff"
     data-footer: " "
 filters:
   - reveal-header 
@@ -48,35 +48,168 @@ open-graph:
 - Email: <p style="font-family: 'Courier New', Courier, monospace;">morozov@uni-bonn.de</p>
 - I work on practical statistical methods with a focus on unobserved heterogeneity
 
+ 
 
-### This Course:   {background="#43464B"}
+### This Course {background="#43464B"}
 
+#### This Course and the Research Module
+
+This course 
 
 #### Why Simulate?
 
 #### What Do Simulations Involve?
 
-#### What You Have to Decide
+#### Why Learn Simulations?
 
-## Content and Motivation {background="#00100F"}
+## Course Logistics {background="#00100F"}
 
 
 ### Organization and Evaluations {background="#43464B"}
 
-#### Projects
+#### Course Format
+
+Two parts of class: 
+
+- Lectures on simulations: towards the beginning of the term
+- Project development: you work on the projects and we have group-level meetings
+
+. . .
+
+<br>
+
+Active questions encouraged! Also feel free to approach me after/before class or use office hours
+
+#### Meeting Times
+
+Class times:
+
+- Wednesdays 16:00-18:00, Room 0.042
+- Fridays 08:30-10:00, Room 0.042
+<br>
+
+<div class="rounded-box">
+
+Any modifications will be announced on eCampus and in class
+
+</div>
 
 
-### Materials {background="#43464B"}
+#### Evaluations
 
-#### 
+<div class="rounded-box">
 
-Not many good books on Monte Carlo
+Course grade is based on project
 
-#### Python References
+</div>
+
+- Project: creating, running and evaluating simulations for a given statistical method
+- Groups of $\leq 3$ people
+- Submittable materials: term paper, public presentation, simulation code
+- See course web for more details 
 
 
-#### For Project Inspiration
+
+### Materials for Simulations {background="#43464B"}
+
+#### On Simulations
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- Course designed to be self-contained regarding simulations
+- Very few books exist that discuss the topic
+- One exception: @Dormann2025StatisticsSimulationSynthetic
+
+:::
+
  
+::: {.column width="5%"}
+  
+
+:::
+
+
+::: {.column width="30%"}
+ 
+![](/images/book-covers/dormann.jpg)
+ 
+
+:::
+
+::::
+
+
+#### Books on Core Python and Git
+
+
+:::: {.columns}
+
+::: {.column width="30%"}
+
+![](/images/book-covers/lutz-2023.png)
+
+@Lutz2025LearningPythonPowerful
+
+
+:::
+
+::: {.column width="30%"}
+
+![](/images/book-covers/lau-2023.jpeg)
+
+@Lau2023LearningDataScience
+
+:::
+
+::: {.column width="30%"}
+
+![](/images/book-covers/skoulikari-2024.png)
+
+@Skoulikari2023LearningGitHandson
+
+:::
+
+::::
+
+
+#### Books For Project Inspiration
+
+
+:::: {.columns}
+
+
+::: {.column width="33%"}
+
+![](/images/book-covers/wager-2024.jpg)
+
+@Wager2024CausalInferenceStatistical
+ 
+:::
+
+::: {.column width="33%"}
+
+![](/images/book-covers/chernozhukov-2024.png)
+
+ 
+@Chernozhukov2024AppliedCausalInference
+
+:::
+
+::: {.column width="29%"}
+
+![](/images/book-covers/gaillac-2025.jpg)
+
+
+@Gaillac2025MachineLearningEconometrics
+
+:::
+
+
+
+:::: 
+
 #### References {.allowframebreaks visibility="uncounted"}
 
 ::: {#refs}
