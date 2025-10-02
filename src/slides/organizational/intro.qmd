@@ -22,7 +22,7 @@ format:
     transition-speed: fast
 slide-level: 4
 title-slide-attributes:
-    data-background-color: "#045D5D"
+    data-background-color: "#39225eff"
     data-footer: " "
 filters:
   - reveal-header 
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: "Course introduction f " 
+    description: "Course introduction " 
 ---
 
 
@@ -52,9 +52,30 @@ open-graph:
 ### This Course:   {background="#43464B"}
 
 
+#### Why Simulate?
+
+#### What Do Simulations Involve?
+
+#### What You Have to Decide
+
+## Content and Motivation {background="#00100F"}
+
+
+### Organization and Evaluations {background="#43464B"}
+
+#### Projects
+
+
+### Materials {background="#43464B"}
+
 #### 
 
-A 
+Not many good books on Monte Carlo
+
+#### Python References
+
+
+#### For Project Inspiration
  
 #### References {.allowframebreaks visibility="uncounted"}
 
