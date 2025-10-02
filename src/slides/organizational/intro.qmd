@@ -52,15 +52,72 @@ open-graph:
 
 ### This Course {background="#43464B"}
 
+
+
+#### Example Questions
+  
+Evaluating and using new statistical methods involves questions like  
+
+<div class="left-color">
+
+- How well does a new causal inference method estimate the effect of interest? 
+- Does an ML algorithm generalize well?
+- Is hypothesis test A more powerful than test B?
+- What is the real coverage of a nominally 95% confidence interval? 
+
+</div>
+
+#### Limits of Theory
+
+Sometimes can answer theoretically using some combination of
+
+- Non-asymptotic analysis
+- Parametric assumptions
+
+. . .
+
+But theory often not satisfactory (loose bounds, restrictive assumptions, intractable math)
+
+#### Place of Simulations
+
+
+<div class="rounded-box">
+
+Simulations offer the next best thing: can check every aspect of performance in controlled "lab" setting
+
+</div>
+
+
+- Using synthetic data: can control every part of data generating process
+- Synthetic data $\Rightarrow$ full knowledge of target quantities (esp. critical for causal methods)
+
+
+
+If data-generating process is chosen "well", informative about performance on real data
+ 
+
+
+
+
 #### This Course and the Research Module
 
-This course 
+This course — part of <span class="highlight">Research Module in Econometrics and Statistics</span>
 
-#### Why Simulate?
+- Preparation for writing a successful master's thesis in DS-adjacent topics (and beyond)
+- At Bonn Econ a "typical" MSc thesis in DS involves  simulations: critically evaluating an existing method (or a new method for more advanced theses)
 
-#### What Do Simulations Involve?
 
-#### Why Learn Simulations?
+<div class="left-color">
+
+Need to know how to write simulations
+ 
+</div>
+ 
+
+
+  
+#### Course Contents
+
 
 ## Course Logistics {background="#00100F"}
 
@@ -86,6 +143,7 @@ Class times:
 
 - Wednesdays 16:00-18:00, Room 0.042
 - Fridays 08:30-10:00, Room 0.042
+
 <br>
 
 <div class="rounded-box">
