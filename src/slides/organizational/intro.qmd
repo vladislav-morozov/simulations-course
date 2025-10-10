@@ -156,7 +156,7 @@ Class times:
 
 <div class="rounded-box">
 
-Any modifications will be announced on eCampus and in class
+Any modifications will be announced on eCampus
 
 </div>
 
@@ -185,7 +185,7 @@ Course grade is based on project
 ::: {.column width="50%"}
 
 - Course designed to be self-contained regarding simulations
-- Very few books exist that discuss the topic
+- In general, very few books discuss the topic
 - One exception: @Dormann2025StatisticsSimulationSynthetic
 
 :::
