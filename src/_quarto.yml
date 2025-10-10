@@ -36,6 +36,7 @@ website:
       - section: "Course Info"
         contents: 
         - slides/organizational/intro.qmd  
+        - project-info.qmd
 
 execute:
   freeze: auto  # re-render only when source changes
