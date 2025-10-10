@@ -16,7 +16,7 @@ diagram:
         - '\usetikzlibrary{arrows,shapes.arrows,shapes.geometric,shapes.multipart,decorations.pathmorphing,positioning,swigs}' 
 
 website:
-  title: "Simulations"
+  title: "Fundamentals of Simulations in Data Science"
   favicon: themes/favicon.ico
   site-url: https://vladislav-morozov.github.io/simulations-course/
   repo-url: https://github.com/vladislav-morozov/simulations-course/
