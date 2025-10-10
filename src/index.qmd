@@ -37,15 +37,36 @@ open-graph:
 
 ## Course Content
  
-  
-### Content 
+This course covers the following points:
 
-The course is structured as follows: 
- 
----
+- The role of simulations in evaluating statistical methods.
+- Principles of well-designed simulations:
+  - Theoretical foundations
+  - Best practices for implementation.
+- Context-specific applications:
+  - Evaluating confidence intervals and hypothesis tests.
+  - Assessing predictive algorithms.
+  - Evaluating causal estimators.
+
+This course is offered as a part of the Research Module in Econometrics and Statistics. 
  
 
 ## Course Materials
+
+### Simulations
+
+This course is self-contained with respect to simulations, and the lecture materials serve as the primary reference. For some further references and philosophical perspectives, one may also consult
+ 
+- Dormann, Carsten F., and Aaron M. Ellison. 2025. *Statistics by Simulation: A Synthetic Data Approach*. Princeton University Press.
+
+
+### Project Resources
+
+For the course project, students are encouraged to analyze methods at the level of modern advanced textbooks The choice of topic is flexible, subject to feasibility. The following texts may inspire project ideas:
+
+- Chernozhukov, Victor, Christian Hansen, Nathan Kallus, Martin Spindler, and Vasilis Syrgkanis. 2024. *Applied Causal Inference Powered by ML and AI.*
+- Gaillac, Christophe, and Jeremy L’Hour. 2025. *Machine Learning for Econometrics*. Oxford University Press.
+- Wager, Stefan. 2024. *Causal Inference: A Statistical Learning Approach*.
 
 
  
@@ -54,7 +75,13 @@ The course is structured as follows:
 
 ### Grading and Evaluation
 
-The final grade for this course is based on
+The course grade is based on the course project. Students will create, run, and evaluate simulations for a statistical method of their choice. Grading criteria include:
+
+- Rigorous interpretation and analysis of the simulation results,
+- Organization, replicability, and documentation of the simulation code,
+- Clarity of the public presentation and submitted project text.
+  
+
  
 ### Policies and Additional Information
 
@@ -63,7 +90,7 @@ Regular attendance and active participation are strongly encouraged.
 
 
 **Academic Integrity:**\
-Students must adhere to the university’s policies on academic integrity and plagiarism. Any violations will be subject to disciplinary action.
+Students must adhere to the university's policies on academic integrity and plagiarism. Any violations will be subject to disciplinary action.
 
 **Accommodations:**\
 If you require any accommodations due to a disability or other circumstances, please contact the relevant office as soon as possible.
