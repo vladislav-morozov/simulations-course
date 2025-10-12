@@ -13,7 +13,7 @@ format:
     incremental: true   
     logo: ../../themes/favicon.ico
     footer: "Course Introduction"
-    footer-logo-link: "https://vladislav-morozov.github.io/econometrics-2/"
+    footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
     theme: ../../themes/slides_theme.scss
     toc: TRUE
     toc-depth: 2
@@ -176,7 +176,7 @@ Course grade is based on project
 
 
 
-### Materials for Simulations {background="#43464B"}
+### Materials {background="#43464B"}
 
 #### On Simulations
 
@@ -269,6 +269,43 @@ Course grade is based on project
 
 
 @Gaillac2025MachineLearningEconometrics
+
+:::
+
+
+
+:::: 
+
+
+#### Resources for Writing and Presenting
+
+
+:::: {.columns}
+
+
+::: {.column width="33%"}
+ 
+Course project involves writing and presenting the results
+
+Check out @Nikolov2022WritingTipsEconomics
+ 
+:::
+
+::: {.column width="29%"}
+
+![](/images/book-covers/alley-2012.jpeg)
+
+ 
+@Alley2013CraftScientificPresentations
+
+:::
+
+::: {.column width="33%"}
+
+![](/images/book-covers/schimel-2013.jpg)
+
+
+@Schimel2012WritingScienceHow
 
 :::
 
