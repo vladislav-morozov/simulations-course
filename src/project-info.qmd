@@ -2,15 +2,20 @@
 description: "Information about the projects for the course on fundamentals of simulation in data science"
 open-graph:
     description: "Information about the projects for the course on fundamentals of simulation in data science" 
+format:
+    html:
+        toc: true
 ---
 
 
 # Course Project Information
  
 
-## About Project  
+## About the Project  
 
-The course project is the cornerstone of your learning experience in the research module. The project involves creating, running, and analyzing simulations to evaluate a given statistical method in a particular context.  The project is designed to help you develop three key skills:
+The course project is the cornerstone of your learning experience in this module. Its key objective is to evaluate a statistical method (or a set of related methods) through Monte Carlo simulations. Students are required to design, execute, and analyze simulations to assess the method's performance in a given context.
+
+The project is designed to help you develop three key skills:
 
 
 1. Designing and interpreting simulations to evaluate statistical methods.
@@ -18,6 +23,13 @@ The course project is the cornerstone of your learning experience in the researc
 3. Communicating findings effectively through writing and presentations.
 
 Your grade for the course will be based entirely on this project. For deadlines, group sign-ups, and submission details, please refer to eCampus.
+
+Broadly, the project involves the following key steps:
+
+- Method selection: choose a method 
+- Simulation design: develop and implement simulations to evaluate the method's properties (e.g., bias, variance, coverage, efficiency, model selection abilities, etc.) across relevant scenarios.
+- Analysis and interpretation: analyze simulation results and discuss their implications.
+- Documentation: produce a term paper and deliver a presentation, accompanied by fully reproducible code.
 
 ## Choosing a Topic
 
@@ -42,74 +54,45 @@ A strong project topic is specific and follows this pattern:
 
 A few simple examples to help explain the idea:
 
-1. Evaluating the @Callaway2021DifferenceinDifferencesMultipleTime estimator.
-    - *Question*: @Callaway2021DifferenceinDifferencesMultipleTime estimator is designed to estimate average treatment effects in settings with staggered treatment timing and heterogeneous effects. How does it perform in terms of bias and variance across different sample sizes and treatment effect distributions?
-    - *Approach*: simulate data with varying sample sizes, treatment effect heterogeneity, and treatment patterns. Tabulate bias, variance, and coverage rates.
 
-2. Efficiency Loss: Callaway and Sant’Anna vs. Two-Way Fixed Effects
-   - *Question:* In settings where the two-way fixed effects (TWFE) estimator is consistent, how much efficiency is lost by using the Callaway and Sant’Anna (2021) estimator instead?
-   - *Approach:* Design DGPs where TWFE is consistent (e.g., homogeneous treatment effects, no dynamic effects). Vary sample sizes, treatment effect distributions, and error structures to quantify efficiency trade-offs.
+<div style="border-left: 4px solid #3c165c; padding-left: 10px; margin-top: 10px; margin-bottom: 15px;">
 
-3. Bias in Cross-Validation for Model Selection
-   - *Question:* Cross-validation is the *de facto* standard for model selection in predictive settings, but it is inherently biased in finite samples. How large is this bias, and does it lead to meaningfully worse predictive performance?
-   - *Approach:* Simulate prediction tasks with varying signal-to-noise ratios, sample sizes, and model complexities. Compare cross-validation-based model selection to oracle benchmarks (e.g., selecting the true model).
+Evaluating the @Callaway2021DifferenceinDifferencesMultipleTime estimator.
+ 
+</div>
 
-two examples using difference-in-differences estimator @Callaway2021DifferenceinDifferencesMultipleTime.
+ 
+- *Question*: @Callaway2021DifferenceinDifferencesMultipleTime estimator is designed to estimate average treatment effects in settings with staggered treatment timing and heterogeneous effects. How does it perform in terms of bias and variance across different sample sizes and treatment effect distributions?
+- *Approach*: simulate data with varying sample sizes, treatment effect heterogeneity, and treatment patterns. Tabulate bias, variance, and coverage rates.
 
-1. The @Callaway2021DifferenceinDifferencesMultipleTime estimators is theoretically able to estimate suitable average treatment effects including in settings with staggered treatment and treatment effect heterogeneity. How well does it actually perform in terms of bias and  variance for a collection of sample sizes?  
-2. In some settings, the standard two-way fixed effects estimator can also recover suitable average effects. How large is the efficiency loss due to using @Callaway2021DifferenceinDifferencesMultipleTime vs. TWFE? Here one would consider several DGPs under which TWFE estimator is consistent, with varying sample sizes, distributions of treatment effects, etc.
-   
-Another question: cross-validation is the de facto standard way of doing model selection in prediction settings. However, cross-validation is inherently biased . The question is then how large can this bias be, and whether it leads to meaningfully worse performance.  
+<div style="border-left: 4px solid #3c165c; padding-left: 10px; margin-top: 10px; margin-bottom: 15px;">
+
+Efficiency Loss: @Callaway2021DifferenceinDifferencesMultipleTime vs. Two-Way Fixed Effects
+
+ 
+</div>
+
+- *Question:* In settings where the two-way fixed effects (TWFE) estimator is consistent, how much efficiency is lost by using the Callaway and Sant'Anna (2021) estimator instead?
+- *Approach:* Design DGPs where TWFE is consistent (e.g. no staggered adoption). Vary sample sizes, treatment effect distributions, and error structures to quantify efficiency trade-offs.
+
+
+<div style="border-left: 4px solid #3c165c; padding-left: 10px; margin-top: 10px; margin-bottom: 15px;">
+
+Bias in Cross-Validation for Model Selection
+
+</div>
+
+- *Question:* Cross-validation (CV) is the *de facto* standard for model selection in predictive settings. However, CV is inherently biased, as $K$-fold CV gives an unbiased estimator for the performance of the algorithm when faced with share $(K-1)/K$ of the training data. However, the final selected algorithm gets retrained on the full dataset. How large is the bias in risk, and does model selection based on biased risk estimates lead to meaningfully worse predictive performance?
+- *Approach:* Simulate prediction tasks with varying signal-to-noise ratios, sample sizes, and model complexities. For a given sample size $N$, compare cross-validation-based model selection based to selection based on a new validation sample of size $N$.
+ 
+
+
 
 
 
 
 ## Format
 
-Groups: You should work in groups of three students, which you will ideally form on your own.
-
-
-The term paper should be a maximum of 20 pages, excluding the bibliography and supplementary appendix. 
-	
-Note that 20 pages is not a target page count, but only an upper limit.
-
-The appendix may be used for long tables and additional figures.   
-
-Formatting: please use size 12 font, with one-half spacing and 2.5cm margins.
-
-The replication code should be submitted as a GitHub repository that contains all the code files necessary for a full replication, along with appropriate replication instructions. You may keep your repository private, just add me using my institutional email.
-
-## Grading Criteria
-
-The final grade for this class is determined by two components:
-
-- Presentation (30%),
-- Term paper and replication code (70%)
-
-
-
- 
-Evaluation criteria for the paper: 
-
-- Clear description of the method analyzed, with appropriate citations and description of context (25%).  Clearly describe the selected paper and its key contributions.
-- Organization, replicability, and documentation of the simulation code (25%).
-- Rigorous interpretation and analysis of the simulation results (25%)
-- Writing quality (25%) 
-
-The code should allow for easy replication.
-
-Grading criteria for the presentation:
-
-- Content understanding (60%): a comprehensive understanding of the method being evaluated, ability to motivate the simulations settings expressed
-- Clarity of Presentation (40%).	 Deliver the presentation in an organized and accessible manner, including legible slides.
-	 
-
-Here’s a polished, student-friendly version of your course project page, with improved clarity, structure, and sharper examples. I’ve also added some motivational language and practical tips to guide students.
-
- 
-  
-
-## Format and Submission
 ### Group Work
 - You will work in groups of three students. Form your groups independently, but notify the instructor if you need help finding teammates.
 
@@ -120,31 +103,27 @@ Here’s a polished, student-friendly version of your course project page, with 
 - Appendix: Use for long tables, additional figures, or supplementary material.
 
 ### Replication Code
-- Submit your code as a GitHub repository (private or public).
+
+- Submit your code as a GitHub repository (private or public). Add the instructor as a collaborator using their institutional email, if using a private repo.
 - Include all files necessary for full replication, along with a README with clear instructions.
-- Add the instructor as a collaborator using their institutional email.
 
----
-
+  
 ## Evaluation Criteria
 Your final grade will be based on two components:
 
 ### 1. Term Paper and Replication Code (70%)
 | Criteria                          | Weight | Details                                                                                     |
 |---------------------------------------|------------|-------------------------------------------------------------------------------------------------|
-| Method Description                | 25%        | Clearly describe the method, its context, and key contributions from the literature.           |
-| Code Organization and Replicability | 25%      | Code should be modular, well-documented, and easy to replicate.                               |
-| Analysis and Interpretation       | 25%        | Rigorously interpret simulation results. Discuss limitations and implications.                 |
-| Writing Quality                  | 25%        | Clarity, structure, and professionalism of the paper.                                         |
+| Method Description                | 15%        | Clearly describe the method, its context, and key contributions from the literature.           |
+| Writing Quality                  | 25%        | Write in a clear and structured manner. State explicitly what question your simulation project is answering.    |
+| Code Organization and Replicability | 25%      | Write modular, well-documented, and easy to replicate code.                               |
+| Simulation Design | 20%      |     Design data-generating processes that are informative and relevant to the question.      |
+| Analysis and Interpretation       | 15%        | Rigorously interpret simulation results. Discuss limitations and implications.                 |
 
 ### 2. Presentation (30%)
 | Criteria               | Weight | Details                                                                                     |
 |----------------------------|------------|-------------------------------------------------------------------------------------------------|
 | Content Understanding  | 60%        | Demonstrate a comprehensive understanding of the method and simulation design.               |
-| Clarity and Delivery   | 40%        | Present in an organized, accessible manner. Use legible slides and engage your audience.       |
+| Clarity and Delivery   | 40%        | Present in an organized, accessible manner. Use legible slides.   |
 
----
-### Additional Notes
-- Originality: While your question need not be novel, your analysis and interpretation should demonstrate independent thought.
-- Feedback: Drafts and early code submissions are encouraged for iterative feedback.
  

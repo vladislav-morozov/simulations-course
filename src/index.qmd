@@ -88,6 +88,7 @@ The course grade is based on the course project. Students will create, run, and 
 - Organization, replicability, and documentation of the simulation code,
 - Clarity of the public presentation and submitted project text.
   
+See the [course project page](project-info.html) for more detailed information.
 
  
 ### Policies and Additional Information
