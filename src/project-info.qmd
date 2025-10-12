@@ -1,2 +1,150 @@
-# Information Regarding Projects
+---
+description: "Information about the projects for the course on fundamentals of simulation in data science"
+open-graph:
+    description: "Information about the projects for the course on fundamentals of simulation in data science" 
+---
 
+
+# Course Project Information
+ 
+
+## About Project  
+
+The course project is the cornerstone of your learning experience in the research module. The project involves creating, running, and analyzing simulations to evaluate a given statistical method in a particular context.  The project is designed to help you develop three key skills:
+
+
+1. Designing and interpreting simulations to evaluate statistical methods.
+2. Organizing and sharing technical work in a reproducible and professional manner.
+3. Communicating findings effectively through writing and presentations.
+
+Your grade for the course will be based entirely on this project. For deadlines, group sign-ups, and submission details, please refer to eCampus.
+
+## Choosing a Topic
+
+### Scope
+
+The expected statistical level aligns with modern methods covered in advanced textbooks [e.g. @Chernozhukov2024AppliedCausalInference; @Gaillac2025MachineLearningEconometrics; @Wager2024CausalInferenceStatistical].  Projects based on recent papers are also welcome if they are feasible within the course timeframe.
+
+You are free to choose a topic from any branch of statistics:
+
+- Causal inference;
+- Prediction;
+- Inference.
+
+
+The question of your project does not have to be groundbreaking, as the emphasis is more on the technical soundness. However, I would still recommend trying more "modern" things, as these will likely provide more learning value and relevance to your future work.
+
+### What Makes a Good Topic?
+
+A strong project topic is specific and follows this pattern:
+
+> One (or more) method(s) are evaluated in one (or more) scenario(s) to answer a specific question.
+
+A few simple examples to help explain the idea:
+
+1. Evaluating the @Callaway2021DifferenceinDifferencesMultipleTime estimator.
+    - *Question*: @Callaway2021DifferenceinDifferencesMultipleTime estimator is designed to estimate average treatment effects in settings with staggered treatment timing and heterogeneous effects. How does it perform in terms of bias and variance across different sample sizes and treatment effect distributions?
+    - *Approach*: simulate data with varying sample sizes, treatment effect heterogeneity, and treatment patterns. Tabulate bias, variance, and coverage rates.
+
+2. Efficiency Loss: Callaway and Sant’Anna vs. Two-Way Fixed Effects
+   - *Question:* In settings where the two-way fixed effects (TWFE) estimator is consistent, how much efficiency is lost by using the Callaway and Sant’Anna (2021) estimator instead?
+   - *Approach:* Design DGPs where TWFE is consistent (e.g., homogeneous treatment effects, no dynamic effects). Vary sample sizes, treatment effect distributions, and error structures to quantify efficiency trade-offs.
+
+3. Bias in Cross-Validation for Model Selection
+   - *Question:* Cross-validation is the *de facto* standard for model selection in predictive settings, but it is inherently biased in finite samples. How large is this bias, and does it lead to meaningfully worse predictive performance?
+   - *Approach:* Simulate prediction tasks with varying signal-to-noise ratios, sample sizes, and model complexities. Compare cross-validation-based model selection to oracle benchmarks (e.g., selecting the true model).
+
+two examples using difference-in-differences estimator @Callaway2021DifferenceinDifferencesMultipleTime.
+
+1. The @Callaway2021DifferenceinDifferencesMultipleTime estimators is theoretically able to estimate suitable average treatment effects including in settings with staggered treatment and treatment effect heterogeneity. How well does it actually perform in terms of bias and  variance for a collection of sample sizes?  
+2. In some settings, the standard two-way fixed effects estimator can also recover suitable average effects. How large is the efficiency loss due to using @Callaway2021DifferenceinDifferencesMultipleTime vs. TWFE? Here one would consider several DGPs under which TWFE estimator is consistent, with varying sample sizes, distributions of treatment effects, etc.
+   
+Another question: cross-validation is the de facto standard way of doing model selection in prediction settings. However, cross-validation is inherently biased . The question is then how large can this bias be, and whether it leads to meaningfully worse performance.  
+
+
+
+
+## Format
+
+Groups: You should work in groups of three students, which you will ideally form on your own.
+
+
+The term paper should be a maximum of 20 pages, excluding the bibliography and supplementary appendix. 
+	
+Note that 20 pages is not a target page count, but only an upper limit.
+
+The appendix may be used for long tables and additional figures.   
+
+Formatting: please use size 12 font, with one-half spacing and 2.5cm margins.
+
+The replication code should be submitted as a GitHub repository that contains all the code files necessary for a full replication, along with appropriate replication instructions. You may keep your repository private, just add me using my institutional email.
+
+## Grading Criteria
+
+The final grade for this class is determined by two components:
+
+- Presentation (30%),
+- Term paper and replication code (70%)
+
+
+
+ 
+Evaluation criteria for the paper: 
+
+- Clear description of the method analyzed, with appropriate citations and description of context (25%).  Clearly describe the selected paper and its key contributions.
+- Organization, replicability, and documentation of the simulation code (25%).
+- Rigorous interpretation and analysis of the simulation results (25%)
+- Writing quality (25%) 
+
+The code should allow for easy replication.
+
+Grading criteria for the presentation:
+
+- Content understanding (60%): a comprehensive understanding of the method being evaluated, ability to motivate the simulations settings expressed
+- Clarity of Presentation (40%).	 Deliver the presentation in an organized and accessible manner, including legible slides.
+	 
+
+Here’s a polished, student-friendly version of your course project page, with improved clarity, structure, and sharper examples. I’ve also added some motivational language and practical tips to guide students.
+
+ 
+  
+
+## Format and Submission
+### Group Work
+- You will work in groups of three students. Form your groups independently, but notify the instructor if you need help finding teammates.
+
+### Term Paper
+- Length: Maximum 20 pages (excluding bibliography and appendix).
+  - *Note:* 20 pages is an upper limit, not a target. Focus on clarity and conciseness.
+- Formatting: Use 12pt font, 1.5-line spacing, and 2.5 cm margins.
+- Appendix: Use for long tables, additional figures, or supplementary material.
+
+### Replication Code
+- Submit your code as a GitHub repository (private or public).
+- Include all files necessary for full replication, along with a README with clear instructions.
+- Add the instructor as a collaborator using their institutional email.
+
+---
+
+## Evaluation Criteria
+Your final grade will be based on two components:
+
+### 1. Term Paper and Replication Code (70%)
+| Criteria                          | Weight | Details                                                                                     |
+|---------------------------------------|------------|-------------------------------------------------------------------------------------------------|
+| Method Description                | 25%        | Clearly describe the method, its context, and key contributions from the literature.           |
+| Code Organization and Replicability | 25%      | Code should be modular, well-documented, and easy to replicate.                               |
+| Analysis and Interpretation       | 25%        | Rigorously interpret simulation results. Discuss limitations and implications.                 |
+| Writing Quality                  | 25%        | Clarity, structure, and professionalism of the paper.                                         |
+
+### 2. Presentation (30%)
+| Criteria               | Weight | Details                                                                                     |
+|----------------------------|------------|-------------------------------------------------------------------------------------------------|
+| Content Understanding  | 60%        | Demonstrate a comprehensive understanding of the method and simulation design.               |
+| Clarity and Delivery   | 40%        | Present in an organized, accessible manner. Use legible slides and engage your audience.       |
+
+---
+### Additional Notes
+- Originality: While your question need not be novel, your analysis and interpretation should demonstrate independent thought.
+- Feedback: Drafts and early code submissions are encouraged for iterative feedback.
+ 
