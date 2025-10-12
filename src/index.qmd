@@ -68,8 +68,15 @@ For the course project, students are encouraged to analyze methods at the level 
 - Gaillac, Christophe, and Jeremy L’Hour. 2025. *Machine Learning for Econometrics*. Oxford University Press.
 - Wager, Stefan. 2024. *Causal Inference: A Statistical Learning Approach*.
 
-
+### Resources on Writing and Presenting
  
+The course project requires students to document their findings in a term paper and present their results effectively. The following resources provide guidance on scientific writing and presentation skills:
+
+- Alley, Michael. 2013. *The Craft of Scientific Presentations: Critical Steps to Succeeed and Critical Errors to Avoid*. 2. ed. Springer.
+- Nikolov, Plamen. 2022. *Writing Tips for Economics Research Papers:  2021-2022 Edition*. <https://doi.org/10.2139/ssrn.4114601>
+- Schimel, Joshua, ed. 2012. *Writing Science: How to Write Papers That Get Cited and Proposals That Get Funded*. Oxford University Press.
+
+
 ## Course Policies
 
 
