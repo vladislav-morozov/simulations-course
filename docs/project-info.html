@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Information about the projects for the course on fundamentals of simulation in data science">
+
+<title>project-info – Fundamentals of Monte Carlo Simulations in Data Science</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./themes/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b53751a350365c71b6c909e95f209ed1.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-e647bac8fba83950dd207c17bf1cc1fe.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-a227ec85e9f4d458351ec4f87195351c.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+ 
+<!-- This is what works with Quarto and MathJax 3+ -->
+<script>
+  MathJax = {
+    tex: {
+      tags: 'ams',  // should be 'ams', 'none', or 'all'
+      macros: {
+        vect: ["\\mathbf{#1}", 1],
+        mat: ["\\mathbf{#1}", 1], 
+
+        bA: "\\boldsymbol{A}",
+        bB: "\\boldsymbol{B}",
+        bC: "\\boldsymbol{C}",
+        bD: "\\boldsymbol{D}",
+        bE: "\\boldsymbol{E}",
+        bF: "\\boldsymbol{F}",
+        bG: "\\boldsymbol{G}",
+        bH: "\\boldsymbol{H}",
+        bI: "\\boldsymbol{I}",
+        bJ: "\\boldsymbol{J}",
+        bK: "\\boldsymbol{K}",
+        bL: "\\boldsymbol{L}",
+        bM: "\\boldsymbol{M}",
+        bN: "\\boldsymbol{N}",
+        bP: "\\boldsymbol{P}",
+        bQ: "\\boldsymbol{Q}",
+        bR: "\\boldsymbol{R}",
+        bS: "\\boldsymbol{S}",
+        bT: "\\boldsymbol{T}",
+        bU: "\\boldsymbol{U}",
+        bV: "\\boldsymbol{V}",
+        bW: "\\boldsymbol{W}",
+        bX: "\\boldsymbol{X}",
+        bY: "\\boldsymbol{Y}",
+        bZ: "\\boldsymbol{Z}",
+        ba: "\\boldsymbol{a}",
+        bb: "\\boldsymbol{b}",
+        bc: "\\boldsymbol{c}",
+        bd: "\\boldsymbol{d}",
+        be: "\\boldsymbol{e}",
+        bg: "\\boldsymbol{g}",
+        bh: "\\boldsymbol{h}",
+        bi: "\\boldsymbol{\\imath}",
+        bm: "\\boldsymbol{m}",
+        bp: "\\boldsymbol{p}",
+        bq: "\\boldsymbol{q}",
+        br: "\\boldsymbol{r}",
+        bs: "\\boldsymbol{s}",
+        bt: "\\boldsymbol{t}",
+        bu: "\\boldsymbol{u}",
+        bv: "\\boldsymbol{v}",
+        bw: "\\boldsymbol{w}",
+        bx: "\\boldsymbol{x}",
+        by: "\\boldsymbol{y}",
+
+        Acal: "\\mathcal{A}",
+        Bcal: "\\mathcal{B}",
+        Ccal: "\\mathcal{C}",
+        Dcal: "\\mathcal{D}",
+        Ecal: "\\mathcal{E}",
+        Fcal: "\\mathcal{F}",
+        Gcal: "\\mathcal{G}",
+        Hcal: "\\mathcal{H}",
+        Ical: "\\mathcal{I}",
+        Jcal: "\\mathcal{J}",
+        Kcal: "\\mathcal{K}",
+        Lcal: "\\mathcal{L}",
+        Mcal: "\\mathcal{M}",
+        Ncal: "\\mathcal{N}",
+        Ocal: "\\mathcal{O}",
+        Pcal: "\\mathcal{P}",
+        Qcal: "\\mathcal{Q}",
+        Rcal: "\\mathcal{R}",
+        Scal: "\\mathcal{S}",
+        Tcal: "\\mathcal{T}",
+        Ucal: "\\mathcal{U}",
+        Vcal: "\\mathcal{V}",
+        Wcal: "\\mathcal{W}",
+        Xcal: "\\mathcal{X}",
+        Ycal: "\\mathcal{Y}",
+        Zcal: "\\mathcal{Z}",
+
+        A: "\\mathbb{A}",
+        B: "\\mathbb{B}",
+        C: "\\mathbb{C}",
+        D: "\\mathbb{D}",
+        E: "\\mathbb{E}",
+        F: "\\mathbb{F}",
+        G: "\\mathbb{G}",
+        H: "\\mathbb{H}",
+        I: "\\mathbb{I}",
+        J: "\\mathbb{J}",
+        K: "\\mathbb{K}",
+        L: "\\mathbb{L}",
+        M: "\\mathbb{M}",
+        N: "\\mathbb{N}",
+        O: "\\mathbb{O}",
+        P: "\\mathbb{P}",
+        Q: "\\mathbb{Q}",
+        R: "\\mathbb{R}",
+        S: "\\mathbb{S}",
+        T: "\\mathbb{T}",
+        U: "\\mathbb{U}",
+        V: "\\mathbb{V}",
+        W: "\\mathbb{W}",
+        X: "\\mathbb{X}",
+        Y: "\\mathbb{Y}",
+        Z: "\\mathbb{Z}",
+
+        bAlpha: "\\boldsymbol{\\Alpha}",
+        bBeta: "\\boldsymbol{\\beta}",
+        bDelta: "\\boldsymbol{\\delta}",
+        bEta: "\\boldsymbol{\\eta}",
+        bGamma: "\\boldsymbol{\\Gamma}",
+        bLambda: "\\boldsymbol{\\Lambda}",
+        bOmega: "\\boldsymbol{\\Omega}",
+        bPhi: "\\boldsymbol{\\Phi}",
+        bPi: "\\boldsymbol{\\Pi}",
+        bPsi: "\\boldsymbol{\\Psi}",
+        bSigma: "\\boldsymbol{\\Sigma}",
+        bTau: "\\boldsymbol{\\tau}",
+        bXi: "\\boldsymbol{\\Xi}",
+        bbeta: "\\boldsymbol{\\beta}",
+        bdelta: "\\boldsymbol{\\delta}",
+        blambda: "\\boldsymbol{\\lambda}",
+        bmu: "\\boldsymbol{\\mu}",
+        bphi: "\\boldsymbol{\\phi}",
+        bpi: "\\boldsymbol{\\pi}",
+        bpsi: "\\boldsymbol{\\psi}",
+        brho: "\\boldsymbol{\\rho}",
+        balpha: "\\boldsymbol{\\alpha}",
+        bsigma: "\\boldsymbol{\\sigma}",
+        btau: "\\boldsymbol{\\tau}",
+        bxi: "\\boldsymbol{\\xi}",
+        bEta: "\\boldsymbol{\\eta}",
+        bPhi: "\\boldsymbol{\\Phi}",
+        bPi: "\\boldsymbol{\\Pi}",
+        bPsi: "\\boldsymbol{\\Psi}",
+        bXi: "\\boldsymbol{\\Xi}",
+        blambda: "\\boldsymbol{\\lambda}",
+        bmu: "\\boldsymbol{\\mu}",
+        bphi: "\\boldsymbol{\\phi}",
+        bpi: "\\boldsymbol{\\pi}",
+        bpsi: "\\boldsymbol{\\psi}",
+        brho: "\\boldsymbol{\\rho}",
+        bsigma: "\\boldsymbol{\\sigma}",
+        btheta: "\\boldsymbol{\\theta}",
+        bgamma: "\\boldsymbol{\\gamma}",  
+        
+        curl: ["\\left\\lbrace#1\\right\\rbrace", 1],
+        floor: ["\\left\\lfloor#1\\right\\rfloor", 1],
+        ceil: ["\\left\\lceil#1\\right\\rceil", 1],
+        abs: ["\\left\\lvert#1\\right\\rvert", 1],
+        norm: ["\\left\\lVert#1\\right\\rVert", 1],
+
+        avar: "\\mathrm{avar}",
+        var: "\\mathrm{var}",
+        cov: "\\mathrm{cov}",
+
+        argmin: "\\operatorname*{argmin}",
+        argmax: "\\operatorname*{argmax}",
+        argsup: "\\operatorname*{argsup}",
+        arginf: "\\operatorname*{arginf}",
+      }
+    }
+  };
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Fundamentals of Monte Carlo Simulations in Data Science">
+<meta property="og:description" content="Information about the projects for the course on fundamentals of simulation in data science">
+<meta property="og:site_name" content="Fundamentals of Monte Carlo Simulations in Data Science">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./slides/organizational/intro.html">Course Info</a></li><li class="breadcrumb-item"><a href="./project-info.html">Course Project Information</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Fundamentals of Monte Carlo Simulations in Data Science</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://vladislav-morozov.github.io/" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-person-arms-up"></i></a>
+    <a href="https://github.com/vladislav-morozov/" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+    <a href="https://www.linkedin.com/in/vladislavvmorozov/" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-linkedin"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Course Info</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./slides/organizational/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Course Introduction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./project-info.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Course Project Information</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#course-project-information" id="toc-course-project-information" class="nav-link active" data-scroll-target="#course-project-information">Course Project Information</a>
+  <ul class="collapse">
+  <li><a href="#about-the-project" id="toc-about-the-project" class="nav-link" data-scroll-target="#about-the-project">About the Project</a></li>
+  <li><a href="#choosing-a-topic" id="toc-choosing-a-topic" class="nav-link" data-scroll-target="#choosing-a-topic">Choosing a Topic</a>
+  <ul class="collapse">
+  <li><a href="#scope" id="toc-scope" class="nav-link" data-scroll-target="#scope">Scope</a></li>
+  <li><a href="#what-makes-a-good-topic" id="toc-what-makes-a-good-topic" class="nav-link" data-scroll-target="#what-makes-a-good-topic">What Makes a Good Topic?</a></li>
+  </ul></li>
+  <li><a href="#format" id="toc-format" class="nav-link" data-scroll-target="#format">Format</a>
+  <ul class="collapse">
+  <li><a href="#group-work" id="toc-group-work" class="nav-link" data-scroll-target="#group-work">Group Work</a></li>
+  <li><a href="#term-paper" id="toc-term-paper" class="nav-link" data-scroll-target="#term-paper">Term Paper</a></li>
+  <li><a href="#replication-code" id="toc-replication-code" class="nav-link" data-scroll-target="#replication-code">Replication Code</a></li>
+  </ul></li>
+  <li><a href="#evaluation-criteria" id="toc-evaluation-criteria" class="nav-link" data-scroll-target="#evaluation-criteria">Evaluation Criteria</a>
+  <ul class="collapse">
+  <li><a href="#term-paper-and-replication-code-70" id="toc-term-paper-and-replication-code-70" class="nav-link" data-scroll-target="#term-paper-and-replication-code-70">1. Term Paper and Replication Code (70%)</a></li>
+  <li><a href="#presentation-30" id="toc-presentation-30" class="nav-link" data-scroll-target="#presentation-30">2. Presentation (30%)</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/vladislav-morozov/simulations-course/edit/main/src/project-info.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/vladislav-morozov/simulations-course/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./slides/organizational/intro.html">Course Info</a></li><li class="breadcrumb-item"><a href="./project-info.html">Course Project Information</a></li></ol></nav></header>
+
+
+
+
+<section id="course-project-information" class="level1">
+<h1>Course Project Information</h1>
+<section id="about-the-project" class="level2">
+<h2 class="anchored" data-anchor-id="about-the-project">About the Project</h2>
+<p>The course project is the cornerstone of your learning experience in this module. Its key objective is to evaluate a statistical method (or a set of related methods) through Monte Carlo simulations. Students are required to design, execute, and analyze simulations to assess the method’s performance in a given context.</p>
+<p>The project is designed to help you develop three key skills:</p>
+<ol type="1">
+<li>Designing and interpreting simulations to evaluate statistical methods.</li>
+<li>Organizing and sharing technical work in a reproducible and professional manner.</li>
+<li>Communicating findings effectively through writing and presentations.</li>
+</ol>
+<p>Your grade for the course will be based entirely on this project. For deadlines, group sign-ups, and submission details, please refer to eCampus.</p>
+<p>Broadly, the project involves the following key steps:</p>
+<ul>
+<li>Method selection: choose a method</li>
+<li>Simulation design: develop and implement simulations to evaluate the method’s properties (e.g., bias, variance, coverage, efficiency, model selection abilities, etc.) across relevant scenarios.</li>
+<li>Analysis and interpretation: analyze simulation results and discuss their implications.</li>
+<li>Documentation: produce a term paper and deliver a presentation, accompanied by fully reproducible code.</li>
+</ul>
+</section>
+<section id="choosing-a-topic" class="level2">
+<h2 class="anchored" data-anchor-id="choosing-a-topic">Choosing a Topic</h2>
+<section id="scope" class="level3">
+<h3 class="anchored" data-anchor-id="scope">Scope</h3>
+<p>The expected statistical level aligns with modern methods covered in advanced textbooks <span class="citation" data-cites="Chernozhukov2024AppliedCausalInference Gaillac2025MachineLearningEconometrics Wager2024CausalInferenceStatistical">(e.g. <a href="#ref-Chernozhukov2024AppliedCausalInference" role="doc-biblioref">Chernozhukov et al. 2024</a>; <a href="#ref-Gaillac2025MachineLearningEconometrics" role="doc-biblioref">Gaillac and L’Hour 2025</a>; <a href="#ref-Wager2024CausalInferenceStatistical" role="doc-biblioref">Wager 2024</a>)</span>. Projects based on recent papers are also welcome if they are feasible within the course timeframe.</p>
+<p>You are free to choose a topic from any branch of statistics:</p>
+<ul>
+<li>Causal inference;</li>
+<li>Prediction;</li>
+<li>Inference.</li>
+</ul>
+<p>The question of your project does not have to be groundbreaking, as the emphasis is more on the technical soundness. However, I would still recommend trying more “modern” things, as these will likely provide more learning value and relevance to your future work.</p>
+</section>
+<section id="what-makes-a-good-topic" class="level3">
+<h3 class="anchored" data-anchor-id="what-makes-a-good-topic">What Makes a Good Topic?</h3>
+<p>A strong project topic is specific and follows this pattern:</p>
+<blockquote class="blockquote">
+<p>One (or more) method(s) are evaluated in one (or more) scenario(s) to answer a specific question.</p>
+</blockquote>
+<p>A few simple examples to help explain the idea:</p>
+<div style="border-left: 4px solid #3c165c; padding-left: 10px; margin-top: 10px; margin-bottom: 15px;">
+<p>Evaluating the <span class="citation" data-cites="Callaway2021DifferenceinDifferencesMultipleTime">Callaway and Sant’Anna (<a href="#ref-Callaway2021DifferenceinDifferencesMultipleTime" role="doc-biblioref">2021</a>)</span> estimator.</p>
+</div>
+<ul>
+<li><em>Question</em>: <span class="citation" data-cites="Callaway2021DifferenceinDifferencesMultipleTime">Callaway and Sant’Anna (<a href="#ref-Callaway2021DifferenceinDifferencesMultipleTime" role="doc-biblioref">2021</a>)</span> estimator is designed to estimate average treatment effects in settings with staggered treatment timing and heterogeneous effects. How does it perform in terms of bias and variance across different sample sizes and treatment effect distributions?</li>
+<li><em>Approach</em>: simulate data with varying sample sizes, treatment effect heterogeneity, and treatment patterns. Tabulate bias, variance, and coverage rates.</li>
+</ul>
+<div style="border-left: 4px solid #3c165c; padding-left: 10px; margin-top: 10px; margin-bottom: 15px;">
+<p>Efficiency Loss: <span class="citation" data-cites="Callaway2021DifferenceinDifferencesMultipleTime">Callaway and Sant’Anna (<a href="#ref-Callaway2021DifferenceinDifferencesMultipleTime" role="doc-biblioref">2021</a>)</span> vs.&nbsp;Two-Way Fixed Effects</p>
+</div>
+<ul>
+<li><em>Question:</em> In settings where the two-way fixed effects (TWFE) estimator is consistent, how much efficiency is lost by using the Callaway and Sant’Anna (2021) estimator instead?</li>
+<li><em>Approach:</em> Design DGPs where TWFE is consistent (e.g.&nbsp;no staggered adoption). Vary sample sizes, treatment effect distributions, and error structures to quantify efficiency trade-offs.</li>
+</ul>
+<div style="border-left: 4px solid #3c165c; padding-left: 10px; margin-top: 10px; margin-bottom: 15px;">
+<p>Bias in Cross-Validation for Model Selection</p>
+</div>
+<ul>
+<li><em>Question:</em> Cross-validation (CV) is the <em>de facto</em> standard for model selection in predictive settings. However, CV is inherently biased, as <span class="math inline">\(K\)</span>-fold CV gives an unbiased estimator for the performance of the algorithm when faced with share <span class="math inline">\((K-1)/K\)</span> of the training data. However, the final selected algorithm gets retrained on the full dataset. How large is the bias in risk, and does model selection based on biased risk estimates lead to meaningfully worse predictive performance?</li>
+<li><em>Approach:</em> Simulate prediction tasks with varying signal-to-noise ratios, sample sizes, and model complexities. For a given sample size <span class="math inline">\(N\)</span>, compare cross-validation-based model selection based to selection based on a new validation sample of size <span class="math inline">\(N\)</span>.</li>
+</ul>
+</section>
+</section>
+<section id="format" class="level2">
+<h2 class="anchored" data-anchor-id="format">Format</h2>
+<section id="group-work" class="level3">
+<h3 class="anchored" data-anchor-id="group-work">Group Work</h3>
+<ul>
+<li>You will work in groups of three students. Form your groups independently, but notify the instructor if you need help finding teammates.</li>
+</ul>
+</section>
+<section id="term-paper" class="level3">
+<h3 class="anchored" data-anchor-id="term-paper">Term Paper</h3>
+<ul>
+<li>Length: Maximum 20 pages (excluding bibliography and appendix).
+<ul>
+<li><em>Note:</em> 20 pages is an upper limit, not a target. Focus on clarity and conciseness.</li>
+</ul></li>
+<li>Formatting: Use 12pt font, 1.5-line spacing, and 2.5 cm margins.</li>
+<li>Appendix: Use for long tables, additional figures, or supplementary material.</li>
+</ul>
+</section>
+<section id="replication-code" class="level3">
+<h3 class="anchored" data-anchor-id="replication-code">Replication Code</h3>
+<ul>
+<li>Submit your code as a GitHub repository (private or public). Add the instructor as a collaborator using their institutional email, if using a private repo.</li>
+<li>Include all files necessary for full replication, along with a README with clear instructions.</li>
+</ul>
+</section>
+</section>
+<section id="evaluation-criteria" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-criteria">Evaluation Criteria</h2>
+<p>Your final grade will be based on two components:</p>
+<section id="term-paper-and-replication-code-70" class="level3">
+<h3 class="anchored" data-anchor-id="term-paper-and-replication-code-70">1. Term Paper and Replication Code (70%)</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 8%">
+<col style="width: 65%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Criteria</th>
+<th>Weight</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Method Description</td>
+<td>15%</td>
+<td>Clearly describe the method, its context, and key contributions from the literature.</td>
+</tr>
+<tr class="even">
+<td>Writing Quality</td>
+<td>25%</td>
+<td>Write in a clear and structured manner. State explicitly what question your simulation project is answering.</td>
+</tr>
+<tr class="odd">
+<td>Code Organization and Replicability</td>
+<td>25%</td>
+<td>Write modular, well-documented, and easy to replicate code.</td>
+</tr>
+<tr class="even">
+<td>Simulation Design</td>
+<td>20%</td>
+<td>Design data-generating processes that are informative and relevant to the question.</td>
+</tr>
+<tr class="odd">
+<td>Analysis and Interpretation</td>
+<td>15%</td>
+<td>Rigorously interpret simulation results. Discuss limitations and implications.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="presentation-30" class="level3">
+<h3 class="anchored" data-anchor-id="presentation-30">2. Presentation (30%)</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 8%">
+<col style="width: 70%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Criteria</th>
+<th>Weight</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Content Understanding</td>
+<td>60%</td>
+<td>Demonstrate a comprehensive understanding of the method and simulation design.</td>
+</tr>
+<tr class="even">
+<td>Clarity and Delivery</td>
+<td>40%</td>
+<td>Present in an organized, accessible manner. Use legible slides.</td>
+</tr>
+</tbody>
+</table>
+
+
+
+</section>
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Callaway2021DifferenceinDifferencesMultipleTime" class="csl-entry" role="listitem">
+Callaway, Brantly, and Pedro H. C. Sant’Anna. 2021. <span>“Difference-in-<span>Differences With Multiple Time Periods</span>.”</span> <em>Journal of Econometrics</em> 225 (2): 200–230. <a href="https://doi.org/10.1016/j.jeconom.2020.12.001">https://doi.org/10.1016/j.jeconom.2020.12.001</a>.
+</div>
+<div id="ref-Chernozhukov2024AppliedCausalInference" class="csl-entry" role="listitem">
+Chernozhukov, Victor, Christian Hansen, Nathan Kallus, Martin Spindler, and Vasilis Syrgkanis. 2024. <span>“Applied <span>Causal Inference Powered</span> by <span>ML</span> and <span>AI</span>.”</span> arXiv. <a href="https://doi.org/10.48550/arXiv.2403.02467">https://doi.org/10.48550/arXiv.2403.02467</a>.
+</div>
+<div id="ref-Gaillac2025MachineLearningEconometrics" class="csl-entry" role="listitem">
+Gaillac, Christophe, and Jeremy L’Hour. 2025. <em>Machine <span>Learning</span> for <span>Econometrics</span></em>. Oxford University Press: Oxford.
+</div>
+<div id="ref-Wager2024CausalInferenceStatistical" class="csl-entry" role="listitem">
+Wager, Stefan. 2024. <em>Causal <span>Inference</span>: <span>A Statistical Learning Approach</span></em>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/vladislav-morozov\.github\.io\/simulations-course\/");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/vladislav-morozov/simulations-course/edit/main/src/project-info.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/vladislav-morozov/simulations-course/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>

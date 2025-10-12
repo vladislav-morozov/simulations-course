@@ -1,0 +1,129 @@
+---
+description: "Information about the projects for the course on fundamentals of simulation in data science"
+open-graph:
+    description: "Information about the projects for the course on fundamentals of simulation in data science" 
+format:
+    html:
+        toc: true
+---
+
+
+# Course Project Information
+ 
+
+## About the Project  
+
+The course project is the cornerstone of your learning experience in this module. Its key objective is to evaluate a statistical method (or a set of related methods) through Monte Carlo simulations. Students are required to design, execute, and analyze simulations to assess the method's performance in a given context.
+
+The project is designed to help you develop three key skills:
+
+
+1. Designing and interpreting simulations to evaluate statistical methods.
+2. Organizing and sharing technical work in a reproducible and professional manner.
+3. Communicating findings effectively through writing and presentations.
+
+Your grade for the course will be based entirely on this project. For deadlines, group sign-ups, and submission details, please refer to eCampus.
+
+Broadly, the project involves the following key steps:
+
+- Method selection: choose a method 
+- Simulation design: develop and implement simulations to evaluate the method's properties (e.g., bias, variance, coverage, efficiency, model selection abilities, etc.) across relevant scenarios.
+- Analysis and interpretation: analyze simulation results and discuss their implications.
+- Documentation: produce a term paper and deliver a presentation, accompanied by fully reproducible code.
+
+## Choosing a Topic
+
+### Scope
+
+The expected statistical level aligns with modern methods covered in advanced textbooks [e.g. @Chernozhukov2024AppliedCausalInference; @Gaillac2025MachineLearningEconometrics; @Wager2024CausalInferenceStatistical].  Projects based on recent papers are also welcome if they are feasible within the course timeframe.
+
+You are free to choose a topic from any branch of statistics:
+
+- Causal inference;
+- Prediction;
+- Inference.
+
+
+The question of your project does not have to be groundbreaking, as the emphasis is more on the technical soundness. However, I would still recommend trying more "modern" things, as these will likely provide more learning value and relevance to your future work.
+
+### What Makes a Good Topic?
+
+A strong project topic is specific and follows this pattern:
+
+> One (or more) method(s) are evaluated in one (or more) scenario(s) to answer a specific question.
+
+A few simple examples to help explain the idea:
+
+
+<div style="border-left: 4px solid #3c165c; padding-left: 10px; margin-top: 10px; margin-bottom: 15px;">
+
+Evaluating the @Callaway2021DifferenceinDifferencesMultipleTime estimator.
+ 
+</div>
+
+ 
+- *Question*: @Callaway2021DifferenceinDifferencesMultipleTime estimator is designed to estimate average treatment effects in settings with staggered treatment timing and heterogeneous effects. How does it perform in terms of bias and variance across different sample sizes and treatment effect distributions?
+- *Approach*: simulate data with varying sample sizes, treatment effect heterogeneity, and treatment patterns. Tabulate bias, variance, and coverage rates.
+
+<div style="border-left: 4px solid #3c165c; padding-left: 10px; margin-top: 10px; margin-bottom: 15px;">
+
+Efficiency Loss: @Callaway2021DifferenceinDifferencesMultipleTime vs. Two-Way Fixed Effects
+
+ 
+</div>
+
+- *Question:* In settings where the two-way fixed effects (TWFE) estimator is consistent, how much efficiency is lost by using the Callaway and Sant'Anna (2021) estimator instead?
+- *Approach:* Design DGPs where TWFE is consistent (e.g. no staggered adoption). Vary sample sizes, treatment effect distributions, and error structures to quantify efficiency trade-offs.
+
+
+<div style="border-left: 4px solid #3c165c; padding-left: 10px; margin-top: 10px; margin-bottom: 15px;">
+
+Bias in Cross-Validation for Model Selection
+
+</div>
+
+- *Question:* Cross-validation (CV) is the *de facto* standard for model selection in predictive settings. However, CV is inherently biased, as $K$-fold CV gives an unbiased estimator for the performance of the algorithm when faced with share $(K-1)/K$ of the training data. However, the final selected algorithm gets retrained on the full dataset. How large is the bias in risk, and does model selection based on biased risk estimates lead to meaningfully worse predictive performance?
+- *Approach:* Simulate prediction tasks with varying signal-to-noise ratios, sample sizes, and model complexities. For a given sample size $N$, compare cross-validation-based model selection based to selection based on a new validation sample of size $N$.
+ 
+
+
+
+
+
+
+## Format
+
+### Group Work
+- You will work in groups of three students. Form your groups independently, but notify the instructor if you need help finding teammates.
+
+### Term Paper
+- Length: Maximum 20 pages (excluding bibliography and appendix).
+  - *Note:* 20 pages is an upper limit, not a target. Focus on clarity and conciseness.
+- Formatting: Use 12pt font, 1.5-line spacing, and 2.5 cm margins.
+- Appendix: Use for long tables, additional figures, or supplementary material.
+
+### Replication Code
+
+- Submit your code as a GitHub repository (private or public). Add the instructor as a collaborator using their institutional email, if using a private repo.
+- Include all files necessary for full replication, along with a README with clear instructions.
+
+  
+## Evaluation Criteria
+Your final grade will be based on two components:
+
+### 1. Term Paper and Replication Code (70%)
+| Criteria                          | Weight | Details                                                                                     |
+|---------------------------------------|------------|-------------------------------------------------------------------------------------------------|
+| Method Description                | 15%        | Clearly describe the method, its context, and key contributions from the literature.           |
+| Writing Quality                  | 25%        | Write in a clear and structured manner. State explicitly what question your simulation project is answering.    |
+| Code Organization and Replicability | 25%      | Write modular, well-documented, and easy to replicate code.                               |
+| Simulation Design | 20%      |     Design data-generating processes that are informative and relevant to the question.      |
+| Analysis and Interpretation       | 15%        | Rigorously interpret simulation results. Discuss limitations and implications.                 |
+
+### 2. Presentation (30%)
+| Criteria               | Weight | Details                                                                                     |
+|----------------------------|------------|-------------------------------------------------------------------------------------------------|
+| Content Understanding  | 60%        | Demonstrate a comprehensive understanding of the method and simulation design.               |
+| Clarity and Delivery   | 40%        | Present in an organized, accessible manner. Use legible slides.   |
+
+ 

@@ -4,7 +4,7 @@ open-graph:
     description: "This course covers the basics of writing and evaluating Monte Carlo simulations in data science: best practices, Python implementations" 
 ---
 
-# Fundamentals of Simulations in Data Science
+# Fundamentals of Monte Carlo Simulations in Data Science
 
 
 
@@ -62,14 +62,21 @@ This course is self-contained with respect to simulations, and the lecture mater
 
 ### Project Resources
 
-For the course project, students are encouraged to analyze methods at the level of modern advanced textbooks The choice of topic is flexible, subject to feasibility. The following texts may inspire project ideas:
+For the course project, students are encouraged to analyze methods at the level of modern advanced textbooks. The choice of topic is flexible, subject to feasibility. The following texts may inspire project ideas:
 
 - Chernozhukov, Victor, Christian Hansen, Nathan Kallus, Martin Spindler, and Vasilis Syrgkanis. 2024. *Applied Causal Inference Powered by ML and AI.*
 - Gaillac, Christophe, and Jeremy L’Hour. 2025. *Machine Learning for Econometrics*. Oxford University Press.
 - Wager, Stefan. 2024. *Causal Inference: A Statistical Learning Approach*.
 
-
+### Resources on Writing and Presenting
  
+The course project requires students to document their findings in a term paper and present their results effectively. The following resources provide guidance on scientific writing and presentation skills:
+
+- Alley, Michael. 2013. *The Craft of Scientific Presentations: Critical Steps to Succeeed and Critical Errors to Avoid*. 2. ed. Springer.
+- Nikolov, Plamen. 2022. *Writing Tips for Economics Research Papers:  2021-2022 Edition*. <https://doi.org/10.2139/ssrn.4114601>
+- Schimel, Joshua, ed. 2012. *Writing Science: How to Write Papers That Get Cited and Proposals That Get Funded*. Oxford University Press.
+
+
 ## Course Policies
 
 
@@ -81,6 +88,7 @@ The course grade is based on the course project. Students will create, run, and 
 - Organization, replicability, and documentation of the simulation code,
 - Clarity of the public presentation and submitted project text.
   
+See the [course project page](project-info.html) for more detailed information.
 
  
 ### Policies and Additional Information

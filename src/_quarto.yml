@@ -16,7 +16,7 @@ diagram:
         - '\usetikzlibrary{arrows,shapes.arrows,shapes.geometric,shapes.multipart,decorations.pathmorphing,positioning,swigs}' 
 
 website:
-  title: "Fundamentals of Simulations in Data Science"
+  title: "Fundamentals of Monte Carlo Simulations in Data Science"
   favicon: themes/favicon.ico
   site-url: https://vladislav-morozov.github.io/simulations-course/
   repo-url: https://github.com/vladislav-morozov/simulations-course/
@@ -36,6 +36,7 @@ website:
       - section: "Course Info"
         contents: 
         - slides/organizational/intro.qmd  
+        - project-info.qmd
 
 execute:
   freeze: auto  # re-render only when source changes
