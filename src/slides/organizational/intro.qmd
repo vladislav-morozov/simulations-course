@@ -6,7 +6,7 @@ format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content="Course introduction (lecture notes slides)."/> 
+        <meta name="description" content="Course introduction for fundamentals of Monte Carlo simulations in data science (lecture notes slides)."/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: "Course introduction " 
+    description: "Course introduction for fundamentals of Monte Carlo simulations in data science (lecture notes slides)." 
 ---
 
 
