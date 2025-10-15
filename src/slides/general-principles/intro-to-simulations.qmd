@@ -1,0 +1,57 @@
+---
+title: "Why Simulate and General Principles"
+subtitle: "Role of Simulations. Principles, Design, and Anatomy"
+author: Vladislav Morozov  
+format:
+  revealjs:
+    include-in-header: 
+      text: |
+        <meta name="description" content=" (lecture notes slides)."/> 
+    width: 1150
+    slide-number: true
+    sc-sb-title: true
+    incremental: true   
+    logo: ../../themes/favicon.ico
+    footer: "Why Simulate and General Principles"
+    footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
+    theme: ../../themes/slides_theme.scss
+    toc: TRUE
+    toc-depth: 2
+    toc-title: Contents
+    transition: convex
+    transition-speed: fast
+slide-level: 4
+title-slide-attributes:
+    data-background-color: "#3c165cff"
+    data-footer: " "
+filters:
+  - reveal-header 
+embed-resources: true
+include-in-header: ../../themes/mathjax.html 
+highlight-style: tango
+open-graph:
+    description: " (lecture note slides)" 
+---
+
+
+
+
+
+
+## Content and Motivation {background="#00100F"}
+
+#### About Me
+  
+
+### This Course {background="#43464B"}
+
+
+
+#### Example Questions
+   
+ 
+
+#### References {.allowframebreaks visibility="uncounted"}
+
+::: {#refs}
+:::
