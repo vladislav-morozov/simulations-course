@@ -46,14 +46,65 @@ open-graph:
 
 #### Learning Outcomes
 
+This lecture is
+
+<br>
+
+By the end, you should be able to
+
+- Describe
 
 #### References
 
  
 
 ## Role of Monte Carlo Simulations {background="#00100F"}
- 
+
+#### What's The Point of Statistics?
+
+
+<div class = .left-color>
+
+Developing new methods that allow to learn things from data
+
+</div>
+
+What's interesting -- depends on the context, problem of the consumer of the method
+
+#### 
+
+So what do consumers of the methods want? 
+
+<div class = .left-color>
+
+Things that work well
+
+</div>
+
+
+Consumers want to know if the methods actually work
+
+#### What's Well?
+
+Modern understanding 
+
+
+<div class = .left-color>
+
+Guarantees that will work under a variety of settings
+</div>
+
+
+- We don't love parametric assumptions very much anymore, especially in social settings
+- Results can be probabilitistic
+
+- Sometimes can prove 
+@Wainwright2019HighDimensionalStatisticsNonAsymptotic,
+
+
 #### Evaluation
+
+
 
 #### Motivating Tool
  
