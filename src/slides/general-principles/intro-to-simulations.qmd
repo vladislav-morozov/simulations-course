@@ -38,18 +38,61 @@ open-graph:
 
 
 
-## Content and Motivation {background="#00100F"}
-
-#### About Me
+## Introduction {background="#00100F"}
+ 
   
 
-### This Course {background="#43464B"}
+### Lecture Info {background="#43464B"}
+
+#### Learning Outcomes
 
 
+#### References
 
-#### Example Questions
-   
  
+
+## Role of Monte Carlo Simulations {background="#00100F"}
+ 
+#### Evaluation
+
+#### Motivating Tool
+ 
+#### Other Usage
+
+#### "Monte Carlo" vs. Other Simulations
+
+kinda the same
+
+#### Limitations of Simulations
+
+What
+
+
+not everything can be simulated (images, text)
+
+Or some models may also be intractable to train more than a few times
+
+
+## Principles of Good Simulations {background="#00100F"}
+ 
+#### The Three Key Characteristics
+
+#### Reproducibility
+
+
+## Anatomy of a Simulation {background="#00100F"}
+ 
+#### The Four Steps
+
+
+
+## Recap and Conclusions {background="#00100F"}
+ 
+#### Recap
+
+
+#### Next Questions
+
 
 #### References {.allowframebreaks visibility="uncounted"}
 
