@@ -1,5 +1,5 @@
 ---
-title: "Why Simulate and General Principles"
+title: "Why Simulate? General Principles"
 subtitle: "Role of Simulations. Principles, Design, and Anatomy"
 author: Vladislav Morozov  
 format:
@@ -60,55 +60,123 @@ By the end, you should be able to
 
 ## Role of Monte Carlo Simulations {background="#00100F"}
 
+### The Method Evaluation Problem {background="#43464B"}
+
 #### What's The Point of Statistics?
 
+In one sentence: 
 
-<div class = .left-color>
+<div class = rounded-box>
 
-Developing new methods that allow to learn things from data
 
-</div>
-
-What's interesting -- depends on the context, problem of the consumer of the method
-
-#### 
-
-So what do consumers of the methods want? 
-
-<div class = .left-color>
-
-Things that work well
+Developing new methods that allow user to learn parameters of interest from data
 
 </div>
 
+. . .
 
-Consumers want to know if the methods actually work
+Parameters of interest:
 
-#### What's Well?
+- Depend on context
+- Specified by the consumer of the method
+- Goal of statistics: say if it can be learned and how
 
-Modern understanding 
+#### What Methods Do Consumers Want? 
+ 
+<div class = rounded-box>
 
+Consumers of statistical methods want to use methods that they know "<span class="highlight">work well</span>"
 
-<div class = .left-color>
-
-Guarantees that will work under a variety of settings
 </div>
 
+Natural: 
 
-- We don't love parametric assumptions very much anymore, especially in social settings
-- Results can be probabilitistic
+- A better tool gives better results
+- Easier to defend choosing to use it
 
-- Sometimes can prove 
-@Wainwright2019HighDimensionalStatisticsNonAsymptotic,
+. . . 
 
+<br>
+
+<div class = left-color>
+
+But what's "<span class="highlight">well</span>"?
+</div>
+
+#### What's "<span class="highlight">Well</span>"?
+
+Modern understanding:
+
+
+<div class = left-color>
+
+A method works "<span class="highlight">well</span>" if some metric of interest "<span class="highlight">tends</span>" to "<span class="highlight">look good</span>" under a reasonably broad variety of data generating processes
+
+
+</div>
+ 
+
+- Metrics: bias, prediction risk, confidence interval coverage
+- "<span class="highlight">Tends</span>": allow for some possibility of bad performance, but with low probability
+- DGPs:  we don't love parametric assumptions
+
+### Theoretical and Empirical Evaluation {background="#43464B"}
+
+#### Evaluation Methods
+
+
+<br>
+
+Three main methods, in decreasing strength:
+
+1. Finite sample theoretical guarantees
+2. (Good) Monte Carlo simulations
+3. Empirical validation
+
+#### Theoretical Bounds
+
+
+<div class = left-color>
+
+Nonparametric finite sample bounds — best possible results
+
+</div>
+ 
+Usually possible for specific scenarios (bounded variables, bounded dimensions). Examples: 
+
+- Bounds on lasso parrameter error [@Wainwright2019HighDimensionalStatisticsNonAsymptotic]
+- The fundamental theorem of PAC learning + finite VC dimension results for certain classifier classses [@Shalev-Shwartz2014UnderstandingMachineLearning]
+  
+
+. . .
+  
+<div class = left-color>
+
+In many problems <span class="highlight">impossible</span> to obtain useful guarantees
+
+</div>
+
+#### Place of Simulations
+
+#### Empirical 
+
+
+### Simulations {background="#43464B"}
 
 #### Evaluation
 
 
 
+
+
 #### Motivating Tool
- 
+
+
+
+
+can also prove that something doesn't work
 #### Other Usage
+
 
 #### "Monte Carlo" vs. Other Simulations
 
