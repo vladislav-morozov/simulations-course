@@ -37,6 +37,9 @@ website:
         contents: 
         - slides/organizational/intro.qmd  
         - project-info.qmd
+      - section: "Course Slides"
+        contents: 
+        - slides/general-principles/intro-to-simulations.qmd
 
 execute:
   freeze: auto  # re-render only when source changes
