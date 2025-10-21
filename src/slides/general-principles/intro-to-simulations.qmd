@@ -429,6 +429,11 @@ digraph MonteCarloWorkflow {
  
 #### Recap
 
+In this lecture we 
+
+1. Discussed ways to evaluate statistical methods
+2. Formulated basic principles of good simulations
+3. Looked at core simulation anatomy
 
 #### Next Questions
 
