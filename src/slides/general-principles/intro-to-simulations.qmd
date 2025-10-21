@@ -216,8 +216,7 @@ Other issues:
 Simulations: check every aspect of performance in a "lab" setting with many synthetic datasets
 
 </div>
-
-<br>
+ 
 
 - Lie somewhere between generic theory and specific real test datasets
 - Using different DGPs — poor person's version of generic theory, gives confidence for <span class="highlight">some</span> scenarios
@@ -280,11 +279,72 @@ Not the only kind of simulations. Contrast with
  
 #### The Three Key Characteristics
 
+
+<br>
+
+<div class="rounded-box">
+
+Good simulations are
+
+- Realistic
+- Reproducible
+- Targeted
+
+</div>
+
+
+#### Realism
+
+<div class="left-color">
+
+DGPs should mimic essential real-world features without excess complexity
+
+</div> 
+
+
+
+<br>
+
+Intuitively: 
+
+- Simulations are like crash-testing cars in a lab vs. on real roads.
+- Lab crashes must be similar to real ones to be informative
+- But don't need to replicate every single aspect of roads
+
+
 #### Reproducibility
 
 
-Intuitively: simulations are like crash-testing cars in a lab vs. on real roads.
+<div class="left-color">
 
+Simulations should be reproducible exactly
+
+</div> 
+
+<br>
+
+Steps to achieve:
+
+- Set random seeds
+- Share code and give replications instructions
+- Describe exactly the environment used (in plain text or Docker)
+
+
+
+#### Targeted Simulations
+
+<div class="left-color">
+
+Simulation DGPs should reflect the property of interest
+
+</div> 
+
+<br>
+
+Example: 
+
+- When evaluating IV-related methods, use DGPs that vary in instrument strength/number of moment conditions
+- When evaluating inference on extreme quantiles, use DGPs that vary in tail properties
 
 ## Anatomy of a Simulation {background="#00100F"}
  
