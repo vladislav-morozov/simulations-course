@@ -1,0 +1,459 @@
+---
+title: "Why Monte Carlo? General Principles"
+subtitle: "Role of Simulations. Principles, Design, and Anatomy"
+author: Vladislav Morozov  
+format:
+  revealjs:
+    include-in-header: 
+      text: |
+        <meta name="description" content="A high-level overview of the place of Monte Carlo simulations. Introduction to best practices of simulation design (lecture note slides)"/> 
+    width: 1150
+    slide-number: true
+    sc-sb-title: true
+    incremental: true   
+    logo: ../../themes/favicon.ico
+    footer: "Why Simulate and General Principles"
+    footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
+    theme: ../../themes/slides_theme.scss
+    toc: TRUE
+    toc-depth: 2
+    toc-title: Contents
+    transition: convex
+    transition-speed: fast
+slide-level: 4
+title-slide-attributes:
+    data-background-color: "#3c165cff"
+    data-footer: " "
+filters:
+  - reveal-header 
+embed-resources: true
+include-in-header: ../../themes/mathjax.html 
+highlight-style: tango
+open-graph:
+    description: "A high-level overview of the place of Monte Carlo simulations. Introduction to best practices of simulation design (lecture note slides)" 
+---
+
+
+
+
+
+
+## Introduction {background="#00100F"}
+ 
+  
+
+### Lecture Info {background="#43464B"}
+
+#### Learning Outcomes
+
+This lecture is a high-level overview of why and how we do Monte Carlo simulations
+
+<br>
+
+By the end, you should be able to
+
+
+- Discuss the pros and cons of different approach for evaluating statistical methods 
+- State the three key characteristics of good simulations
+- Describe the high-level flow of a simulation study
+ 
+
+ 
+
+## Role of Monte Carlo Simulations {background="#00100F"}
+
+### The Method Evaluation Problem {background="#43464B"}
+
+#### What's The Point of Statistics?
+
+In one sentence: 
+
+<div class = rounded-box>
+
+
+Developing new methods that allow user to learn parameters of interest from data
+
+</div>
+
+. . .
+
+Parameters of interest:
+
+- Depend on context
+- Specified by the consumer of the method
+- Goal of statistics: say if parameter can be learned and how
+
+#### What Methods Do Consumers Want? 
+ 
+<div class = rounded-box>
+
+Consumers of statistical methods want to use methods that they know "<span class="highlight">work well</span>"
+
+</div>
+
+Natural: 
+
+- A better tool gives better results
+- Easier to defend choosing to use it
+
+. . . 
+
+<br>
+
+<div class = left-color>
+
+But what's "<span class="highlight">well</span>"?
+</div>
+
+#### What's "<span class="highlight">Well</span>"?
+
+Modern understanding:
+
+
+<div class = left-color>
+
+A method works "<span class="highlight">well</span>" if some metric of interest "<span class="highlight">tends</span>" to "<span class="highlight">look good</span>" under a reasonably <span class="highlight">broad variety</span> of data generating processes
+
+
+</div>
+ 
+
+- Metrics: bias, prediction risk, confidence interval coverage
+- "<span class="highlight">Tends</span>": allow for some possibility of bad performance, but with low probability
+- DGPs:we don't love parametric assumptions
+
+### Theoretical and Empirical Evaluation {background="#43464B"}
+
+#### Evaluation Methods
+
+
+<br>
+
+Three main methods, in decreasing strength:
+
+1. Finite sample theoretical guarantees
+2. (Good) Monte Carlo simulations
+3. Empirical validation
+
+#### Theoretical Bounds
+
+
+<div class = left-color>
+
+Nonparametric finite sample bounds — best possible results
+
+</div>
+ 
+Usually possible for specific scenarios (bounded variables, bounded dimensions). Examples: 
+
+- Bounds on lasso estimation error [@Wainwright2019HighDimensionalStatisticsNonAsymptotic]
+- The fundamental theorem of PAC learning + finite VC dimension results for certain classifier classes [@Shalev-Shwartz2014UnderstandingMachineLearning]
+  
+#### Limitations of Theoretical Bounds
+
+Key challenge:
+
+<div class = left-color>
+
+
+In many problems <span class="highlight">impossible</span> to obtain useful guarantees
+
+</div>
+
+<br>
+
+Problematic scenarios:
+
+- Highly-structured DGPs (dependence or structured outputs)
+- Nonlinear and multistep algorithms
+- Settings without natural known bounds on variables
+
+#### Empirical Evaluation
+
+Other end of spectrum:
+
+<div class = left-color>
+
+Testing methods on real datasets of interest
+
+</div>
+
+<br>
+
+Examples: 
+
+- Numerical data: OpenML-CC18 [@Bischl2021OpenMLBenchmarkingSuites]
+- Images data: ImageNet [@Deng2009ImageNetLargeScaleHierarchical]
+- Text data: General Language Understanding Evaluation (GLUE) [@Wang2019GLUEMultiTaskBenchmark]
+
+
+
+::: {.footer}
+
+See the relevant [Wikipedia page](https://en.wikipedia.org/wiki/List_of_datasets_for_machine-learning_research) for more example datasets
+
+:::
+
+#### Limitations of Evaluation on Real Data
+
+<div class = left-color>
+
+Limited to scenarios where you know the ground truth: <span class="highlight">only prediction, but no causal inference
+
+</div>
+
+<br>
+
+Other issues:
+
+- Eventually invalid: due to comparing many algorithms on same test set (~implicit training on the test set)
+- Cost: real-life data is not easy to obtain
+- Limited scope: results only informative for the dataset used and similar data 
+
+### Simulations {background="#43464B"}
+
+#### Place of Simulations
+
+
+<div class="rounded-box">
+
+Simulations: check every aspect of performance in a "lab" setting with many synthetic datasets
+
+</div>
+ 
+
+- Lie somewhere between generic theory and specific real test datasets
+- Using different DGPs — poor person's version of generic theory, gives confidence for <span class="highlight">some</span> scenarios
+- Synthetic data $\Rightarrow$ full knowledge of target quantities $\Rightarrow$ can evaluate both causal and predictive methods
+
+#### Simulations as Evaluation Tools
+
+
+Simulations allow answering "what if" questions, e.g.:
+
+- Does this estimator actually work when tail conditions hold?
+- Does this inference method suffer size distortions when identification is irregular?  
+- Is there a big efficiency loss when using a more general estimator? 
+
+
+
+#### Limitations of Simulations
+ 
+- Only as good as the DGPs used
+- Computationally expensive — challenging with algorithms that take a long time to train
+- Limited scope:
+  - Mostly useful with numerical data
+  - Reason: not clear how to write DGPs for image, text, etc.
+
+#### Other Uses: Motivating Tool
+
+An easy clear simulation: good way of motivating a problem
+
+<div class="center-slide">
+
+![](../../images/ext-sim-results/dml-motivation.png){width=70%}
+
+</div>
+ 
+Example: figure from <span class="highlight">intro</span> of @Chernozhukov2018DoubleDebiasedMachine — danger of not using Neyman orthogonalization (left panel)
+
+#### Monte Carlo vs. Other Kinds of Simulations
+
+<div class="left-color">
+
+Our focus: Monte Carlo simulations
+
+</div>
+
+MC: drawing many random datasets and tabulating performance across these datasets
+
+. . .
+
+<br>
+
+
+Not the only kind of simulations. Contrast with 
+
+- Deterministic simulations
+- Synthetic data generation for training data augmentation (see [this link](https://www.nvidia.com/en-us/use-cases/synthetic-data/))
+
+
+
+## Principles of Good Simulations {background="#00100F"}
+ 
+### Characteristics of Good Simulations {background="#43464B"}
+
+
+#### The Three Key Characteristics
+
+
+<br>
+
+<div class="rounded-box">
+
+Good simulations are
+
+- Realistic
+- Reproducible
+- Targeted
+
+</div>
+
+
+#### Realism
+
+<div class="left-color">
+
+DGPs should mimic essential real-world features without excess complexity
+
+</div> 
+
+
+
+<br>
+
+Intuitively: 
+
+- Simulations are like crash-testing cars in a lab vs. on real roads.
+- Lab crashes must be similar to real ones to be informative
+- But don't need to replicate every single aspect of roads
+
+
+#### Reproducibility
+
+
+<div class="left-color">
+
+Simulations should be reproducible exactly
+
+</div> 
+
+<br>
+
+Steps to achieve:
+
+- Set random seeds
+- Share code and give replications instructions
+- Describe exactly the environment used (in plain text or Docker)
+
+
+
+#### Targeted Simulations
+
+<div class="left-color">
+
+Simulation DGPs should reflect the property of interest
+
+</div> 
+
+<br>
+
+Example: 
+
+- When evaluating IV-related methods, use DGPs that vary in instrument strength/number of moment conditions
+- When evaluating inference on extreme quantiles, use DGPs that vary in tail properties
+
+### Anatomy of a Simulation {background="#43464B"}
+
+#### Common Structure: The Three Steps
+
+
+:::: {.columns}
+
+::: {.column width="35%"}
+
+
+```{dot}
+//| fig-width: 4
+digraph MonteCarloWorkflow {
+    rankdir=UD
+    bgcolor="#f4f4f4ff"
+    fontname="Helvetica"
+
+    // Outer dummy cluster for full border
+    subgraph cluster_outer {
+        label=""
+        color="#3c165c"
+        style=rounded
+        penwidth=2
+
+        node [shape=box, style=filled, fillcolor="#f0f0f0", fontname="Helvetica"]
+
+        // Step 1
+        ResearchQuestion [label="Identify research question\nand metric of interest"]
+
+        // Step 2: Simulation loop cluster
+        subgraph cluster_simulation { 
+            style=dashed
+            color=gray
+            fontname="Helvetica"
+            DrawData [label="Draw data"]
+            ApplyMethod [label="Apply method"]
+            CompareEstimates [label="Compare estimates\nto ground truth"]
+        }
+
+        // Step 3
+        SummarizeResults [label="Summarize results\nacross datasets"]
+
+        // Flow connections
+        ResearchQuestion -> DrawData
+        DrawData -> ApplyMethod
+        ApplyMethod -> CompareEstimates
+        CompareEstimates -> SummarizeResults
+        CompareEstimates -> DrawData
+    }
+}
+
+
+```
+
+:::
+
+  
+
+
+::: {.column width="65%"} 
+ 
+1. Choose what you care about (e.g. bias of several estimators)
+2. Run simulation loop:
+   - Draw a dataset from given DGP
+   - Apply methods of interest 
+   - Compare expected result to the obtained one
+3. Summarize results: compute averages, tabulate distributions, etc.
+
+:::
+
+::::
+
+
+
+ 
+
+## Recap and Conclusions {background="#00100F"}
+ 
+#### Recap
+
+<br>
+
+In this lecture we 
+
+1. Discussed ways to evaluate statistical methods
+2. Formulated basic principles of good simulations
+3. Looked at core simulation anatomy
+
+#### Next Questions
+
+<br>
+
+Now have an idea of the *what* and *why* — next question is *how*?
+
+
+- How to implement the steps in code? 
+- How to choose DGPs?
+- How to approach different statistical scenarios? 
+- How to improve reproducibility?
+
+#### References {.allowframebreaks visibility="uncounted"}
+
+::: {#refs}
+:::
