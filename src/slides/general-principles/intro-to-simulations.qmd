@@ -277,6 +277,9 @@ Not the only kind of simulations. Contrast with
 
 ## Principles of Good Simulations {background="#00100F"}
  
+### Characteristics of Good Simulations {background="#43464B"}
+
+
 #### The Three Key Characteristics
 
 
@@ -346,15 +349,12 @@ Example:
 - When evaluating IV-related methods, use DGPs that vary in instrument strength/number of moment conditions
 - When evaluating inference on extreme quantiles, use DGPs that vary in tail properties
 
-## Anatomy of a Simulation {background="#00100F"}
- 
+### Anatomy of a Simulation {background="#43464B"}
+
 #### The Four Steps
 
 
-#### "Monte Carlo" and Other Simulations
-
-kinda the same
-
+ 
 
 ## Recap and Conclusions {background="#00100F"}
  
@@ -362,6 +362,10 @@ kinda the same
 
 
 #### Next Questions
+
+Now have an idea of the *what* and the *why* — next question is *how*?
+
+
 
 
 #### References {.allowframebreaks visibility="uncounted"}
