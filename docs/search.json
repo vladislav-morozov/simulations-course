@@ -55,6 +55,50 @@
     ]
   },
   {
+    "objectID": "slides/general-principles/intro-to-simulations.html#introduction",
+    "href": "slides/general-principles/intro-to-simulations.html#introduction",
+    "title": "Why Monte Carlo? General Principles",
+    "section": "Introduction",
+    "text": "Introduction",
+    "crumbs": [
+      "Course Slides",
+      "Why Monte Carlo? General Principles"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/intro-to-simulations.html#role-of-monte-carlo-simulations",
+    "href": "slides/general-principles/intro-to-simulations.html#role-of-monte-carlo-simulations",
+    "title": "Why Monte Carlo? General Principles",
+    "section": "Role of Monte Carlo Simulations",
+    "text": "Role of Monte Carlo Simulations",
+    "crumbs": [
+      "Course Slides",
+      "Why Monte Carlo? General Principles"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/intro-to-simulations.html#principles-of-good-simulations",
+    "href": "slides/general-principles/intro-to-simulations.html#principles-of-good-simulations",
+    "title": "Why Monte Carlo? General Principles",
+    "section": "Principles of Good Simulations",
+    "text": "Principles of Good Simulations",
+    "crumbs": [
+      "Course Slides",
+      "Why Monte Carlo? General Principles"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/intro-to-simulations.html#recap-and-conclusions",
+    "href": "slides/general-principles/intro-to-simulations.html#recap-and-conclusions",
+    "title": "Why Monte Carlo? General Principles",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Course Slides",
+      "Why Monte Carlo? General Principles"
+    ]
+  },
+  {
     "objectID": "slides/organizational/intro.html#content-and-motivation",
     "href": "slides/organizational/intro.html#content-and-motivation",
     "title": "Course Introduction",
