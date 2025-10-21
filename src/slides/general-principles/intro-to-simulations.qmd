@@ -79,7 +79,7 @@ Parameters of interest:
 
 - Depend on context
 - Specified by the consumer of the method
-- Goal of statistics: say if it can be learned and how
+- Goal of statistics: say if parameter can be learned and how
 
 #### What Methods Do Consumers Want? 
  
@@ -110,7 +110,7 @@ Modern understanding:
 
 <div class = left-color>
 
-A method works "<span class="highlight">well</span>" if some metric of interest "<span class="highlight">tends</span>" to "<span class="highlight">look good</span>" under a reasonably broad variety of data generating processes
+A method works "<span class="highlight">well</span>" if some metric of interest "<span class="highlight">tends</span>" to "<span class="highlight">look good</span>" under a reasonably <span class="highlight">broad variety</span> of data generating processes
 
 
 </div>
@@ -144,24 +144,76 @@ Nonparametric finite sample bounds — best possible results
  
 Usually possible for specific scenarios (bounded variables, bounded dimensions). Examples: 
 
-- Bounds on lasso parrameter error [@Wainwright2019HighDimensionalStatisticsNonAsymptotic]
+- Bounds on lasso estimation error [@Wainwright2019HighDimensionalStatisticsNonAsymptotic]
 - The fundamental theorem of PAC learning + finite VC dimension results for certain classifier classses [@Shalev-Shwartz2014UnderstandingMachineLearning]
   
+#### Limitations of Theoretical Bounds
 
-. . .
-  
+Key challenge:
+
 <div class = left-color>
+
 
 In many problems <span class="highlight">impossible</span> to obtain useful guarantees
 
 </div>
 
-#### Place of Simulations
+Problematic scenarios:
 
-#### Empirical 
+- Highly-structured DGPs (dependence or structured outputs)
+- Nonlinear and multistep algorithms
+- Settings without natural known bounds on variables
 
+#### Empirical Evaluation
+
+Other end of spectrum:
+
+<div class = left-color>
+
+Testing methods on real datasets of interest
+
+</div>
+
+<br>
+
+Examples: 
+
+- Numerical data: OpenML-CC18 [@Bischl2021OpenMLBenchmarkingSuites]
+- Images data: ImageNet [@Deng2009ImageNetLargeScaleHierarchical]
+- Text data: General Language Understanding Evaluation (GLUE) [@Wang2019GLUEMultiTaskBenchmark]
+
+
+
+::: {.footer}
+
+See the relevant [Wikipedia page](https://en.wikipedia.org/wiki/List_of_datasets_for_machine-learning_research) for more example datasets
+
+:::
+
+#### Limitations of Evaluation on Real Data
+
+<div class = left-color>
+
+Limited to scenarios where you know the ground truth: <span class="highlight">only prediction, but no causal inference
+
+</div>
+
+<br>
+
+Other issues:
+
+- Eventually invalid: due to comparing many algorithms on same test set (~implicit training on the test set)
+- Cost: real-life data is not easy to obtain
+- Limited scope: results only informative for the dataset used and similar data 
 
 ### Simulations {background="#43464B"}
+
+#### Place of Simulations
+
+
+<span class="highlight">what if </span>
+
+
 
 #### Evaluation
 
@@ -169,14 +221,22 @@ In many problems <span class="highlight">impossible</span> to obtain useful guar
 
 
 
-#### Motivating Tool
+#### Other Uses: Motivating Tool
 
+An easy clear simulation: good way of motivating a problem
 
+<div class="center-slide">
 
+![](../../images/ext-sim-results/dml-motivation.png){width=70%}
 
-can also prove that something doesn't work
+</div>
+ 
+Example: figure from <span class="highlight">intro</span> of @Chernozhukov2018DoubleDebiasedMachine — danger of not using Neyman orthogonalization (left panel)
+
 #### Other Usage
 
+
+(see [this link](https://www.nvidia.com/en-us/use-cases/synthetic-data/) from Nvidia)
 
 #### "Monte Carlo" vs. Other Simulations
 
