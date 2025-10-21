@@ -239,8 +239,7 @@ Other metrics:
 #### Sample Size
 
 #### DGP for Innovations and Exogenous $X_t$
-
-#### 
+ 
 
 $T$
 
@@ -259,9 +258,18 @@ Here: talk in a very stylized manner. Later — more on
 
 ### Basic Function {background="#43464B"}
 
-#### Learning Outcomes
 
-This lecture is  
+#### Summary So Far
+
+#### General Steps
+
+#### Simple Evaluation
+
+How to not get overwhelmed: try to put the simplest thing in practice 
+
+Our simplest thing: static model
+
+#### Thing
 
 ```{python}
 import numpy as np
