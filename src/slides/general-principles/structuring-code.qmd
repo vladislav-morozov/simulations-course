@@ -111,13 +111,31 @@ If bias is big, can lead to
 
 $\Rightarrow$ both can lead to incorrect policy conclusions
  
-#### Today's Question
+#### Today's Questions
 
-How big the bias is 
+::: {.nonincremental}
 
-A more targeted approach would tabulate incorrect signs
+<br>
+
+<div class="rounded-box">
+
+- How big is the bias?
+- How to think about and structure simulations in general?
+  
+ 
+</div>
+
+:::
 
 
+
+<br> 
+
+Today — a showcase of 
+
+- Our three-step simulation anatomy
+- A sketch for extensible simulation design — foundation for later
+ 
 
 ## Setting Out Simulation Goals {background="#00100F"}
  
@@ -128,18 +146,30 @@ A more targeted approach would tabulate incorrect signs
 
 
 
-#### Why Simulations?
+#### Why Not Theory?
 
-Theory not fully satisfactory: 
+Theory not fully satisfactory: expression for bias depends on the DGP for $(X_t, U_t)$:
+$$
+\E[\hat{\bbeta}] - \bbeta= \E\left[ (\bW'\bW)^{-1}\bW'\bU \right]
+$$
+where $\bW$ — $T\times 2$ with $t$th row given by $(1, X_t)$
 
-- Expression for bias depends on the DGP for $(X_t, U_t)$
+
 - @Bao2007SecondOrderBiasMean: asymptotic order $O(1/T)$
 - Unclear if actual magnitude "important in practice"
 
 
+#### Why Not Use Real Data?
+
+ 
+Empirical data validation not an option both in causal and predictive settings:
+
+- Can never measure true bias even if believe in linear model
+- In predictive settings: don't even care about $\hat{\bbeta}$, only about predicted $\hat{Y}_t$
+
 . . .
 
-Empirical data validation not an option, as cannot measure true bias in practice due to causal nature
+<br>
 
 
 <div class="left-color">
@@ -148,22 +178,81 @@ Have to recur to simulations
 
 </div>
 
-#### Specifying Simulations
+#### Simulation Requirements
 
+
+
+<br>
 
 Recall that simulations should be 
 
-- Realistic 
-- Targeted
+- Realistic: need to think about relevant real world scenario to emulate
+
+- Targeted: 
+    - Be specific in terms of target metrics
+    - Focus in DGPs that cause differences in target metrics
+ 
+#### Choosing Scenario: Time Series
+
+As an example, we care about <span class="highlight">time series</span>
+
+<br>
+
+What's relevant?
+
+- Possibility of dependence across time
+- Different strength of dependence
+- Different lengths of time series
+- (More advanced): data drift/time-varying DGP
+
+. . . 
+
+We'll include the first three
+
+#### Metrics
+
+For simplicity, we will consider just one explicit metric:
+
+<div class="rounded-box">
+
+Our metric: absolute bias of OLS estimator
+
+</div>
+
+
+<br> 
+
+
+Other metrics:
+
+- Coverage of CIs based on the OLS estimator
+- Proportion of incorrect signs ($\mathrm{sgn}{\hat{\beta}_1}\neq \mathrm{sgn}(\beta_1)$)
+
 
 
 ### Specifying DGPs {background="#43464B"}
+
+#### The Problem of DGP Choice
+
+#### Static vs. Dynamic
+
+#### Sample Size
+
+#### DGP for Innovations and Exogenous $X_t$
 
 #### 
 
 $T$
 
-## Naïve Approach {background="#00100F"}
+
+<div class="left-color">
+
+Here: talk in a very stylized manner. Later — more on
+
+</div>
+
+
+## Naïve Implementation {background="#00100F"}
  
 
  
@@ -232,7 +321,7 @@ ar1_results = run_ols_simulation(dgp_type="ar1", rho=0.7)
 
 ```
 
-## Writing Better Code {background="#00100F"}
+## A More Robust Implementation {background="#00100F"}
  
   
 
@@ -241,6 +330,13 @@ ar1_results = run_ols_simulation(dgp_type="ar1", rho=0.7)
 #### Unifying 
 
 This lecture is  
+
+#### How Much Information
+
+
+#### Better DGPs
+
+attached to some empirical dataset
 
 
 ## Recap and Conclusions {background="#00100F"}
