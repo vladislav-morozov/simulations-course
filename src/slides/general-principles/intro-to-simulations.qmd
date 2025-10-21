@@ -1,12 +1,12 @@
 ---
-title: "Why Simulate? General Principles"
+title: "Why Monte Carlo? General Principles"
 subtitle: "Role of Simulations. Principles, Design, and Anatomy"
 author: Vladislav Morozov  
 format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content=" (lecture notes slides)."/> 
+        <meta name="description" content="A high-level overview of the place of Monte Carlo simulations. Introduction to best practices of simulation design (lecture note slides)"/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: " (lecture note slides)" 
+    description: "A high-level overview of the place of Monte Carlo simulations. Introduction to best practices of simulation design (lecture note slides)" 
 ---
 
 
@@ -46,15 +46,17 @@ open-graph:
 
 #### Learning Outcomes
 
-This lecture is
+This lecture is a high-level overview of why and how we do Monte Carlo simulations
 
 <br>
 
 By the end, you should be able to
 
-- Describe
 
-#### References
+- Discuss the pros and cons of different approach for evaluating statistical methods 
+- State the three key characteristics of good simulations
+- Describe the high-level flow of a simulation study
+ 
 
  
 
@@ -118,7 +120,7 @@ A method works "<span class="highlight">well</span>" if some metric of interest 
 
 - Metrics: bias, prediction risk, confidence interval coverage
 - "<span class="highlight">Tends</span>": allow for some possibility of bad performance, but with low probability
-- DGPs:  we don't love parametric assumptions
+- DGPs:we don't love parametric assumptions
 
 ### Theoretical and Empirical Evaluation {background="#43464B"}
 
@@ -145,7 +147,7 @@ Nonparametric finite sample bounds — best possible results
 Usually possible for specific scenarios (bounded variables, bounded dimensions). Examples: 
 
 - Bounds on lasso estimation error [@Wainwright2019HighDimensionalStatisticsNonAsymptotic]
-- The fundamental theorem of PAC learning + finite VC dimension results for certain classifier classses [@Shalev-Shwartz2014UnderstandingMachineLearning]
+- The fundamental theorem of PAC learning + finite VC dimension results for certain classifier classes [@Shalev-Shwartz2014UnderstandingMachineLearning]
   
 #### Limitations of Theoretical Bounds
 
@@ -157,6 +159,8 @@ Key challenge:
 In many problems <span class="highlight">impossible</span> to obtain useful guarantees
 
 </div>
+
+<br>
 
 Problematic scenarios:
 
@@ -261,7 +265,7 @@ Our focus: Monte Carlo simulations
 
 </div>
 
-MC: drawing many random datasets and tabulating performance on the ensemble
+MC: drawing many random datasets and tabulating performance across these datasets
 
 . . .
 
@@ -271,7 +275,7 @@ MC: drawing many random datasets and tabulating performance on the ensemble
 Not the only kind of simulations. Contrast with 
 
 - Deterministic simulations
-- Synthetic data generation for training data augmentation (see [this link](https://www.nvidia.com/en-us/use-cases/synthetic-data/) from Nvidia)
+- Synthetic data generation for training data augmentation (see [this link](https://www.nvidia.com/en-us/use-cases/synthetic-data/))
 
 
 
@@ -429,6 +433,8 @@ digraph MonteCarloWorkflow {
  
 #### Recap
 
+<br>
+
 In this lecture we 
 
 1. Discussed ways to evaluate statistical methods
@@ -437,7 +443,9 @@ In this lecture we
 
 #### Next Questions
 
-Now have an idea of the *what* and the *why* — next question is *how*?
+<br>
+
+Now have an idea of the *what* and *why* — next question is *how*?
 
 
 - How to implement the steps in code? 
