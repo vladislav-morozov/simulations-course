@@ -351,7 +351,76 @@ Example:
 
 ### Anatomy of a Simulation {background="#43464B"}
 
-#### The Four Steps
+#### Common Structure: The Three Steps
+
+
+:::: {.columns}
+
+::: {.column width="35%"}
+
+
+```{dot}
+//| fig-width: 4
+digraph MonteCarloWorkflow {
+    rankdir=UD
+    bgcolor="#f4f4f4ff"
+    fontname="Helvetica"
+
+    // Outer dummy cluster for full border
+    subgraph cluster_outer {
+        label=""
+        color="#3c165c"
+        style=rounded
+        penwidth=2
+
+        node [shape=box, style=filled, fillcolor="#f0f0f0", fontname="Helvetica"]
+
+        // Step 1
+        ResearchQuestion [label="Identify research question\nand metric of interest"]
+
+        // Step 2: Simulation loop cluster
+        subgraph cluster_simulation { 
+            style=dashed
+            color=gray
+            fontname="Helvetica"
+            DrawData [label="Draw data"]
+            ApplyMethod [label="Apply method"]
+            CompareEstimates [label="Compare estimates\nto ground truth"]
+        }
+
+        // Step 3
+        SummarizeResults [label="Summarize results\nacross datasets"]
+
+        // Flow connections
+        ResearchQuestion -> DrawData
+        DrawData -> ApplyMethod
+        ApplyMethod -> CompareEstimates
+        CompareEstimates -> SummarizeResults
+        CompareEstimates -> DrawData
+    }
+}
+
+
+```
+
+:::
+
+  
+
+
+::: {.column width="65%"} 
+ 
+1. Choose what you care about (e.g. bias of several estimators)
+2. Run simulation loop:
+   - Draw a dataset from given DGP
+   - Apply methods of interest 
+   - Compare expected result to the obtained one
+3. Summarize results: compute averages, tabulate distributions, etc.
+
+:::
+
+::::
+
 
 
  
@@ -366,7 +435,10 @@ Example:
 Now have an idea of the *what* and the *why* — next question is *how*?
 
 
-
+- How to implement the steps in code? 
+- How to choose DGPs?
+- How to approach different statistical scenarios? 
+- How to improve reproducibility?
 
 #### References {.allowframebreaks visibility="uncounted"}
 
