@@ -226,7 +226,7 @@ Our metric: absolute bias of OLS estimator
 Other metrics:
 
 - Coverage of CIs based on the OLS estimator
-- Proportion of incorrect signs ($\mathrm{sgn}{\hat{\beta}_1}\neq \mathrm{sgn}(\beta_1)$)
+- Proportion of incorrect signs ($\mathrm{sgn}(\hat{\beta}_1)\neq \mathrm{sgn}(\beta_1)$)
 
 
 
@@ -234,21 +234,103 @@ Other metrics:
 
 #### The Problem of DGP Choice
 
+We now have to choose data generating processes that reflect
+
+- Dynamics of different strength
+- Different sample sizes
+
+. . .
+
+Ideally: would specify based on some reference empirical datasets
+
+<div class="left-color">
+
+Here: talk in a very stylized manner. Later — more specific designs
+
+</div>
+
 #### Static vs. Dynamic
 
-#### Sample Size
+First dimension: include both static   and dynamic cases
 
-#### DGP for Innovations and Exogenous $X_t$
+
+
+:::: {.columns}
+
+::: {.column width="46%"}
+
  
+**Static**:
 
-$T$
+$$  \small
+Y_{t} = \beta_0 + \beta_1 X_{t} + U_{t}
+$$
+
+Covariate $X_t$ independent from $U_t$ and over time
+
+:::
+
+  
+::: {.column width="8%"} 
+
+:::
+
+::: {.column width="46%"} 
+  
+**Dynamic**:
+
+$$ \small
+Y_{t} = \beta_0 + \beta_1 Y_{t-1} + U_{t}
+$$
+
+Dependence: $\beta_1$ value
+
+$$  \small
+\beta_1 \in \curl{0, 0.5, 0.9}
+$$
+
+:::
+
+::::
 
 
 <div class="left-color">
 
-Here: talk in a very stylized manner. Later — more on
+Bias appears in dynamic setting, but not static. Checking this dimension is <span class="highlight">targeted</span>
 
 </div>
+
+
+#### Sample Size and Distributions of $U_t, X_t, Y_0$
+
+<div class="left-color">
+
+
+::: {.nonincremental}
+
+Second and third design dimension:
+
+2. Sample sizes
+3. DGPs for variables not determined by model
+
+:::
+
+</div>
+
+
+To start with — keep things simple to focus on essentials:
+
+- One DGP per $U_t, X_t, Y_0$: each $N(0, 1)$
+- $T=50, 200$ 
+
+
+. . .
+
+Different sample sizes: how bias changes (targeted)
+
+
+
+
 
 
 ## Naïve Implementation {background="#00100F"}
@@ -261,6 +343,10 @@ Here: talk in a very stylized manner. Later — more on
 
 #### Summary So Far
 
+- 
+
+Now we need to turn 
+
 #### General Steps
 
 #### Simple Evaluation
@@ -268,6 +354,8 @@ Here: talk in a very stylized manner. Later — more on
 How to not get overwhelmed: try to put the simplest thing in practice 
 
 Our simplest thing: static model
+
+
 
 #### Thing
 
@@ -329,15 +417,29 @@ ar1_results = run_ols_simulation(dgp_type="ar1", rho=0.7)
 
 ```
 
+#### Issues
+
+We had to rewrite
+
+Note: it's not bad per se if you just want run 
+
 ## A More Robust Implementation {background="#00100F"}
  
-  
+
+### Modular Design {background="#43464B"}
+
+#### Problem: No Separation of Concerns
+
+#### Separation of Concerns
+
+Every part occupied with its own activity
+
+
 
 ### Further Improvements {background="#43464B"}
 
 #### Unifying 
-
-This lecture is  
+ 
 
 #### How Much Information
 
@@ -361,6 +463,7 @@ In this lecture we
 <br>
 
 Now  
+
 #### References {.allowframebreaks visibility="uncounted"}
 
 ::: {#refs}
