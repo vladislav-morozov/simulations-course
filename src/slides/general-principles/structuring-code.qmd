@@ -135,7 +135,14 @@ Today — a showcase of
 
 - Our three-step simulation anatomy
 - A sketch for extensible simulation design — foundation for later
- 
+
+#### Imports
+
+```{python}
+#| echo: true
+import numpy as np
+```
+
 
 ## Setting Out Simulation Goals {background="#00100F"}
  
@@ -215,12 +222,15 @@ For simplicity, we will consider just one explicit metric:
 
 <div class="rounded-box">
 
-Our metric: absolute bias of OLS estimator
+Our metric: absolute bias of OLS estimator of $\beta_1$:
+
+$$
+\text{Bias}(\hat{\beta}_1) = \E[\hat{\beta}_1] - \beta_1
+$$
 
 </div>
 
-
-<br> 
+ 
 
 
 Other metrics:
@@ -263,7 +273,7 @@ First dimension: include both static   and dynamic cases
 **Static**:
 
 $$  \small
-Y_{t} = \beta_0 + \beta_1 X_{t} + U_{t}
+Y_{t} = \beta_0 + 0.5 X_{t} + U_{t}
 $$
 
 Covariate $X_t$ independent from $U_t$ and over time
@@ -333,7 +343,7 @@ Different sample sizes: how bias changes (targeted)
 
 
 
-## Naïve Implementation {background="#00100F"}
+## First Implementation {background="#00100F"}
  
 
  
@@ -343,18 +353,123 @@ Different sample sizes: how bias changes (targeted)
 
 #### Summary So Far
 
-- 
+So far specified:
 
-Now we need to turn 
+- Metric
+- How each dataset should be generate
+- Size of each dataset
 
-#### General Steps
+. . .
 
-#### Simple Evaluation
+<br>
 
-How to not get overwhelmed: try to put the simplest thing in practice 
+<div class="left-color">
 
-Our simplest thing: static model
+Now time to actually implement — but how?
 
+</div>
+
+#### General Advice
+
+How to not get overwhelmed — a good universal rule: 
+
+<div class="rounded-box">
+
+Start with the simplest pieces and iterate from there
+
+
+</div>
+
+<br>
+
+- Simulations are often fairly complex piece of code
+- Do not try to write the whole thing in one go
+- Do not be afraid of rewriting and improving things later
+
+::: {.footer}
+
+A good way to work is to follow a lightweight agile approach
+
+:::
+
+#### Practice: Starting with the Static Case
+ 
+
+Our simplest thing: static model with a small sample
+$$
+Y_{t} = \beta_0 + \beta_1 X_t + U_t, \quad T=50
+$$
+
+
+
+Remember simulation anatomy: `for` many datasets we
+
+1. Draw 50 points $(X_t, Y_t)$
+2. Run OLS estimator $\hat{\beta}_1$
+3. Compute error $\hat{\beta}_1-\beta_1$
+
+Simplest: wrap in a single function
+
+#### Example: Basic Simulation Function {.scrollable}
+
+
+
+```{python}
+#| echo: true
+def simulate_static_ols(n_sim=1000, n_obs=100, beta0=0, beta1=0.5):
+    """Simulates OLS estimation for a static/exogenous DGP: y = beta0 + beta1*x + u.
+
+    Args:
+        n_sim (int): Number of simulations to run. Defaults to 1000.
+        n_obs (int): Number of observations per simulation. Defaults to 100.
+        beta0 (float): True intercept value. Defaults to 0.
+        beta1 (float): True slope coefficient. Defaults to 0.5.
+
+    Returns:
+        list[float]: List of errors of beta1 estimates for each simulation.
+    """
+
+    # Create container to store results
+    results_ols_errors = []
+
+    # Core simulation loop
+    for _ in range(n_sim):
+        # 1. Draw data
+        x = np.random.normal(size=n_obs)
+        u = np.random.normal(size=n_obs)
+        y = beta0 + beta1 * x + u
+
+        # 2. Run OLS estimation
+        W = np.column_stack([np.ones(n_obs), x])
+        beta_hat = np.linalg.inv(W.T @ W) @ W.T @ y
+
+        # 3. Compute error
+        results_ols_errors.append(beta_hat[1]-beta1)  # Store slope estimate
+
+    return results_ols_errors
+```
+
+#### Our First Results
+
+Now can execute our simulation by calling function with default arguments:
+```{python}
+#| echo: true
+static_results = simulate_static_ols()
+print(f"Bias (static DGP): {np.mean(static_results)}")
+```
+
+Qualitatively:
+
+- Bias small relative to coefficients (recall $\beta_1=0.5$)
+- Theory is confirmed
+
+::: {.footer}
+
+In practice you would usually wrap the function in a script and call from the command line
+
+:::
+
+#### Distribution of MC Estimates
 
 
 #### Thing
@@ -364,7 +479,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def run_ols_simulation(n_sim=1000, n_obs=100, beta0=0, beta1=1, rho=0, dgp_type="strict"):
+def run_ols_simulation(n_sim=1000, n_obs=100, beta0=0, beta1=0.5, rho=0, dgp_type="strict"):
     """
     Monolithic function to simulate OLS bias under two DGPs.
 
@@ -417,16 +532,24 @@ ar1_results = run_ols_simulation(dgp_type="ar1", rho=0.7)
 
 ```
 
-#### Issues
-
-We had to rewrite
-
-Note: it's not bad per se if you just want run 
-
 ## A More Robust Implementation {background="#00100F"}
  
 
 ### Modular Design {background="#43464B"}
+
+
+#### Issues
+
+We had to rewrite
+
+Note: it's not bad if you just want run one thing
+
+
+What if we want?
+
+Also didn't set a seed.
+
+
 
 #### Problem: No Separation of Concerns
 
