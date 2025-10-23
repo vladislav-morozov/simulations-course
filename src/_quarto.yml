@@ -40,6 +40,7 @@ website:
       - section: "Course Slides"
         contents: 
         - slides/general-principles/intro-to-simulations.qmd
+        - slides/general-principles/structuring-code.qmd
 
 execute:
   freeze: auto  # re-render only when source changes
