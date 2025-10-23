@@ -509,7 +509,107 @@ plt.show()
 ```
 
 
+#### Problem: Lack of Reproducibility
+
+What happens if we rerun our code twice?
+
+```{python}
+#| echo: true
+static_results_1 = simulate_ols()
+static_results_2 = simulate_ols()
+print(f"Bias (first run): {np.mean(static_results_1)}")
+print(f"Bias (second run): {np.mean(static_results_2)}")
+```
+
+. . .
+
+- Same qualitative result
+- <span class="highlight">Different</span> numerical results
+
+. . .
+
+<div class="left-color">
+
+Our results are not <span class="highlight">reproducible</span> 
+
+</div>
+
+
+#### Setting the RNG Seed
+
+Solution: provide a `seed` to our RNG
+
+
+```{python}
+#| echo: true
+#| code-line-numbers: "1,9,19"
+def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, seed=1):
+    """Simulates OLS estimation for a static/exogenous DGP: y = beta0 + beta1*x + u.
+
+    Args:
+        n_sim (int): Number of simulations to run. Defaults to 1000.
+        n_obs (int): Number of observations per simulation. Defaults to 100.
+        beta0 (float): True intercept value. Defaults to 0.
+        beta1 (float): True slope coefficient. Defaults to 0.5.
+        seed (int): random number generator seed. Defaults to 1.
+
+    Returns:
+        list[float]: List of errors of beta1 estimates for each simulation.
+    """
+
+    # Create container to store results
+    results_ols_errors = []
+
+    # Initialize the RNG
+    rng = np.random.default_rng(seed)
+
+    # Core simulation loop
+    for _ in range(n_sim):
+        # 1. Draw data
+        x = rng.normal(size=n_obs)
+        u = rng.normal(size=n_obs)
+        y = beta0 + beta1 * x + u
+
+        # 2. Run OLS estimation
+        W = np.column_stack([np.ones(n_obs), x])
+        beta_hat = np.linalg.inv(W.T @ W) @ W.T @ y
+
+        # 3. Compute error
+        results_ols_errors.append(beta_hat[1]-beta1)
+
+    return results_ols_errors
+```
+
+
+::: {.footer}
+
+Setting a seed guarantees the same sequence of (pseudo)random numbers
+
+:::
  
+#### Rerunning Simulations
+ 
+Now rerunning with the same (default) seed gives the same results:
+
+```{python}
+#| echo: true
+static_results_1 = simulate_ols()
+static_results_2 = simulate_ols()
+print(f"Bias (first run): {np.mean(static_results_1)}")
+print(f"Bias (second run): {np.mean(static_results_2)}")
+```
+
+. . .
+
+<br>
+
+ 
+<div class="rounded-box">
+
+Always set seeds explicitly to help reproducibility
+
+</div>
+
 ### Expanding the Simulation {background="#43464B"}
 
 
@@ -535,14 +635,15 @@ Simplest way: just expand existing function
 
 ```{python}
 #| echo: true
-#| code-line-numbers: "1,27-35"
-def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, dgp_type="static"):
+#| code-line-numbers: "1,28-36"
+def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, seed=1, dgp_type="static"):
     """Simulates OLS estimation for static or AR(1) DGP.
     Args:
         n_sim (int): Number of simulations to run. Defaults to 1000.
         n_obs (int): Number of observations per simulation. Defaults to 100.
         beta0 (float): True intercept value. Defaults to 0.
         beta1 (float): True slope coefficient. Defaults to 0.5
+        seed (int): random number generator seed. Defaults to 1.
         dgp_type (str): Type of DGP: "static" or "ar1". Defaults to "static".
 
     Returns:
@@ -561,7 +662,7 @@ def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, dgp_type="static"):
         if dgp_type == "static":
             x = rng.normal(size=n_obs)
             u = rng.normal(size=n_obs)
-            y = beta0 + beta1 * x + epsilon
+            y = beta0 + beta1 * x + u
         elif dgp_type == "ar1":
             y = np.zeros(n_obs + 1)
             u = rng.normal(size=n_obs + 1)
@@ -681,27 +782,35 @@ But what if we <span class="highlight">expand our simulations</span>?
 
 #### Limitations of Current Approach
 
-We had to rewrite
+<div class='left-color'>
 
-Note: it's not bad if you just want run one thing
+We need a better approach to organizing simulations
 
+</div>
 
-What if we want?
-
-#### Setting the RNG Seed
-
-
-Also didn't set a seed.
+- Basic approach is fine if you just want run one thing
+- But difficult if you want to expand more:
+    - Adding new DGPs would mean expanding simulation functions even more
+    - We would have to remember to run all the different cases ourselves
+ 
 
 
 #### Problem: No Separation of Concerns
+
+A step back: there are three pieces
 
 Things are all jumbled up and hardcoded 
 
 - DGPs
 - Estimator
 
+
+The `simulate_ols()` functions mixes everything
+
+But why should it? 
 But does the simulation loop really need to know that? From the point of simulation loop, so
+
+
 
 #### Separation of Concerns
 
@@ -712,6 +821,9 @@ Every part occupied with its own activity
 
 Also preallocate space with a NumPy array (sicne we know)
 
+#### 
+
+You can add any kind of of summaries (or make a different class that can process those results, make images, etc)
 
 ### Further Improvements {background="#43464B"}
 
