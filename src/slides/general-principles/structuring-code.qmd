@@ -1,5 +1,5 @@
 ---
-title: "Writing Good Simulation Code"
+title: "Good Simulation Code I"
 subtitle: "How to Structure Code: From Monolithic to Modular Design"
 author: Vladislav Morozov  
 format:
@@ -46,7 +46,9 @@ open-graph:
 
 #### Learning Outcomes
 
-This lecture is  
+This lecture focuses 
+
+Goal is to prepare
 
 <br>
 
@@ -71,6 +73,7 @@ Programming
 
 :::
 
+ 
 
 ### Simulation Setting {background="#43464B"}
 
@@ -89,7 +92,7 @@ $Y_t^x$ — potential outcome under $x$ for observation $t$
 Basic econometrics tells us that OLS estimator in regressing $Y_t$ on $(1, X_t)$ is
 
 - Unbiased if $\E[U_t|X_1, \dots, X_T] = 0$
-- Biased otherwise 
+- Possibly biased otherwise 
 
 #### Why Care About Bias?
 
@@ -132,19 +135,19 @@ $\Rightarrow$ both can lead to incorrect policy conclusions
 
 <br> 
 
-Today — a showcase of 
+Today — talk mostly about <span class="highlight">code design</span>
 
 - Our three-step simulation anatomy
 - A sketch for extensible simulation design — foundation for later
+  
 
-#### Imports
-
-```{python}
-#| echo: true
+```{python} 
 import numpy as np
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+from typing import Tuple
 ```
 
 
@@ -211,7 +214,7 @@ Recall that simulations should be
 
 - Targeted: 
     - Be specific in terms of target metrics
-    - Focus in DGPs that cause differences in target metrics
+    - Focus DGPs that cause differences in target metrics
  
 #### Choosing Scenario: Time Series
 
@@ -269,7 +272,7 @@ Ideally: would specify based on some reference empirical datasets
 
 <div class="left-color">
 
-Here: talk in a very stylized manner. Later — more specific designs
+Here: talk in a very stylized manner 
 
 </div>
 
@@ -310,7 +313,7 @@ $$
 Dependence: $\beta_1$ value
 
 $$  \small
-\beta_1 \in \curl{0, 0.5, 0.9}
+\beta_1 \in \curl{0, 0.5, 0.95}
 $$
 
 :::
@@ -320,7 +323,7 @@ $$
 
 <div class="left-color">
 
-Bias appears in dynamic setting, but not static. Checking this dimension is <span class="highlight">targeted</span>
+Bias appears in dynamic setting, but not static. Checking dynamic vs. static is <span class="highlight">targeted</span>
 
 </div>
 
@@ -382,6 +385,22 @@ So far specified:
 Now time to actually implement — but how?
 
 </div>
+
+#### Plan for Today
+
+Today we talk about two approaches:
+
+- Based on a single function (good for starting and small simulations)
+- A more modular approach (better for larger simulations and easier to develop)
+
+<br>
+
+<div class="left-color">
+
+Code examples of today: illustrative examples
+
+</div>
+
 
 #### General Advice
 
@@ -629,7 +648,7 @@ Now need to expand simulations to add AR(1) design
  
 Simplest way: just expand existing function
 
-- Add new DGP option `ar1`
+- Add new DGP option `"ar1"`
 - Involves changing `simulate_ols` to have a new argument for `dgp_type`
   - Old beahvior: `dgp_type="static"`
   - New behavior: `dgp_type="ar1"`
@@ -766,7 +785,6 @@ Bias decays as sample size increases
 ## A More Robust Implementation {background="#00100F"}
  
 
-### Modular Design {background="#43464B"}
 
 #### Problem: How To Expand Simulations?
 
@@ -807,6 +825,22 @@ The simulation function becomes a ["god object"](https://en.wikipedia.org/wiki/G
 
 :::
 
+#### This Lecture: Dealing With Complexity
+
+For the rest of today: dealing with <span class="highlight">design</span>
+
+- Untangling the different components of simulation
+- Learning a more modular structure
+
+<br>
+
+. . .
+
+Next time: dealing with the manual orchestration issue
+
+### Towards Modular Design {background="#43464B"}
+
+
 #### A Step Back: What Are We Doing?
 
 There are three code tasks:
@@ -816,7 +850,9 @@ There are three code tasks:
 3. *Orchestration*: run the above many times and collect results
 
 
-Things are all jumbled up and hardcoded  by`simulate_ols()` functions mixes everything
+<br>
+
+For now things are all jumbled up and hardcoded  by `simulate_ols()` 
 
 
 #### Why Should The Simulation Loop Care? 
@@ -890,8 +926,8 @@ Interfaces are like contracts
 
 
 
-- DPS promises to give valid date if `sample` is called 
-- Estimator promises to give suitable coefficients if `fit` is called 
+- DGP promises to give valid date if `sample()` is called 
+- Estimator promises to give suitable coefficients if `fit()` is called 
 
 . . .
 
@@ -924,47 +960,355 @@ Each DGP encapsulates its own logic:
 
 The outside world only sees the `sample()` method that returns a sample of `X` and `y` 
 
+
+### Implementing The New Design {background="#43464B"}
+
+
 #### Example: Static DGP Class
 
+```{python} 
+#| echo: true
+class StaticNormalDGP:
+    """A data-generating process (DGP) for a static linear model
+
+    Attributes:
+        beta0 (float): Intercept term.
+        beta1 (float): Slope coefficient.
+    """
+
+    def __init__(self, beta0: float = 0.0, beta1: float = 0.5):
+        """Initializes the DGP with intercept and slope.
+
+        Args:
+            beta0 (float): Intercept term. Defaults to 0.0.
+            beta1 (float): Slope coefficient. Defaults to 1.0.
+        """
+        self.beta0 = beta0
+        self.beta1 = beta1
+
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Samples data from the static DGP.
+
+        Args:
+            n_obs (int): Number of observations to sample.
+            seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+        Returns:
+            tuple: (x, y) arrays, each of length n_obs.
+        """
+        rng = np.random.default_rng(seed)
+        x = rng.normal(size=n_obs)
+        u = rng.normal(size=n_obs)
+        y = self.beta0 + self.beta1 * x + u
+        return x, y
+```
 
 #### Discussion of DGP Class
 
-- We use classes to capture different concerns and specify interfaces
-- Example
+We use a class to:
 
-#### 
+- Capture a specific concern (data drawing)
+- Specify interfaces (a `sample` method)
+- Encapsulate logic (could add more data logic)
 
-
-Also preallocate space with a NumPy array (sicne we know)
-
-#### 
-
-You can add any kind of of summaries (or make a different class that can process those results, make images, etc)
+. . .
 
 
-####
+Example usage
 
-### Further Improvements {background="#43464B"}
+```{python}
+#| echo: true
+static_sampler = StaticNormalDGP(beta1=0.4)
+x, y = static_sampler.sample(n_obs=5, seed=1)
+print(f"x: {x.round(2)} \ny: {y.round(2)}")
+```
 
-#### Wrapping Into a Single Block
+#### Example: AR(1) Class
 
-So far — just called things separately
+A class for AR(1) with <span class="highlight">same `sample()` interface</span>
+```{python}
+#| echo: true
+#| code-line-numbers: "19-21"
+class DynamicNormalDGP:
+    """A data-generating process (DGP) for a dynamic linear model: y_t = beta0 + beta1*y_{t-1} + u_t.
 
-- Dangerous: what if you forget something? 
-- Also annoying
+    Attributes:
+        beta0 (float): Intercept term.
+        beta1 (float): AR(1) coefficient.
+    """
 
-#### Unifying 
+    def __init__(self, beta0: float = 0.0, beta1: float = 0.5):
+        """Initializes the DGP with intercept and AR(1) coefficient.
+
+        Args:
+            beta0 (float): Intercept term. Defaults to 0.0.
+            beta1 (float): AR(1) coefficient. Defaults to 0.5.
+        """
+        self.beta0 = beta0
+        self.beta1 = beta1
+
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Samples data from the dynamic DGP.
+
+        Args:
+            n_obs (int): Number of observations to sample.
+            seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+        Returns:
+            tuple: (x, y) arrays, each of length n_obs.
+                  x is y_{t-1} (lagged y), and y is y_t.
+        """
+        rng = np.random.default_rng(seed)
+        y = np.zeros(n_obs + 1)  # Extra observation for lag
+        u = rng.normal(size=n_obs + 1)
+        y[0] = self.beta0 + u[0]  # Initial condition
+        for t in range(1, n_obs + 1):
+            y[t] = self.beta0 + self.beta1 * y[t - 1] + u[t]
+        # Return lagged y as x and y[1:] as y
+        return y[:-1], y[1:]
+
+```
+
+#### Same Idea: Simple Estimator Class
+
+Hide estimator logic and only provide `fit()`
+
+```{python}
+#| echo: true
+class SimpleOLS:
+    """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float | None): Estimated intercept. None until fit is called.
+        beta1_hat (float | None): Estimated slope. None until fit is called.
+    """
+
+    def __init__(self) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float | None = None
+        self.beta1_hat: float | None = None
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the OLS model to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
  
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+```
 
-#### How Much Information
+#### `SimpleOLS` In Action
 
-do not take this as an absolute truth, but more of a suggestion
+To fit an instance of `SimpleOLS`, just pass data:
+
+```{python}
+#| echo: true
+ols = SimpleOLS()
+x, y = static_sampler.sample(n_obs=5000, seed=1)
+ols.fit(x, y)
+print(f"Estimated slope coefficient: {ols.beta1_hat:.3f}")
+```
 
 
-#### Better DGPs
+<br>
 
-attached to some empirical dataset
+<div class="left-color">
 
+Now ready to put things together into simulation
+
+</div>
+
+#### Simulation Runner Class
+
+
+```{python}
+#| echo: true 
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and estimator.
+
+    Attributes:
+        dgp: Data-generating process with a `sample` method.
+        estimator: Estimator with a `fit` method and `beta1_hat` attribute.
+        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+    """
+
+    def __init__(
+        self,
+        dgp: "StaticNormalDGP" | "DynamicNormalDGP",
+        estimator: SimpleOLS,
+    ) -> None:
+        """Initializes the simulation runner.
+
+        Args:
+            dgp: An instance of a DGP class (must implement `sample`).
+            estimator: An instance of an estimator class (must implement `fit`).
+        """
+        self.dgp = dgp
+        self.estimator = estimator
+        self.errors = None
+
+    def simulate(self, n_sim: int, n_obs: int, seed: int | None = None) -> None:
+        """Runs simulations and stores estimation errors.
+
+        Args:
+            n_sim (int): number of simulations to run.
+            n_obs (int): Number of observations per simulation.
+            seed (int | None): Random seed for reproducibility. Defaults to None.
+        """
+        # Preallocate array to hold estimation errors
+        self.errors = np.empty(n_sim)
+
+        # Run simulation
+        for sim_id in range(n_sim):
+            # Draw data
+            x, y = self.dgp.sample(n_obs, seed=seed + sim_id if seed else None)
+            # Fit model
+            self.estimator.fit(x, y)
+            # Store error
+            self.errors[sim_id] = self.estimator.beta1_hat - self.dgp.beta1
+```
+
+#### Simulation Runner in Action
+
+Simulation flow now:
+
+- Create DGP and estimator
+- Pass to `SimulationRunner` and `simulate()`
+
+```{python}
+#| echo: true
+# Initialize DGP and estimator
+static_dgp = StaticNormalDGP(beta0=0.0, beta1=0.5)
+ols_estimator = SimpleOLS()
+
+# Initialize and run simulation
+ols_static_sim = SimulationRunner(static_dgp, ols_estimator)
+ols_static_sim.simulate(n_sim=1000, n_obs=50, seed=1)
+
+# Summarize bias
+print(f"Average estimation error (bias): {ols_static_sim.errors.mean():.4f}")
+```
+
+#### Discussion: What Just Happened?
+ 
+<div class="left-color">
+
+DGP, estimator, and simulation runner are now independent
+
+</div>
+
+. . . 
+
+<br>
+
+Benefits:
+
+- Can add new scenarios without touching the core simulation logic
+- Different people can work on these without conflicts
+- Can reuse components elsewhere
+- Easier to read and change the code
+
+
+#### What To Do With Results
+
+`SimulationRunner` stores raw simulation results (here: full estimation errors)
+
+. . .
+
+<br>
+
+How these are handled — depends on what you want to do
+
+- Can add summary methods
+- Can create other objects that process run simulations (and generate figures)
+ 
+#### Example: Adding A Summary to `SimulationRunner`
+
+```{python}
+#| echo: true 
+#| code-line-numbers: "45-51"
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and estimator.
+
+    Attributes:
+        dgp: Data-generating process with a `sample` method.
+        estimator: Estimator with a `fit` method and `beta1_hat` attribute.
+        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+    """
+
+    def __init__(
+        self,
+        dgp: "StaticNormalDGP" | "DynamicNormalDGP",
+        estimator: SimpleOLS,
+    ) -> None:
+        """Initializes the simulation runner.
+
+        Args:
+            dgp: An instance of a DGP class (must implement `sample`).
+            estimator: An instance of an estimator class (must implement `fit`).
+        """
+        self.dgp = dgp
+        self.estimator = estimator
+        self.errors = None
+
+    def simulate(self, n_sim: int, n_obs: int, seed: int | None = None) -> None:
+        """Runs simulations and stores estimation errors.
+
+        Args:
+            n_sim (int): number of simulations to run.
+            n_obs (int): Number of observations per simulation.
+            seed (int | None): Random seed for reproducibility. Defaults to None.
+        """
+        # Preallocate array to hold estimation errors
+        self.errors = np.empty(n_sim)
+
+        # Run simulation
+        for sim_id in range(n_sim):
+            # Draw data
+            x, y = self.dgp.sample(n_obs, seed=seed + sim_id if seed else None)
+            # Fit model
+            self.estimator.fit(x, y)
+            # Store error
+            self.errors[sim_id] = self.estimator.beta1_hat - self.dgp.beta1
+
+    def summarize_bias(self) -> float:
+        """Computes the average estimation error (bias) for beta1.
+
+        Returns:
+            float: Average error (beta1_hat - beta1) across simulations.
+        """ 
+        return np.mean(self.errors)
+```
+
+
+ 
+#### Example: Summarizing AR(1) Simulation
+
+For example: compute bias in dynamic model with a lot of persistence: 
+
+```{python}
+#| echo: true
+# Initialize DGP and estimator
+dynamic_dgp = DynamicNormalDGP(beta0=0.0, beta1=0.95)
+ols_estimator = SimpleOLS()
+
+# Initialize and run simulation
+ols_dynamic_sim = SimulationRunner(dynamic_dgp, ols_estimator)
+ols_dynamic_sim.simulate(n_sim=1000, n_obs=50, seed=1)
+
+# Summarize bias
+print(f"Average estimation error (bias): {ols_dynamic_sim.errors.mean():.4f}")
+```
 
 ## Recap and Conclusions {background="#00100F"}
  
@@ -974,12 +1318,45 @@ attached to some empirical dataset
 
 In this lecture we 
  
+- Saw our first simulation
+- Talked about a simple approach to structuring simulation code (function)
+- Discussed the benefits of a more modular structure
+
+#### How To Intepret Things From Today: Two Final Points
+
+
+Choose the appropriate level of complexity for your situation:
+
+- A brief simulation with one DGP does not need deep architecture
+- A complex simulation involving many scenarios and estimators would benefit from a clearer structure
+
+
+<div class="left-color">
+
+The specific implementations of today are not absolute, but an example of how to think
+
+</div>
+
+
+#### Further Improvements
+
+<br>
+
+Our simulation is in a good prototype shape, but can still improve some things:
+
+
+- Clean up relationships between DGP classes and organize them in a common family
+- Add simulation metadata (DGP name, estimator name for further purposes)
+- Tracking progress 
 
 #### Next Questions
 
 <br>
 
-Now  
+- How to clean up some loose ends in existing code?
+- How to organize running many simulations?
+- How to handle simulation results?
+- How to apply these logic to deeper statistical scenarios?
 
 #### References {.allowframebreaks visibility="uncounted"}
 
