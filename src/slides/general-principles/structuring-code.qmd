@@ -66,6 +66,7 @@ Statistics:
 
 Programming
 
+- Chapter 2-3 of @Hillard2020PracticesPythonPro on basics of design
 - Chapter 26-27 of @Lutz2025LearningPythonPowerful on OOP in Python
 
 :::
@@ -509,6 +510,9 @@ plt.show()
 ```
 
 
+### Setting Seeds {background="#43464B"}
+
+
 #### Problem: Lack of Reproducibility
 
 What happens if we rerun our code twice?
@@ -788,42 +792,157 @@ We need a better approach to organizing simulations
 
 </div>
 
-- Basic approach is fine if you just want run one thing
+- Basic approach is <span class="highlight">fine</span> if you just want run one thing
 - But difficult if you want to expand more:
-    - Adding new DGPs would mean expanding simulation functions even more
+    - Adding new DGPs would mean expanding simulation function even more
     - We would have to remember to run all the different cases ourselves
+ 
+. . .
+
+Becomes difficult to scale and maintain
+
+::: {.footer}
+
+The simulation function becomes a ["god object"](https://en.wikipedia.org/wiki/God_object)
+
+:::
+
+#### A Step Back: What Are We Doing?
+
+There are three code tasks:
+
+1. *Data generation*: draw data from a DGP
+2. *Estimation*: apply an estimator to the data
+3. *Orchestration*: run the above many times and collect results
+
+
+Things are all jumbled up and hardcoded  by`simulate_ols()` functions mixes everything
+
+
+#### Why Should The Simulation Loop Care? 
+
+<div class="left-color">
+
+The simulation loop shouldn't need to know:
+
+- How data is generated (e.g., AR(1) vs. static)
+- How estimation works (e.g., OLS vs. IV)
+
+
+
+
+</div> 
+
+It only needs to:
+
+- Get data from *something* (DGP)
+- Pass data to *something* (estimator)
+- Repeat and store results
+
+
+#### Background: Separation of Concerns
+
+
+<div class="left-color">
+
+
+Key in clear code: divide various behavious into small, manageable pieces
+
+
+</div> 
+
+
+Best way to divide — <span class="highlight">by concern</span>. This:
+
+- Reduces complexity (each part does one thing well)
+- Improves reusability (swap DGPs/estimators without rewriting everything)
+- Makes collaboration easier (different people can work on different parts)
+
+#### Interfaces: Glue Between Components
+
+
+The simulation runner only needs to know about <span class="highlight">interfaces</span>:
+
+- DGP interface: Must provide a method like `sample(n_obs, seed)`
+- Estimator interface: Must provide a method like `fit(X, y)`
+
+<br>
+
+
+<div class="left-color">
+
+
+As long as a DGP/estimator implement given interface, simulation runner can use it
+
+ <span class="highlight">Their implementation details do not matter</span>
+
+</div> 
+
+
+#### Background: Interfaces
+
+
+
+
+Interfaces are like contracts
+
  
 
 
-#### Problem: No Separation of Concerns
 
-A step back: there are three pieces
+- DPS promises to give valid date if `sample` is called 
+- Estimator promises to give suitable coefficients if `fit` is called 
 
-Things are all jumbled up and hardcoded 
-
-- DGPs
-- Estimator
+. . .
 
 
-The `simulate_ols()` functions mixes everything
+<br>
 
-But why should it? 
-But does the simulation loop really need to know that? From the point of simulation loop, so
-
+<div class="left-color">
 
 
-#### Separation of Concerns
+Benefit: You can add new DGPs/estimators without touching the simulation runner!
 
-Every part occupied with its own activity
+</div>
+
+ 
+
+::: {.footer}
+
+You likely familiar with this from `statsmodels` or `scikit-learn`: always having `fit()` for all estimators and algorithms
+
+:::
+
+#### DGPs Encapsulate Their Logic
+
+Each DGP encapsulates its own logic:
+
+- AR(1) DGP handles its own loops, initial conditions, etc.
+- Static DGP just draws IID data.
+
+<br>
+
+The outside world only sees the `sample()` method that returns a sample of `X` and `y` 
+
+#### Example: Static DGP Class
 
 
-####
+#### Discussion of DGP Class
+
+- We use classes to capture different concerns and specify interfaces
+- Example
+
+#### 
+
 
 Also preallocate space with a NumPy array (sicne we know)
 
 #### 
 
 You can add any kind of of summaries (or make a different class that can process those results, make images, etc)
+
+
+####
 
 ### Further Improvements {background="#43464B"}
 
