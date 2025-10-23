@@ -6,7 +6,7 @@ format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content="  (lecture note slides)"/> 
+        <meta name="description" content="How to write good Monte Carlo simulation code: from monolithic functional to modular OOP design, with a worked OLS example (lecture note slides)"/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: " (lecture note slides)" 
+    description: "How to write good Monte Carlo simulation code: from monolithic functional to modular OOP design, with a worked OLS example (lecture note slides)" 
 ---
 
 
@@ -46,16 +46,16 @@ open-graph:
 
 #### Learning Outcomes
 
-This lecture focuses 
-
-Goal is to prepare
+This lecture is about writing clean Monte Carlo code  
 
 <br>
 
 By the end, you should be able to
 
 
-- Discuss  
+- Start with a simple function-based simulation and recognize its limitations
+- Refactor your code into modular reusable classes
+- Understand how modularity leads to clearer, more extensible code  
 
 #### References
 
@@ -852,7 +852,7 @@ There are three code tasks:
 
 <br>
 
-For now things are all jumbled up and hardcoded  by `simulate_ols()` 
+For now things are all jumbled up and hardcoded  by `simulate_ols()`  — <span class="highlight">monolithic design</span>
 
 
 #### Why Should The Simulation Loop Care? 
