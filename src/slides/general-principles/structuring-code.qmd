@@ -445,11 +445,14 @@ def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5):
     # Create container to store results
     results_ols_errors = []
 
+    # Initialize the RNG
+    rng = np.random.default_rng()
+
     # Core simulation loop
     for _ in range(n_sim):
         # 1. Draw data
-        x = np.random.normal(size=n_obs)
-        u = np.random.normal(size=n_obs)
+        x = rng.normal(size=n_obs)
+        u = rng.normal(size=n_obs)
         y = beta0 + beta1 * x + u
 
         # 2. Run OLS estimation
@@ -520,14 +523,19 @@ Now need to expand simulations to add AR(1) design
 
 </div>
  
-- Simplest way: just expand existing function
-- Add new DGP option: 
+Simplest way: just expand existing function
+
+- Add new DGP option `ar1`
+- Involves changing `simulate_ols` to have a new argument for `dgp_type`
+  - Old beahvior: `dgp_type="static"`
+  - New behavior: `dgp_type="ar1"`
+- Also deal with losing one observation to $Y_{t-1}$
 
 #### Expanded Simulation Function: With AR(1) DGP
 
 ```{python}
 #| echo: true
-#| code-line-numbers: "24-32"
+#| code-line-numbers: "1,27-35"
 def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, dgp_type="static"):
     """Simulates OLS estimation for static or AR(1) DGP.
     Args:
@@ -544,20 +552,23 @@ def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, dgp_type="static"):
     # Create container to store results
     results_ols_errors = []
 
+    # InitializeRNG
+    rng = np.random.default_rng()
+
     # Core simulation loop
     for _ in range(n_sim):
         # 1. Draw data
         if dgp_type == "static":
-            x = np.random.normal(size=n_obs)
-            u = np.random.normal(size=n_obs)
+            x = rng.normal(size=n_obs)
+            u = rng.normal(size=n_obs)
             y = beta0 + beta1 * x + epsilon
         elif dgp_type == "ar1":
             y = np.zeros(n_obs + 1)
-            u = np.random.normal(size=n_obs + 1)
+            u = rng.normal(size=n_obs + 1)
             y[0] = beta0 + u[0]
             for t in range(1, n_obs + 1):
                 y[t] = beta0 + beta1 * y[t-1] + u[t]
-            # Use the last n_obs elements of y and the first n_obs elements of y as x
+            # Use the last n_obs elements of y as and the first n_obs as x
             x = y[:-1]  # x is y lagged (n_obs elements)
             y = y[1:]  # y[1:] is the dependent variable (n_obs elements)
             
@@ -574,29 +585,41 @@ def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, dgp_type="static"):
 
 #### Running AR(1) Simulation
  
+Can now run our simulations with $\beta \in \curl{0, 0.5, 0.95}$:
 
 ```{python}
 #| echo: true
-ar_results = simulate_ols(dgp_type="ar1")
-print(f"Bias (static DGP): {np.mean(ar_results)}")
+ar_results_no_pers = simulate_ols(beta1=0, dgp_type="ar1")
+ar_results_med_pers = simulate_ols(beta1=0.5, dgp_type="ar1")
+ar_results_high_pers = simulate_ols(beta1=0.95, dgp_type="ar1")
+print(f"Bias (no persistence): {np.mean(ar_results_no_pers):.3f}")
+print(f"Bias (medium persistence): {np.mean(ar_results_med_pers):.3f}")
+print(f"Bias (high persistence): {np.mean(ar_results_high_pers):.3f}")
 ```
 
+. . .
+
+Conclusions:
+
+<div class='left-color'>
+
+- More persistence = larger absolute bias
+- Direction: downward (underestimating)
+
+</div>
+  
 
 
-#### Running AR(1) Simulation With High Persistence
  
-```{python}
-#| echo: true
-ar_results = simulate_ols(beta1=0.95, dgp_type="ar1")
-print(f"Bias (static DGP): {np.mean(ar_results)}")
-```
-
 
 ## A More Robust Implementation {background="#00100F"}
  
 
 ### Modular Design {background="#43464B"}
 
+#### More DGPs
+
+more sample sizes, more DGPs (e.g. heavier tails)
 
 #### Issues
 
@@ -624,6 +647,10 @@ But does the simulation loop really need to know that? From the point of simulat
 
 Every part occupied with its own activity
 
+
+####
+
+Also preallocate space with a NumPy array (sicne we know)
 
 
 ### Further Improvements {background="#43464B"}
