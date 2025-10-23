@@ -1,5 +1,5 @@
 ---
-title: "Good Simulation Code I"
+title: "Good Simulation Code I: Design"
 subtitle: "How to Structure Code: From Monolithic to Modular Design"
 author: Vladislav Morozov  
 format:
@@ -53,7 +53,7 @@ This lecture is about writing clean Monte Carlo code
 By the end, you should be able to
 
 
-- Start with a simple function-based simulation and recognize its limitations
+- Start with a simple function-based simulation and recognize its place and limitations
 - Refactor your code into modular reusable classes
 - Understand how modularity leads to clearer, more extensible code  
 

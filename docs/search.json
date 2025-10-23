@@ -55,6 +55,83 @@
     ]
   },
   {
+    "objectID": "slides/general-principles/structuring-code.html#introduction",
+    "href": "slides/general-principles/structuring-code.html#introduction",
+    "title": "Good Simulation Code I: Design",
+    "section": "Introduction",
+    "text": "Introduction",
+    "crumbs": [
+      "Course Slides",
+      "Good Simulation Code I: Design"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/structuring-code.html#setting-out-simulation-goals",
+    "href": "slides/general-principles/structuring-code.html#setting-out-simulation-goals",
+    "title": "Good Simulation Code I: Design",
+    "section": "Setting Out Simulation Goals",
+    "text": "Setting Out Simulation Goals",
+    "crumbs": [
+      "Course Slides",
+      "Good Simulation Code I: Design"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/structuring-code.html#first-implementation",
+    "href": "slides/general-principles/structuring-code.html#first-implementation",
+    "title": "Good Simulation Code I: Design",
+    "section": "First Implementation",
+    "text": "First Implementation",
+    "crumbs": [
+      "Course Slides",
+      "Good Simulation Code I: Design"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/structuring-code.html#a-more-robust-implementation",
+    "href": "slides/general-principles/structuring-code.html#a-more-robust-implementation",
+    "title": "Good Simulation Code I: Design",
+    "section": "A More Robust Implementation",
+    "text": "A More Robust Implementation",
+    "crumbs": [
+      "Course Slides",
+      "Good Simulation Code I: Design"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/structuring-code.html#recap-and-conclusions",
+    "href": "slides/general-principles/structuring-code.html#recap-and-conclusions",
+    "title": "Good Simulation Code I: Design",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Course Slides",
+      "Good Simulation Code I: Design"
+    ]
+  },
+  {
+    "objectID": "slides/organizational/intro.html#content-and-motivation",
+    "href": "slides/organizational/intro.html#content-and-motivation",
+    "title": "Course Introduction",
+    "section": "Content and Motivation",
+    "text": "Content and Motivation",
+    "crumbs": [
+      "Course Info",
+      "Course Introduction"
+    ]
+  },
+  {
+    "objectID": "slides/organizational/intro.html#course-logistics",
+    "href": "slides/organizational/intro.html#course-logistics",
+    "title": "Course Introduction",
+    "section": "Course Logistics",
+    "text": "Course Logistics",
+    "crumbs": [
+      "Course Info",
+      "Course Introduction"
+    ]
+  },
+  {
     "objectID": "slides/general-principles/intro-to-simulations.html#introduction",
     "href": "slides/general-principles/intro-to-simulations.html#introduction",
     "title": "Why Monte Carlo? General Principles",
@@ -96,28 +173,6 @@
     "crumbs": [
       "Course Slides",
       "Why Monte Carlo? General Principles"
-    ]
-  },
-  {
-    "objectID": "slides/organizational/intro.html#content-and-motivation",
-    "href": "slides/organizational/intro.html#content-and-motivation",
-    "title": "Course Introduction",
-    "section": "Content and Motivation",
-    "text": "Content and Motivation",
-    "crumbs": [
-      "Course Info",
-      "Course Introduction"
-    ]
-  },
-  {
-    "objectID": "slides/organizational/intro.html#course-logistics",
-    "href": "slides/organizational/intro.html#course-logistics",
-    "title": "Course Introduction",
-    "section": "Course Logistics",
-    "text": "Course Logistics",
-    "crumbs": [
-      "Course Info",
-      "Course Introduction"
     ]
   },
   {
