@@ -1093,7 +1093,7 @@ class SimpleOLS:
         self.beta1_hat: float | None = None
 
     def fit(self, x: np.ndarray, y: np.ndarray) -> None:
-        """Fits the OLS model to the provided data.
+        """Fit OLS to the provided data.
 
         Args:
             x (np.ndarray): Independent variable (1D array).
@@ -1287,7 +1287,7 @@ class SimulationRunner:
         Returns:
             float: Average error (beta1_hat - beta1) across simulations.
         """ 
-        return np.mean(self.errors)
+        print(f"Average estimation error (bias): {np.mean(self.errors):.4f}")
 ```
 
 
@@ -1307,7 +1307,85 @@ ols_dynamic_sim = SimulationRunner(dynamic_dgp, ols_estimator)
 ols_dynamic_sim.simulate(n_sim=1000, n_obs=50, seed=1)
 
 # Summarize bias
-print(f"Average estimation error (bias): {ols_dynamic_sim.errors.mean():.4f}")
+ols_dynamic_sim.summarize_bias()
+```
+
+
+#### Adding a New Estimator
+
+- So far: only used one estimator (OLS)
+- But our design can easily allow us to consider other estimators
+
+. . . 
+
+<div class="left-color">
+
+Consider the simple *ridge* estimator:
+$$
+\hat{\bbeta} = (\bX'\bX+\lambda I)^{-1} \bX'\bY
+$$
+$\lambda$ — regularization strength
+
+</div>
+
+Ridge — one of simpler examples of <span class="highlight">shrinkage</span> estimators
+
+#### Implementation of Simple Ridge Estimator
+
+```{python}
+#| echo: true
+#| code-line-numbers: "1,10,14,16,27"
+class SimpleRidge:
+    """A simple ridge estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float | None): Estimated intercept. None until fit is called.
+        beta1_hat (float | None): Estimated slope. None until fit is called.
+        reg_param (float): Strength of regularization. Defaults to 0.01.
+    """
+
+    def __init__(self, reg_param: float = 0.01) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float | None = None
+        self.beta1_hat: float | None = None
+        self.reg_param = reg_param
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the ridge estimator to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+ 
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X + self.reg_param * np.eye(2)) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+```
+
+#### Bias vs. Regularization Strength
+
+```{python}
+#| echo: true
+#| code-line-numbers: "5-6,9-10"
+# Initialize DGP and estimator
+static_dgp = StaticNormalDGP(beta0=0.0, beta1=0.5)
+
+# Estimators
+ridge_weak = SimpleRidge(reg_param=0.01)
+ridge_strong = SimpleRidge(reg_param=100)
+
+# Initialize and run simulations
+sim_ridge_weak = SimulationRunner(static_dgp, ridge_weak)
+sim_ridge_strong = SimulationRunner(static_dgp, ridge_strong)
+sim_ridge_weak.simulate(n_sim=1000, n_obs=50, seed=1)
+sim_ridge_strong.simulate(n_sim=1000, n_obs=50, seed=1)
+
+# Summarize bias 
+sim_ridge_weak.summarize_bias()
+sim_ridge_strong.summarize_bias()
 ```
 
 ## Recap and Conclusions {background="#00100F"}
