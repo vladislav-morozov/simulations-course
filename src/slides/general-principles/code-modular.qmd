@@ -1,6 +1,6 @@
 ---
-title: "Good Simulation Code I: Design"
-subtitle: "How to Structure Code: From Monolithic to Modular Design"
+title: "Good Simulation Code II: Modular Approach"
+subtitle: "A Flexible and Extensible Design"
 author: Vladislav Morozov  
 format:
   revealjs:

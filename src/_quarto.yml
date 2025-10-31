@@ -37,10 +37,11 @@ website:
         contents: 
         - slides/organizational/intro.qmd  
         - project-info.qmd
-      - section: "Course Slides"
-        contents: 
         - slides/general-principles/intro-to-simulations.qmd
-        - slides/general-principles/structuring-code.qmd
+      - section: "Structuring Your Code"
+        contents: 
+        - slides/general-principles/code-basic.qmd
+        - slides/general-principles/code-modular.qmd
 
 execute:
   freeze: auto  # re-render only when source changes
