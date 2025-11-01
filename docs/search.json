@@ -55,58 +55,102 @@
     ]
   },
   {
-    "objectID": "slides/general-principles/structuring-code.html#introduction",
-    "href": "slides/general-principles/structuring-code.html#introduction",
-    "title": "Good Simulation Code I: Design",
+    "objectID": "slides/general-principles/code-basic.html#introduction",
+    "href": "slides/general-principles/code-basic.html#introduction",
+    "title": "Good Simulation Code I: Starting with Functions",
     "section": "Introduction",
     "text": "Introduction",
     "crumbs": [
-      "Course Slides",
-      "Good Simulation Code I: Design"
+      "Structuring Your Code",
+      "Good Simulation Code I: Starting with Functions"
     ]
   },
   {
-    "objectID": "slides/general-principles/structuring-code.html#setting-out-simulation-goals",
-    "href": "slides/general-principles/structuring-code.html#setting-out-simulation-goals",
-    "title": "Good Simulation Code I: Design",
-    "section": "Setting Out Simulation Goals",
-    "text": "Setting Out Simulation Goals",
+    "objectID": "slides/general-principles/code-basic.html#specifying-our-simulation",
+    "href": "slides/general-principles/code-basic.html#specifying-our-simulation",
+    "title": "Good Simulation Code I: Starting with Functions",
+    "section": "Specifying Our Simulation",
+    "text": "Specifying Our Simulation",
     "crumbs": [
-      "Course Slides",
-      "Good Simulation Code I: Design"
+      "Structuring Your Code",
+      "Good Simulation Code I: Starting with Functions"
     ]
   },
   {
-    "objectID": "slides/general-principles/structuring-code.html#first-implementation",
-    "href": "slides/general-principles/structuring-code.html#first-implementation",
-    "title": "Good Simulation Code I: Design",
-    "section": "First Implementation",
-    "text": "First Implementation",
+    "objectID": "slides/general-principles/code-basic.html#basic-functional-implementation",
+    "href": "slides/general-principles/code-basic.html#basic-functional-implementation",
+    "title": "Good Simulation Code I: Starting with Functions",
+    "section": "Basic Functional Implementation",
+    "text": "Basic Functional Implementation",
     "crumbs": [
-      "Course Slides",
-      "Good Simulation Code I: Design"
+      "Structuring Your Code",
+      "Good Simulation Code I: Starting with Functions"
     ]
   },
   {
-    "objectID": "slides/general-principles/structuring-code.html#a-more-robust-implementation",
-    "href": "slides/general-principles/structuring-code.html#a-more-robust-implementation",
-    "title": "Good Simulation Code I: Design",
-    "section": "A More Robust Implementation",
-    "text": "A More Robust Implementation",
+    "objectID": "slides/general-principles/code-basic.html#expanding-the-simulation",
+    "href": "slides/general-principles/code-basic.html#expanding-the-simulation",
+    "title": "Good Simulation Code I: Starting with Functions",
+    "section": "Expanding the Simulation",
+    "text": "Expanding the Simulation",
     "crumbs": [
-      "Course Slides",
-      "Good Simulation Code I: Design"
+      "Structuring Your Code",
+      "Good Simulation Code I: Starting with Functions"
     ]
   },
   {
-    "objectID": "slides/general-principles/structuring-code.html#recap-and-conclusions",
-    "href": "slides/general-principles/structuring-code.html#recap-and-conclusions",
-    "title": "Good Simulation Code I: Design",
+    "objectID": "slides/general-principles/code-basic.html#recap-and-conclusions",
+    "href": "slides/general-principles/code-basic.html#recap-and-conclusions",
+    "title": "Good Simulation Code I: Starting with Functions",
     "section": "Recap and Conclusions",
     "text": "Recap and Conclusions",
     "crumbs": [
-      "Course Slides",
-      "Good Simulation Code I: Design"
+      "Structuring Your Code",
+      "Good Simulation Code I: Starting with Functions"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/intro-to-simulations.html#introduction",
+    "href": "slides/general-principles/intro-to-simulations.html#introduction",
+    "title": "Why Monte Carlo? General Principles",
+    "section": "Introduction",
+    "text": "Introduction",
+    "crumbs": [
+      "Course Info",
+      "Why Monte Carlo? General Principles"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/intro-to-simulations.html#role-of-monte-carlo-simulations",
+    "href": "slides/general-principles/intro-to-simulations.html#role-of-monte-carlo-simulations",
+    "title": "Why Monte Carlo? General Principles",
+    "section": "Role of Monte Carlo Simulations",
+    "text": "Role of Monte Carlo Simulations",
+    "crumbs": [
+      "Course Info",
+      "Why Monte Carlo? General Principles"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/intro-to-simulations.html#principles-of-good-simulations",
+    "href": "slides/general-principles/intro-to-simulations.html#principles-of-good-simulations",
+    "title": "Why Monte Carlo? General Principles",
+    "section": "Principles of Good Simulations",
+    "text": "Principles of Good Simulations",
+    "crumbs": [
+      "Course Info",
+      "Why Monte Carlo? General Principles"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/intro-to-simulations.html#recap-and-conclusions",
+    "href": "slides/general-principles/intro-to-simulations.html#recap-and-conclusions",
+    "title": "Why Monte Carlo? General Principles",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Course Info",
+      "Why Monte Carlo? General Principles"
     ]
   },
   {
@@ -132,47 +176,58 @@
     ]
   },
   {
-    "objectID": "slides/general-principles/intro-to-simulations.html#introduction",
-    "href": "slides/general-principles/intro-to-simulations.html#introduction",
-    "title": "Why Monte Carlo? General Principles",
+    "objectID": "slides/general-principles/code-modular.html#introduction",
+    "href": "slides/general-principles/code-modular.html#introduction",
+    "title": "Good Simulation Code II: Modular Approach",
     "section": "Introduction",
     "text": "Introduction",
     "crumbs": [
-      "Course Slides",
-      "Why Monte Carlo? General Principles"
+      "Structuring Your Code",
+      "Good Simulation Code II: Modular Approach"
     ]
   },
   {
-    "objectID": "slides/general-principles/intro-to-simulations.html#role-of-monte-carlo-simulations",
-    "href": "slides/general-principles/intro-to-simulations.html#role-of-monte-carlo-simulations",
-    "title": "Why Monte Carlo? General Principles",
-    "section": "Role of Monte Carlo Simulations",
-    "text": "Role of Monte Carlo Simulations",
+    "objectID": "slides/general-principles/code-modular.html#towards-a-modular-design",
+    "href": "slides/general-principles/code-modular.html#towards-a-modular-design",
+    "title": "Good Simulation Code II: Modular Approach",
+    "section": "Towards a Modular Design",
+    "text": "Towards a Modular Design",
     "crumbs": [
-      "Course Slides",
-      "Why Monte Carlo? General Principles"
+      "Structuring Your Code",
+      "Good Simulation Code II: Modular Approach"
     ]
   },
   {
-    "objectID": "slides/general-principles/intro-to-simulations.html#principles-of-good-simulations",
-    "href": "slides/general-principles/intro-to-simulations.html#principles-of-good-simulations",
-    "title": "Why Monte Carlo? General Principles",
-    "section": "Principles of Good Simulations",
-    "text": "Principles of Good Simulations",
+    "objectID": "slides/general-principles/code-modular.html#implementation",
+    "href": "slides/general-principles/code-modular.html#implementation",
+    "title": "Good Simulation Code II: Modular Approach",
+    "section": "Implementation",
+    "text": "Implementation",
     "crumbs": [
-      "Course Slides",
-      "Why Monte Carlo? General Principles"
+      "Structuring Your Code",
+      "Good Simulation Code II: Modular Approach"
     ]
   },
   {
-    "objectID": "slides/general-principles/intro-to-simulations.html#recap-and-conclusions",
-    "href": "slides/general-principles/intro-to-simulations.html#recap-and-conclusions",
-    "title": "Why Monte Carlo? General Principles",
+    "objectID": "slides/general-principles/code-modular.html#summarizing-results",
+    "href": "slides/general-principles/code-modular.html#summarizing-results",
+    "title": "Good Simulation Code II: Modular Approach",
+    "section": "Summarizing Results",
+    "text": "Summarizing Results",
+    "crumbs": [
+      "Structuring Your Code",
+      "Good Simulation Code II: Modular Approach"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/code-modular.html#recap-and-conclusions",
+    "href": "slides/general-principles/code-modular.html#recap-and-conclusions",
+    "title": "Good Simulation Code II: Modular Approach",
     "section": "Recap and Conclusions",
     "text": "Recap and Conclusions",
     "crumbs": [
-      "Course Slides",
-      "Why Monte Carlo? General Principles"
+      "Structuring Your Code",
+      "Good Simulation Code II: Modular Approach"
     ]
   },
   {
