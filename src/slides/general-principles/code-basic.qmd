@@ -873,9 +873,63 @@ Bias decays as sample size increases
 
 #### What's Good About The Functional Approach
 
-####
 
-#### Expanding the Simulation
+
+The monolithic function approach has a few pluses in our <span class="highlight">small</span> simulation:
+
+- Was easy to create and design: just put all the components in one function in the same order
+- Everything is in one place: easy to look at the whole code
+
+. . . 
+
+<br>
+
+<div class='left-color'>
+
+These advantages $\Rightarrow$ why writing a simple function is usually a good starting place for new simulations
+
+
+</div>
+
+#### Problem: How To Expand Simulations?
+
+By now: a working base simulation
+
+. . . 
+
+<br>
+
+
+But what if we <span class="highlight">expand our simulations</span>?
+
+- Try more DGPs (e.g. heavier tails for innovations, different $X$)
+- More sample sizes
+- Different models (not necessarily $Y_t = \beta_0 + \beta_1 X_t + U_t$)
+
+
+#### Limitations of Current Approach
+
+<div class='left-color'>
+
+We need a better approach to organizing simulations
+
+</div>
+
+- Basic approach is <span class="highlight">fine</span> if you just want run one thing
+- But difficult if you want to expand more:
+    - Adding new DGPs would mean expanding simulation function even more
+    - We would have to remember to run all the different cases ourselves
+ 
+. . .
+
+Becomes difficult to scale and maintain
+
+::: {.footer}
+
+The simulation function becomes a ["god object"](https://en.wikipedia.org/wiki/God_object)
+
+:::
+
 
 ## Recap and Conclusions {background="#00100F"}
  
