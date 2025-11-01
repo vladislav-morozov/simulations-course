@@ -399,7 +399,7 @@ Different sample sizes: how bias changes (targeted)
 
  
 
-### Basic Function {background="#43464B"}
+### Implementation Approaches {background="#43464B"}
 
 
 #### Summary So Far
@@ -420,12 +420,12 @@ Now time to actually implement — but how?
 
 </div>
 
-#### Plan for Today
+#### Two Approaches
 
-Today we talk about two approaches:
+In this block talk about two approaches: 
 
-- Based on a single function (good for starting and small simulations)
-- A more modular approach (better for larger simulations and easier to develop)
+- <span class="highlight">Today</span>: monolithic, based on a single function (good for starting and small simulations)
+- <span class="highlight">Next time</span>: a more modular approach (better for larger simulations and easier to develop)
 
 <br>
 
@@ -446,18 +446,29 @@ Start with the simplest pieces and iterate from there
 
 
 </div>
-
-<br>
-
+ 
 - Simulations are often fairly complex piece of code
 - Do not try to write the whole thing in one go
 - Do not be afraid of rewriting and improving things later
+
+
+. . . 
+
+<br>
+
+Often: start with basic simulation function (today) and then refactor and split up (next time)
+
 
 ::: {.footer}
 
 A good way to work is to follow a lightweight agile approach
 
 :::
+
+
+### Basic Function {background="#43464B"}
+
+
 
 #### Practice: Starting with the Static Case
  
@@ -483,7 +494,9 @@ Simplest: wrap in a single function
 
 ```{python}
 #| echo: true
-def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5):
+def simulate_ols(
+    n_sim: int = 1000, n_obs: int = 50, beta0: float = 0.0, beta1: float = 0.5
+) -> list[float]:
     """Simulates OLS estimation for a static/exogenous DGP: y = beta0 + beta1*x + u.
 
     Args:
@@ -514,7 +527,7 @@ def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5):
         beta_hat = np.linalg.inv(W.T @ W) @ W.T @ y
 
         # 3. Compute error
-        results_ols_errors.append(beta_hat[1]-beta1)
+        results_ols_errors.append(beta_hat[1] - beta1)
 
     return results_ols_errors
 ```
@@ -591,16 +604,47 @@ Our results are not <span class="highlight">reproducible</span>
 
 </div>
 
+#### Why No Reproducibility and How to Fix?
+
+Different data drawn by `rng` in different runs of the function
+
+. . . 
+
+<br>
+
+To get same data, need to know that:
+
+- Computers cannot generate actual random numbers
+- Instead used <span class="highlight">pseudo</span>random number generators — deterministic algorithms with "good" properties
+- PseudoRNG controlled by <span class="highlight">seeds</span>
+
+<div class="left-color">
+
+Give same seed = get the same sequence of numbers
+
+</div>
+
+::: {.footer}
+
+For example, see [Wikipedia](https://en.wikipedia.org/wiki/Pseudorandom_number_generator) on pseudoRNG
+
+:::
 
 #### Setting the RNG Seed
 
-Solution: provide a `seed` to our RNG
+In practice: easy to provide a `seed` to our `rng`
 
 
 ```{python}
 #| echo: true
-#| code-line-numbers: "1,9,19"
-def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, seed=1):
+#| code-line-numbers: "1,6,15,25"
+def simulate_ols(
+    n_sim: int = 1000,
+    n_obs: int = 50,
+    beta0: float = 0.0,
+    beta1: float = 0.5,
+    seed: int = 1,
+) -> list[float]:
     """Simulates OLS estimation for a static/exogenous DGP: y = beta0 + beta1*x + u.
 
     Args:
@@ -632,9 +676,10 @@ def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, seed=1):
         beta_hat = np.linalg.inv(W.T @ W) @ W.T @ y
 
         # 3. Compute error
-        results_ols_errors.append(beta_hat[1]-beta1)
+        results_ols_errors.append(beta_hat[1] - beta1)
 
     return results_ols_errors
+
 ```
 
 
@@ -663,7 +708,7 @@ print(f"Bias (second run): {np.mean(static_results_2)}")
  
 <div class="rounded-box">
 
-Always set seeds explicitly to help reproducibility
+<span class="highlight">Always set seeds explicitly to help reproducibility</span>
 
 </div>
 
@@ -813,7 +858,9 @@ Bias decays as sample size increases
 </div>
   
 
+### Limitations {background="#43464B"}
 
+#### Expanding the Simulation
 
 ## Recap and Conclusions {background="#00100F"}
  
