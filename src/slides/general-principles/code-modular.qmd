@@ -383,7 +383,7 @@ Interfaces are like contracts
 
 
 
-- DGP promises to give valid date if `sample()` is called 
+- DGP promises to give valid data if `sample()` is called 
 - Estimator promises to give suitable coefficients if `fit()` is called 
 
 . . .
@@ -418,10 +418,44 @@ Each DGP encapsulates its own logic:
 The outside world only sees the `sample()` method that returns a sample of `X` and `y` 
 
 
-## Implementing The New Design {background="#00100F"}
+## Implementation {background="#00100F"}
  
+### DGP and Estimator Classes {background="#43464B"}
+
+#### Approach: Classes
+
+Now want implementation with these good properties (separation of concerns, loose coupling, encapsulation)
  
 
+. . .
+
+<div class="left-color">
+
+Will capture required logic with appropriate <span class="highlight">classes</span>
+
+</div>
+
+- Going OOP allows us to view DGPs, estimators, and simulations as objects: 
+  - Each will have some appropriate data and some logic for doing something with that data
+  - Different objects can interact using that logic
+- Simulation runner can  <span class="highlight">compose</span> DGPs and estimators
+
+
+#### What Attributes and Methods Do Our Classes Need?
+
+<div class="left-color">
+
+To define a class need to choose what data and functions its instances contain
+
+</div>
+
+- DGPs need to:
+  - Know their true `beta1` (e.g. for bias computation)
+  - Offer samples with given number of points from DGP-specific distribution
+- Estimator needs to:
+  - Compute `beta1_hat` based on data
+  - Remember computed `beta1_hat` 
+  
 #### Example: Static DGP Class
 
 ```{python} 
@@ -434,15 +468,15 @@ class StaticNormalDGP:
         beta1 (float): Slope coefficient.
     """
 
-    def __init__(self, beta0: float = 0.0, beta1: float = 0.5):
+    def __init__(self, beta0: float = 0.0, beta1: float = 0.5) -> None:
         """Initializes the DGP with intercept and slope.
 
         Args:
             beta0 (float): Intercept term. Defaults to 0.0.
             beta1 (float): Slope coefficient. Defaults to 1.0.
         """
-        self.beta0 = beta0
-        self.beta1 = beta1
+        self.beta0: float = beta0
+        self.beta1: float = beta1
 
     def sample(
         self, n_obs: int, seed: int | None = None
@@ -468,8 +502,8 @@ class StaticNormalDGP:
 We use a class to:
 
 - Capture a specific concern (data drawing)
-- Specify interfaces (a `sample` method)
-- Encapsulate logic (could add more data logic)
+- Specify interfaces (a `sample()` method)
+- Encapsulate logic (class keeps its DGP details in `sample()`)
 
 . . .
 
@@ -504,8 +538,8 @@ class DynamicNormalDGP:
             beta0 (float): Intercept term. Defaults to 0.0.
             beta1 (float): AR(1) coefficient. Defaults to 0.5.
         """
-        self.beta0 = beta0
-        self.beta1 = beta1
+        self.beta0: float = beta0
+        self.beta1: float = beta1
 
     def sample(
         self, n_obs: int, seed: int | None = None
@@ -530,6 +564,14 @@ class DynamicNormalDGP:
         return y[:-1], y[1:]
 
 ```
+
+#### Discussion: DGP Classes
+
+- Now `StaticNormalDGP` and `DynamicNormalDGP` capture our DGPs
+- Important: can interact with them in the <span class="highlight">same way</span>:
+  - Ask their true `beta1` value
+  - `sample()` given number of poinst with given `seed`
+- In line with what simulation loop wants, all other logic kept inside
 
 #### Same Idea: Simple Estimator Class
 
@@ -586,7 +628,19 @@ Now ready to put things together into simulation
 
 </div>
 
-#### Simulation Runner Class
+### Simulation Runner Class {background="#43464B"}
+
+#### Capturing Simulation Logic
+
+Now missing final piece — the simulation loop:
+
+- Will create appropriate `SimulationRunner` class
+- `SimulationRunner` composes DGP and estimator (part of its data)
+- With data, will run Monte Carlo simulation for given number of datasets
+
+
+
+#### Simulation Runner Implementation
 
 
 ```{python}
@@ -595,14 +649,14 @@ class SimulationRunner:
     """Runs Monte Carlo simulations for a given DGP and estimator.
 
     Attributes:
-        dgp: Data-generating process with a `sample` method.
-        estimator: Estimator with a `fit` method and `beta1_hat` attribute.
+        dgp: data-generating process with a sample() method.
+        estimator: estimator with a fit() method and beta1_hat attribute.
         errors: array of estimation errors (beta1_hat - beta1) for each simulation.
     """
 
     def __init__(
         self,
-        dgp: "StaticNormalDGP" | "DynamicNormalDGP",
+        dgp: StaticNormalDGP | DynamicNormalDGP,
         estimator: SimpleOLS,
     ) -> None:
         """Initializes the simulation runner.
@@ -611,17 +665,18 @@ class SimulationRunner:
             dgp: An instance of a DGP class (must implement `sample`).
             estimator: An instance of an estimator class (must implement `fit`).
         """
-        self.dgp = dgp
-        self.estimator = estimator
-        self.errors = None
+        self.dgp: StaticNormalDGP | DynamicNormalDGP = dgp
+        self.estimator: SimpleOLS = estimator
+        self.errors: np.ndarray | None  = None
 
-    def simulate(self, n_sim: int, n_obs: int, seed: int | None = None) -> None:
+    def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
         """Runs simulations and stores estimation errors.
 
         Args:
             n_sim (int): number of simulations to run.
             n_obs (int): Number of observations per simulation.
-            seed (int | None): Random seed for reproducibility. Defaults to None.
+            first_seed (int | None): Starting random seed for reproducibility. 
+                Defaults to None.
         """
         # Preallocate array to hold estimation errors
         self.errors = np.empty(n_sim)
@@ -629,7 +684,7 @@ class SimulationRunner:
         # Run simulation
         for sim_id in range(n_sim):
             # Draw data
-            x, y = self.dgp.sample(n_obs, seed=seed + sim_id if seed else None)
+            x, y = self.dgp.sample(n_obs, seed=first_seed + sim_id if first_seed else None)
             # Fit model
             self.estimator.fit(x, y)
             # Store error
@@ -651,17 +706,17 @@ ols_estimator = SimpleOLS()
 
 # Initialize and run simulation
 ols_static_sim = SimulationRunner(static_dgp, ols_estimator)
-ols_static_sim.simulate(n_sim=1000, n_obs=50, seed=1)
+ols_static_sim.simulate(n_sim=1000, n_obs=50, first_seed=1)
 
 # Summarize bias
 print(f"Average estimation error (bias): {ols_static_sim.errors.mean():.4f}")
 ```
 
-#### Discussion: What Just Happened?
+#### Discussion I: What Just Happened?
  
 <div class="left-color">
 
-DGP, estimator, and simulation runner are now independent
+DGP, estimator, and simulation runner are now only loosely connected
 
 </div>
 
@@ -676,13 +731,29 @@ Benefits:
 - Can reuse components elsewhere
 - Easier to read and change the code
 
+#### Discussion II: Reproducibility in `simulate()`
 
-## Expanding {background="#00100F"}
+<div class="left-color">
+
+`simulate()` ensures reproducibility with the `first_seed` argument
+
+</div>
+
+<br>
+
+- `first_seed` — seed used for first dataset
+- $i$th dataset uses seed = `first_seed` + `i`
+- Ensures different datasets in different steps 
+
+## Extending Our Code {background="#00100F"}
  
+  
+### Summarizing Results {background="#43464B"}
+
 
 #### What To Do With Results
 
-`SimulationRunner` stores raw simulation results (here: full estimation errors)
+`SimulationRunner` stores raw simulation results (here: full estimation errors in `errors` )
 
 . . .
 
@@ -693,6 +764,14 @@ How these are handled — depends on what you want to do
 - Can add summary methods
 - Can create other objects that process run simulations (and generate figures)
  
+. . .
+
+<div class="left-color">
+
+We will add a simple `summarize_bias()` method
+
+</div>
+
 #### Example: Adding A Summary to `SimulationRunner`
 
 ```{python}
@@ -722,13 +801,13 @@ class SimulationRunner:
         self.estimator = estimator
         self.errors = None
 
-    def simulate(self, n_sim: int, n_obs: int, seed: int | None = None) -> None:
+    def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
         """Runs simulations and stores estimation errors.
 
         Args:
             n_sim (int): number of simulations to run.
             n_obs (int): Number of observations per simulation.
-            seed (int | None): Random seed for reproducibility. Defaults to None.
+            first_seed (int | None): Random seed for reproducibility. Defaults to None.
         """
         # Preallocate array to hold estimation errors
         self.errors = np.empty(n_sim)
@@ -736,17 +815,14 @@ class SimulationRunner:
         # Run simulation
         for sim_id in range(n_sim):
             # Draw data
-            x, y = self.dgp.sample(n_obs, seed=seed + sim_id if seed else None)
+            x, y = self.dgp.sample(n_obs, seed=first_seed + sim_id if first_seed else None)
             # Fit model
             self.estimator.fit(x, y)
             # Store error
             self.errors[sim_id] = self.estimator.beta1_hat - self.dgp.beta1
 
-    def summarize_bias(self) -> float:
-        """Computes the average estimation error (bias) for beta1.
-
-        Returns:
-            float: Average error (beta1_hat - beta1) across simulations.
+    def summarize_bias(self) -> None:
+        """Prints the average estimation error (bias) for beta1. 
         """ 
         print(f"Average estimation error (bias): {np.mean(self.errors):.4f}")
 ```
@@ -765,11 +841,20 @@ ols_estimator = SimpleOLS()
 
 # Initialize and run simulation
 ols_dynamic_sim = SimulationRunner(dynamic_dgp, ols_estimator)
-ols_dynamic_sim.simulate(n_sim=1000, n_obs=50, seed=1)
+ols_dynamic_sim.simulate(n_sim=1000, n_obs=50, first_seed=1)
 
 # Summarize bias
 ols_dynamic_sim.summarize_bias()
 ```
+
+
+### Shifting Scope and Adding Other Estimators {background="#43464B"}
+
+#### Problem: Scope Change
+
+What if the scope changes?
+
+Scope changes are natural, especially in research
 
 
 #### Adding a New Estimator
@@ -792,9 +877,8 @@ $\lambda$ — regularization strength
 
 Ridge — one of simpler examples of <span class="highlight">shrinkage</span> estimators
 
-#### 
 
-What if the scope changes?
+
 
 #### Implementation of Simple Ridge Estimator
 
@@ -846,8 +930,8 @@ ridge_strong = SimpleRidge(reg_param=100)
 # Initialize and run simulations
 sim_ridge_weak = SimulationRunner(static_dgp, ridge_weak)
 sim_ridge_strong = SimulationRunner(static_dgp, ridge_strong)
-sim_ridge_weak.simulate(n_sim=1000, n_obs=50, seed=1)
-sim_ridge_strong.simulate(n_sim=1000, n_obs=50, seed=1)
+sim_ridge_weak.simulate(n_sim=1000, n_obs=50, first_seed=1)
+sim_ridge_strong.simulate(n_sim=1000, n_obs=50, first_seed=1)
 
 # Summarize bias 
 sim_ridge_weak.summarize_bias()
