@@ -852,18 +852,24 @@ ols_dynamic_sim.summarize_bias()
 
 #### Problem: Scope Change
 
-What if the scope changes?
+Now imagine that the scope of the overall project changes to a broader one:
 
-Scope changes are natural, especially in research
+<div class="left-color">
 
+Comparing bias of several "near-OLS" estimators in a static and dynamic settings
 
-#### Adding a New Estimator
-
-- So far: only used one estimator (OLS)
-- But our design can easily allow us to consider other estimators
+</div>
+ 
+- Scope changes are natural, especially in research (often based in preliminary results)
+- Need to be flexible both in statistics and code
 
 
 . . . 
+
+Can our code accommodate more estimators?
+
+#### Adding a New Estimator: Ridge
+
 
 <div class="left-color">
 
@@ -875,8 +881,10 @@ $\lambda$ — regularization strength
 
 </div>
 
-Ridge — one of simpler examples of <span class="highlight">shrinkage</span> estimators
+- Ridge — one of simpler examples of <span class="highlight">shrinkage</span> estimators
+- Ridge solves $L^2$-regularized 
 
+#### Ridge Estimator and `SimulationRunner`
 
 
 
@@ -942,7 +950,9 @@ sim_ridge_strong.summarize_bias()
 
 even though type hints (recall Python does not enforce them, though code quality checks can catch them)
 
-(or interfaces in languages that support them)
+
+duck typing saved us, but still would be nice to fix that — next time
+
 
 ## Recap and Conclusions {background="#00100F"}
  
