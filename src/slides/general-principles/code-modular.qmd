@@ -46,7 +46,7 @@ open-graph:
 
 #### Learning Outcomes
 
-This lecture is a modular approach to designing simulation code
+This lecture is about a modular approach to designing simulation code
 
 <br>
 
