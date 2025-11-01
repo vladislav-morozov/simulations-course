@@ -6,7 +6,7 @@ format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content="How to write good Monte Carlo simulation code: from monolithic functional to modular OOP design, with a worked OLS example (lecture note slides)"/> 
+        <meta name="description" content="How to write good Monte Carlo simulation code in data science: basic monolithic function design for starting, with OLS bias example (lecture note slides)"/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: "How to write good Monte Carlo simulation code: from monolithic functional to modular OOP design, with a worked OLS example (lecture note slides)" 
+    description: "How to write good Monte Carlo simulation code in data science: basic monolithic function design for starting, with OLS bias example (lecture note slides)" 
 ---
 
 
