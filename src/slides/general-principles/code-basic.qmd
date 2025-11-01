@@ -54,6 +54,7 @@ By the end, you should be able to
 
 - Specify a basic simulation design
 - Start with a simple function-based simulation 
+- Understand the importance of setting an RNG seed
 - Recognize the limitations of a monolithic design
 
 
@@ -576,7 +577,7 @@ plt.show()
 ```
 
 
-### Setting Seeds {background="#43464B"}
+### Internal Reproducibility: Setting Seeds {background="#43464B"}
 
 
 #### Problem: Lack of Reproducibility
@@ -714,7 +715,8 @@ print(f"Bias (second run): {np.mean(static_results_2)}")
 
 ## Expanding the Simulation {background="#00100F"}
  
- 
+### Adding a Dynamic DGP {background="#43464B"}
+
 
 #### Expanding the Simulation
  
@@ -728,7 +730,7 @@ Simplest way: just expand existing function
 
 - Add new DGP option `"ar1"`
 - Involves changing `simulate_ols` to have a new argument for `dgp_type`
-  - Old beahvior: `dgp_type="static"`
+  - Old behavior: `dgp_type="static"`
   - New behavior: `dgp_type="ar1"`
 - Also deal with losing one observation to $Y_{t-1}$
 
@@ -736,8 +738,15 @@ Simplest way: just expand existing function
 
 ```{python}
 #| echo: true
-#| code-line-numbers: "1,28-36"
-def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, seed=1, dgp_type="static"):
+#| code-line-numbers: "7,16,35-43"
+def simulate_ols(
+    n_sim: int = 1000,
+    n_obs: int = 50,
+    beta0: float = 0.0,
+    beta1: float = 0.5,
+    seed: int = 1,
+    dgp_type: str = "static",
+) -> list[float]:
     """Simulates OLS estimation for static or AR(1) DGP.
     Args:
         n_sim (int): Number of simulations to run. Defaults to 1000.
@@ -755,7 +764,7 @@ def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, seed=1, dgp_type="sta
     results_ols_errors = []
 
     # InitializeRNG
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(seed)
 
     # Core simulation loop
     for _ in range(n_sim):
@@ -769,18 +778,20 @@ def simulate_ols(n_sim=1000, n_obs=50, beta0=0, beta1=0.5, seed=1, dgp_type="sta
             u = rng.normal(size=n_obs + 1)
             y[0] = beta0 + u[0]
             for t in range(1, n_obs + 1):
-                y[t] = beta0 + beta1 * y[t-1] + u[t]
+                y[t] = beta0 + beta1 * y[t - 1] + u[t]
             # Use the last n_obs elements of y as and the first n_obs as x
             x = y[:-1]  # x is y lagged (n_obs elements)
             y = y[1:]  # y[1:] is the dependent variable (n_obs elements)
-            
+        else:
+            # Handle the case of giving the wrong DGP value
+            raise ValueError("Invalid DGP choice")
 
         # 2. Run OLS estimation
         W = np.column_stack([np.ones(n_obs), x])
         beta_hat = np.linalg.inv(W.T @ W) @ W.T @ y
-        
+
         # 3. Compute error
-        results_ols_errors.append(beta_hat[1]-beta1)   
+        results_ols_errors.append(beta_hat[1] - beta1)
 
     return results_ols_errors
 ```
@@ -834,7 +845,7 @@ plt.show()
 
 #### Effect of Sample Size
  
-To check effect of sample size, modify `n_obs`:
+To check effect of sample size, use different values for `n_obs`:
 
 ```{python}
 #| echo: true
@@ -858,7 +869,11 @@ Bias decays as sample size increases
 </div>
   
 
-### Limitations {background="#43464B"}
+### Limitations of Functional Approach {background="#43464B"}
+
+#### What's Good About The Functional Approach
+
+####
 
 #### Expanding the Simulation
 
@@ -871,7 +886,8 @@ Bias decays as sample size increases
 In this lecture we 
  
 - Saw our first simulation
-- Talked about a simple approach to structuring simulation code (function) 
+- Talked about a simple approach to structuring simulation code (function)
+- 
   
 
 #### Next Questions
