@@ -6,7 +6,7 @@ format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content="How to write good Monte Carlo simulation code: from monolithic functional to modular OOP design, with a worked OLS example (lecture note slides)"/> 
+        <meta name="description" content="How to write good Monte Carlo simulation code in data science: modular OOP design with DGP and simulation classes; worked OLS example (lecture note slides)"/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: "How to write good Monte Carlo simulation code: from monolithic functional to modular OOP design, with a worked OLS example (lecture note slides)" 
+    description: "How to write good Monte Carlo simulation code in data science: modular OOP design with DGP and simulation classes; worked OLS example (lecture note slides)" 
 ---
 
 
@@ -53,9 +53,9 @@ This lecture is a modular approach to designing simulation code
 By the end, you should be able to
 
  
-- Refactor your code into modular reusable classes
+- Refactor code into modular reusable classes
+- Compose DGPs and estimators into simulations
 - Understand how modularity leads to clearer, more extensible code  
-- 
 
 #### References
 
@@ -854,17 +854,17 @@ ols_dynamic_sim.summarize_bias()
 <br>
 
 In this lecture we 
- 
-- Saw our first simulation
-- Talked about a simple approach to structuring simulation code (function)
-- Discussed the benefits of a more modular structure
 
-#### How To Intepret Things From Today: Two Final Points
+- Discussed the benefits of a more modular structure
+- Implemented such an approach using appropriate classes
+- Talked about basic result summaries
+
+#### How To Intepret Example Code
 
 
 Choose the appropriate level of complexity for your situation:
 
-- A brief simulation with one DGP does not need deep architecture
+- A brief simulation with one DGP does not need deep architecture and can be done with a monolithic function (last time)
 - A complex simulation involving many scenarios and estimators would benefit from a clearer structure
 
 
