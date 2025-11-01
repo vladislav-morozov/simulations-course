@@ -12,7 +12,7 @@ format:
     sc-sb-title: true
     incremental: true   
     logo: ../../themes/favicon.ico
-    footer: "Why Simulate and General Principles"
+    footer: "Code Design II: A Modular Approach"
     footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
     theme: ../../themes/slides_theme.scss
     toc: TRUE
