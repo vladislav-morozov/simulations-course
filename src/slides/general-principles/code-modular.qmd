@@ -222,66 +222,39 @@ def simulate_ols(
     return results_ols_errors
 ```
 
- 
-
-## A More Robust Implementation {background="#00100F"}
- 
-
 
 #### Problem: How To Expand Simulations?
+ 
 
-By now: a working base simulation
+What if we want to <span class="highlight">expand our simulations</span>?
 
-. . . 
+- More distributions (e.g. heavier tails for innovations, different $X$)
+- Different models (not necessarily $Y_t = \beta_0 + \beta_1 X_t + U_t$)
 
 <br>
 
-
-But what if we <span class="highlight">expand our simulations</span>?
-
-- Try more DGPs (e.g. heavier tails for innovations, different $X$)
-- More sample sizes
-- Different models (not necessarily $Y_t = \beta_0 + \beta_1 X_t + U_t$)
-
-
-#### Limitations of Current Approach
-
-<div class='left-color'>
-
-We need a better approach to organizing simulations
-
-</div>
-
-- Basic approach is <span class="highlight">fine</span> if you just want run one thing
-- But difficult if you want to expand more:
-    - Adding new DGPs would mean expanding simulation function even more
-    - We would have to remember to run all the different cases ourselves
- 
 . . .
 
-Becomes difficult to scale and maintain
+Function approach is <span class="highlight">difficult to expand</span>: would have to keep adding components and selectors to `simulate_ols()`
 
-::: {.footer}
-
-The simulation function becomes a ["god object"](https://en.wikipedia.org/wiki/God_object)
-
-:::
 
 #### This Lecture: Dealing With Complexity
 
-For the rest of today: dealing with <span class="highlight">design</span>
+
+Today: dealing with <span class="highlight">design</span>
 
 - Untangling the different components of simulation
 - Learning a more modular structure
+- Understanding the why of it
+ 
 
-<br>
+## Towards a Modular Design {background="#00100F"}
+ 
 
-. . .
+### Identifying Component Blocks in Code {background="#43464B"}
 
-Next time: dealing with the manual orchestration issue
 
-### Towards Modular Design {background="#43464B"}
-
+ 
 
 #### A Step Back: What Are We Doing?
 
@@ -317,6 +290,48 @@ It only needs to:
 - Pass data to *something* (estimator)
 - Repeat and store results
 
+#### Why Should the Estimator and DGP Care?
+
+Same logic goes for DGP: it shouldn't care
+
+- Whether it's going to be used one time or many times in a loop
+- About how the estimator uses its data after
+
+. . .
+
+Likewise, the estimator:
+
+- Doesn't need details of the loop
+- Doesn't need to know how the `y` and `x` are created, just their form
+
+#### Conclusion: Components
+
+Overall: identified three logical units in code
+
+. . . 
+
+
+<br> 
+
+<div class="left-color">
+
+
+
+These units should be more or less independent (<span class="highlight">loosely coupled</span>) 
+
+
+</div>
+
+<br>
+
+E.g.: 
+
+- Changing DGP details should not affect loop, if loop can still sample in the same way
+- Can also then swap or add more components easily
+
+### Some Design Concepts {background="#43464B"}
+
+
 
 #### Background: Separation of Concerns
 
@@ -339,7 +354,7 @@ Best way to divide — <span class="highlight">by concern</span>. This:
 #### Interfaces: Glue Between Components
 
 
-The simulation runner only needs to know about <span class="highlight">interfaces</span>:
+Simulation runner only needs to know how to <span class="highlight">interface</span> with DGP and estimator:
 
 - DGP interface: Must provide a method like `sample(n_obs, seed)`
 - Estimator interface: Must provide a method like `fit(X, y)`
@@ -352,7 +367,7 @@ The simulation runner only needs to know about <span class="highlight">interface
 
 As long as a DGP/estimator implement given interface, simulation runner can use it
 
- <span class="highlight">Their implementation details do not matter</span>
+ <span class="highlight">Their implementation details do not matter to runner</span>
 
 </div> 
 
@@ -403,8 +418,9 @@ Each DGP encapsulates its own logic:
 The outside world only sees the `sample()` method that returns a sample of `X` and `y` 
 
 
-### Implementing The New Design {background="#43464B"}
-
+## Implementing The New Design {background="#00100F"}
+ 
+ 
 
 #### Example: Static DGP Class
 
@@ -661,6 +677,9 @@ Benefits:
 - Easier to read and change the code
 
 
+## Expanding {background="#00100F"}
+ 
+
 #### What To Do With Results
 
 `SimulationRunner` stores raw simulation results (here: full estimation errors)
@@ -758,6 +777,7 @@ ols_dynamic_sim.summarize_bias()
 - So far: only used one estimator (OLS)
 - But our design can easily allow us to consider other estimators
 
+
 . . . 
 
 <div class="left-color">
@@ -771,6 +791,10 @@ $\lambda$ — regularization strength
 </div>
 
 Ridge — one of simpler examples of <span class="highlight">shrinkage</span> estimators
+
+#### 
+
+What if the scope changes?
 
 #### Implementation of Simple Ridge Estimator
 
@@ -829,6 +853,12 @@ sim_ridge_strong.simulate(n_sim=1000, n_obs=50, seed=1)
 sim_ridge_weak.summarize_bias()
 sim_ridge_strong.summarize_bias()
 ```
+
+#### Technical
+
+even though type hints (recall Python does not enforce them, though code quality checks can catch them)
+
+(or interfaces in languages that support them)
 
 ## Recap and Conclusions {background="#00100F"}
  
