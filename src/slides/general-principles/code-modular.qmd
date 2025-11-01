@@ -893,7 +893,7 @@ Our simulation is in a good prototype shape, but can still improve some things:
 - How to clean up some loose ends in existing code?
 - How to organize running many simulations?
 - How to handle simulation results?
-- How to apply these logic to deeper statistical scenarios?
+- How to apply this logic to deeper statistical scenarios?
 
 #### References {.allowframebreaks visibility="uncounted"}
 
