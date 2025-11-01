@@ -42,6 +42,7 @@ website:
         contents: 
         - slides/general-principles/code-basic.qmd
         - slides/general-principles/code-modular.qmd
+        - slides/general-principles/code-organization.qmd
 
 execute:
   freeze: auto  # re-render only when source changes
