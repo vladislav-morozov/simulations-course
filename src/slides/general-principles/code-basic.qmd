@@ -940,15 +940,17 @@ The simulation function becomes a ["god object"](https://en.wikipedia.org/wiki/G
 In this lecture we 
  
 - Saw our first simulation
-- Talked about a simple approach to structuring simulation code (function)
-- 
+- Talked about structuring simulation code in a single function + advantages and limitations of this approach
+- Discussed setting RNG seeds for reproducibility
   
 
 #### Next Questions
 
 <br>
 
-- How to 
+- How to use a more modular and loosely modular design for larger simulations?
+- How to run many simulation scenarios at the same time?
+- How to apply these approaches to different statistical scenarios?
 
 #### References {.allowframebreaks visibility="uncounted"}
 
