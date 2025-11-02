@@ -78,6 +78,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from sklearn.linear_model import Lasso as SklearnLasso
+
 plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams["font.sans-serif"] = ["Arial"]
 
@@ -368,7 +370,7 @@ $$
 - Shrinkage strength controlled by $\lambda \geq 0$
 - Minimizes sum of squared residuals with $L^2$ penalty:
 $$ \small
-\hat{\bbeta}^{Ridge} = \argmin \sum_{t=1}^T (Y_t - b_0 - b_1 X_t)^2 + \lambda \norm{\bbeta}_2^2
+\hat{\bbeta}^{Ridge} = \argmin \sum_{t=1}^T (Y_t - b_0 - b_1 X_t)^2 + \lambda \norm{(b_0, b_1)}_2^2
 $$
 
 
@@ -642,6 +644,11 @@ class SimulationRunner:
             self.estimator.fit(x, y)
             # Store error
             self.errors[sim_id] = self.estimator.beta1_hat - self.dgp.beta1
+
+    def summarize_bias(self) -> None:
+        """Prints the average estimation error (bias) for beta1. 
+        """ 
+        print(f"Average estimation error (bias): {np.mean(self.errors):.4f}")
 ```
 
 ::: {.footer}
@@ -669,19 +676,32 @@ See chapter 13 of @Ramalho2022FluentPythonClear on this point
 
 ::: 
 
-### Adding Lasso {background="#43464B"}
+### Adding Lasso Following Our Protocols {background="#43464B"}
 
-#### 
 
-Another penalized SSR ("OLS-like") estimator is lasso, which solves
+#### Lasso
 
-####
+Another penalized SSR ("OLS-like") estimator for $\beta_1$ is *lasso*, which solves:
+$$ \small
+\hat{\bbeta}^{Lasso} = \argmin \sum_{t=1}^T (Y_t - b_0 - b_1 X_t)^2 + \lambda \norm{(b_0, b_1)}_1
+$$
 
-Do not want to implement it, a bit annoying
 
-but `scikit-learn` has an implementation
+- Lasso penalizes $L^1$ norm of $(b_0, b_1)$, not $L^2$ like ridge
+- Want to add to our simulation under new scope
 
-problem is it's not compatible with our `EstimatorProtocol`
+
+#### How to Add Lasso?
+
+- Unlike ridge, $\hat{\bbeta}^{Lasso}$ has no closed-form solution
+- Can implement numerical minimization logic ourselves
+
+. . .
+
+But don't want to implement it ourselves (hard, etc.)
+
+- There is already a well-optimized implemenation in `scikit-learn`
+- Problem: `scikit-learn` lasso does not follow our protocol
 
 <div class="left-color">
 
@@ -689,8 +709,82 @@ Not a problem: can wrap it in a compatible manner
 
 </div>
 
-####
+#### Point of This Section
 
+Why are we discussing this?
+ 
+
+<br>
+
+Three reasons:
+
+
+- Seeing how our protocol guides us and serves as a contract
+- Seeing how you can make use of existing things from other sources
+- Seeing another new estimator
+
+#### A Look at `scikit-learn` Lasso
+
+```{python}
+
+```
+
+#### Lasso Wrapper Implementation
+
+```{python}
+#| echo: true
+from sklearn.linear_model import Lasso as SklearnLasso 
+
+class LassoWrapper:
+    """A wrapper for scikit-learn's Lasso estimator to match the EstimatorProtocol interface.
+
+    Attributes:
+        model (sklearn.linear_model.Lasso): a scikit-learn Lasso instance.
+        beta0_hat (float): Estimated intercept. Initialized as np.nan.
+        beta1_hat (float): Estimated slope. Initialized as np.nan.
+    """
+
+    def __init__(self, reg_param: float = 1.0) -> None:
+        """Initializes the Lasso wrapper with a scikit-learn Lasso model.
+
+        Args:
+            reg_param (float): Regularization strength (alpha). Defaults to 1.0.
+        """
+        self.model = SklearnLasso(alpha=reg_param)
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the Lasso model to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+        X = np.column_stack([np.ones(len(x)), x])
+        self.model.fit(X, y)
+        self.beta0_hat = float(self.model.intercept_)
+        self.beta1_hat = float(self.model.coef_[0]) 
+
+```
+
+#### Lasso Wrapper in Action
+
+```{python}
+static_dgp = StaticNormalDGP(beta0=0.0, beta1=0.5)
+lasso = LassoWrapper(reg_param=0.001)
+
+sim_lasso = SimulationRunner(static_dgp, lasso)
+sim_lasso.simulate(n_sim=1000, n_obs=50, first_seed=1)
+sim_lasso.summarize_bias() 
+```
+
+On average, lasso totally kills 
+
+#### Discussion
+
+"Remember how we had to update type hints for Ridge? With protocols, we don’t need to change SimulationRunner to add Lasso!"
+"This is why protocols are better than concrete classes in type hints."
 
 ## Organizing Files {background="#00100F"}
  
