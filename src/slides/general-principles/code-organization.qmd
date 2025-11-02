@@ -474,8 +474,8 @@ How do you remember or tell teammates what interface the estimators should have?
 </div>
 
 
-- *Could write docs*: that's good, but extra effort that a lot of people do not take until later
-- *Could look at how `SimulationRunner` uses the estimator*: works when it's your fresh code. Otherwise harder, and can miss something
+- *Could write docs*: good, but extra effort that a lot of people do not take until later
+- *Could look at how `SimulationRunner` uses the estimator*: works best it's your fresh code. Otherwise harder, and can miss something
 
 . . .
 
@@ -555,6 +555,7 @@ What about DGPs? Two requirements:
 
 . . .
 
+Same approach: 
 
 ```{python}
 #| echo: true
@@ -569,12 +570,79 @@ class DGPProtocol(Protocol):
     def beta1(self) -> float: ...
 ```
 
+#### How To Use Protocols?
 
+To repeat:
+
+<div class="left-color">
+
+Protocols communicate information about interfaces both to readers and type checkers — like a <span class="highlight">checklist</span>
+
+</div>
+
+To use them modify `SimulationRunner` constructor:
+
+- Insert `DGPProtocol` as type hint for `dgp` argument
+- Insert `EstimatorProtocol` as type hint for `estimator` argument
+
+. . .
+
+
+Seeing a `Protocol` in type hints suggests that some particular interface is expected here (e.g. `fit()` and `beta1_hat`)
 
 #### Updating `SimulationRunner`
 
-To use our protocols to communicate information both to readers and type checkers, just insert them in type hints and docstrings
+Updated implementation with protocols in place:
+```{python}
+#| echo: true
+#| code-line-numbers: "12-13,21-22"
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and estimator.
 
+    Attributes:
+        dgp: data-generating process with a sample() method and beta1 attribute.
+        estimator: estimator with a fit() method and beta1_hat attribute.
+        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+    """
+
+    def __init__(
+        self,
+        dgp: DGPProtocol,
+        estimator: EstimatorProtocol,
+    ) -> None:
+        """Initializes the simulation runner.
+
+        Args:
+            dgp: An instance of a DGP class (must implement `sample`).
+            estimator: An instance of an estimator class (must implement `fit`).
+        """
+        self.dgp: DGPProtocol = dgp
+        self.estimator: EstimatorProtocol = estimator
+        self.errors: np.ndarray | None = None
+
+    def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
+        """Runs simulations and stores estimation errors.
+
+        Args:
+            n_sim (int): number of simulations to run.
+            n_obs (int): Number of observations per simulation.
+            first_seed (int | None): Starting random seed for reproducibility.
+                Defaults to None.
+        """
+        # Preallocate array to hold estimation errors
+        self.errors = np.empty(n_sim)
+
+        # Run simulation
+        for sim_id in range(n_sim):
+            # Draw data
+            x, y = self.dgp.sample(
+                n_obs, seed=first_seed + sim_id if first_seed else None
+            )
+            # Fit model
+            self.estimator.fit(x, y)
+            # Store error
+            self.errors[sim_id] = self.estimator.beta1_hat - self.dgp.beta1
+```
 
 ::: {.footer}
 
@@ -585,7 +653,7 @@ To use our protocols to communicate information both to readers and type checker
 
 #### Alternative: ABCs
 
-<div class="left=color">
+<div class="left-color">
 
 <span class="highlight">Abstract base classes</span> provide another way to specify the desired interface contract
 
