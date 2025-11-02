@@ -266,6 +266,11 @@ class SimpleOLS:
         self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
 ```
  
+::: {.footer}
+
+Notice: has `beta1_hat` attribute and `fit()` method
+
+:::
 
 #### Reminder: `SimulationRunner`
 
@@ -328,7 +333,7 @@ class SimulationRunner:
 
 
 
-### Shifting Scope and Adding Other Estimators {background="#43464B"}
+### Shifting Scope and Adding a New Estimator {background="#43464B"}
 
 #### Problem: Scope Change
 
@@ -336,40 +341,40 @@ Now imagine that the scope of the overall project changes to a broader one:
 
 <div class="left-color">
 
-Comparing bias of several "near-OLS" estimators in a static and dynamic settings
+New goal: comparing bias of several "near-OLS" estimators in a static and dynamic settings
 
 </div>
  
-- Scope changes are natural, especially in research (often based in preliminary results)
+- Scope changes are natural, especially in "experimental" scenarios
 - Need to be flexible both in statistics and code
 
 
 . . . 
 
-Can our code accommodate more estimators?
+How to proceed? 
 
-#### Adding a New Estimator: Ridge
+#### Add a New Estimator (Ridge)
 
-
+First OLS-like estimator is <span class="highlight">ridge</span>
 <div class="left-color">
 
-Consider the simple *ridge* estimator:
-$$
-\hat{\bbeta} = (\bX'\bX+\lambda I)^{-1} \bX'\bY
-$$
-$\lambda$ — regularization strength
 
+$$ \small
+\hat{\bbeta}^{Ridge} = (\bX'\bX+\lambda I)^{-1} \bX'\bY
+$$
 </div>
 
 - Ridge — one of simpler examples of <span class="highlight">shrinkage</span> estimators
-- Ridge solves $L^2$-regularized 
-
-#### Ridge Estimator and `SimulationRunner`
-
+- Shrinkage strength controlled by $\lambda \geq 0$
+- Minimizes sum of squared residuals with $L^2$ penalty:
+$$ \small
+\hat{\bbeta}^{Ridge} = \argmin \sum_{t=1}^T (Y_t - b_0 - b_1 X_t)^2 + \lambda \norm{\bbeta}_2^2
+$$
 
 
 #### Implementation of Simple Ridge Estimator
 
+Implement ridge with same interface as `SimpleOLS`:
 ```{python}
 #| echo: true
 #| code-line-numbers: "1,10,14,16,27"
@@ -403,6 +408,9 @@ class SimpleRidge:
         self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
 ```
 
+
+
+
 #### Bias vs. Regularization Strength
 
 ```{python}
@@ -410,7 +418,6 @@ class SimpleRidge:
 #| code-line-numbers: "5-6,9-10"
 # Initialize DGP and estimator
 static_dgp = StaticNormalDGP(beta0=0.0, beta1=0.5)
-
 # Estimators
 ridge_weak = SimpleRidge(reg_param=0.01)
 ridge_strong = SimpleRidge(reg_param=100)
@@ -420,36 +427,81 @@ sim_ridge_weak = SimulationRunner(static_dgp, ridge_weak)
 sim_ridge_strong = SimulationRunner(static_dgp, ridge_strong)
 sim_ridge_weak.simulate(n_sim=1000, n_obs=50, first_seed=1)
 sim_ridge_strong.simulate(n_sim=1000, n_obs=50, first_seed=1)
-
 # Summarize bias 
 sim_ridge_weak.summarize_bias()
 sim_ridge_strong.summarize_bias()
 ```
 
-#### Technical
+<div class="left-color">
 
-even though type hints (recall Python does not enforce them, though code quality checks can catch them)
+More regularization $\Rightarrow$ more bias
 
-
-duck typing saved us, but still would be nice to fix that — next time
+</div>
 
 ## Defining Interfaces {background="#00100F"}
  
 
 ### Organizing Classes with Protocols {background="#43464B"}
 
+#### Results for Ridge: Discussion
 
-####  
+<div class="rounded-box">
 
-Couple of problems
+`SimulationRunner` works with new `SimpleRidge`, even though `SimulationRunner` was made with `SimpleOLS` in mind
 
-- How do you communicate and remember 
-  - You can write docs: that's good, but extra effort that a lot of people do not take until later
-  - You can try to look at code: works best when it's freshly written by you, but harder otherwise
-- Our type hints
+</div>
 
-#### A  
+Why?
 
+- `SimpleOLS` and `SimpleRidge` look same to `SimulationRunner`: same `fit()` method and `beta1_hat` 
+- Example of <span class="highlight">duck typing</span> in action
+
+. . . 
+
+<div class="left-color">
+
+$\Rightarrow$ can we just keep adding new estimators to answer new expanded study question?
+
+</div>
+
+#### Problem 1: Communicating Estimator Interface
+
+Problem with "just adding":
+<div class="left-color">
+
+How do you remember or tell teammates what interface the estimators should have?
+
+</div>
+
+
+- *Could write docs*: that's good, but extra effort that a lot of people do not take until later
+- *Could look at how `SimulationRunner` uses the estimator*: works when it's your fresh code. Otherwise harder, and can miss something
+
+. . .
+
+Better to be explicit about what new estimators need
+  
+#### Problem 2: Incorrect Type Hints
+
+A smaller but annoying problem:
+
+- Our type hints in `SimulationRunner` don't allow for `SimpleRidge` as an estimator
+- Not a problem for execution: Python doesn't care about type hints
+- But code quality tools/IDEs will (rightfully) complain:
+
+![Figure: Issue raised by Pylance](../../images/code-screenshots/ridge-pylance.png)
+
+
+#### Solution: Protocols  
+
+#### Estimator Protocol
+
+
+#### Protocol for DGPs
+
+Likewise for DGPs
+
+#### Update Simulation Runner
 
 ### Aside: Alternative Approach {background="#43464B"}
 
@@ -462,11 +514,36 @@ One can also use abstract base classes
 
 There is a bit more infrastructure
 
-#### ABCs vs. Protocolss
+#### ABCs vs. Protocols
 
 Protocols are really about implementation
 
+
 ABCs
+
+can have  a more explicit inheritance relationship (e.g. every DGP inherits from abstract base class `BaseDGP`)
+
+### Adding Lasso {background="#43464B"}
+
+#### 
+
+Another penalized SSR ("OLS-like") estimator is lasso, which solves
+
+####
+
+Do not want to implement it, a bit annoying
+
+but `scikit-learn` has an implementation
+
+problem is it's not compatible with our `EstimatorProtocol`
+
+<div class="left-color">
+
+Not a problem: can wrap it in a compatible manner
+
+</div>
+
+####
 
 
 ## Organizing Files {background="#00100F"}
