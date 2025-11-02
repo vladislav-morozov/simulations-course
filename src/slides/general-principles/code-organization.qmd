@@ -647,11 +647,8 @@ class SimulationRunner:
 ::: {.footer}
 
 :::
-
-### Aside: Alternative Approach {background="#43464B"}
-
-
-#### Alternative: ABCs
+ 
+#### Aside: Alternative Approach with ABCs
 
 <div class="left-color">
 
@@ -660,20 +657,17 @@ class SimulationRunner:
 </div>
 
 - With ABCs you define an abstract `BaseDGP` and `BaseEstimator` with abstract methods of desired form
-- Specific estimators and DGPs inherit from 
-can have  a more explicit inheritance relationship (e.g. every DGP inherits from abstract base class `BaseDGP`)
+- Concrete estimators and DGPs inherit from from bases and implement `sample()` and `fit()`
 
-One can also use abstract base classes 
+. . . 
 
-There is a bit more infrastructure
+Protocol vs. ABCs: depends on whether you want an inheritance structure (no inheritance needed with protocols)
 
-#### ABCs vs. Protocols
+::: {.footer}
 
-Protocols are really about implementation
+See chapter 13 of @Ramalho2022FluentPythonClear on this point
 
-
-ABCs
-
+::: 
 
 ### Adding Lasso {background="#43464B"}
 
