@@ -67,7 +67,7 @@ Statistics:
 Programming:
  
 - 22 in @Lutz2025LearningPythonPowerful about modules and program structure
-- [This tutorial](https://realpython.com/python-protocol/) on protocols in Python
+- 13 in @Ramalho2022FluentPythonClear and [this tutorial](https://realpython.com/python-protocol/) on protocols in Python
 
 :::
 
@@ -242,14 +242,14 @@ class SimpleOLS:
     """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
 
     Attributes:
-        beta0_hat (float | None): Estimated intercept. None until fit is called.
-        beta1_hat (float | None): Estimated slope. None until fit is called.
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
     """
 
     def __init__(self) -> None:
         """Initializes the OLS estimator with no estimates."""
-        self.beta0_hat: float | None = None
-        self.beta1_hat: float | None = None
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
 
     def fit(self, x: np.ndarray, y: np.ndarray) -> None:
         """Fit OLS to the provided data.
@@ -382,15 +382,15 @@ class SimpleRidge:
     """A simple ridge estimator for the linear model y = beta0 + beta1*x + u.
 
     Attributes:
-        beta0_hat (float | None): Estimated intercept. None until fit is called.
-        beta1_hat (float | None): Estimated slope. None until fit is called.
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
         reg_param (float): Strength of regularization. Defaults to 0.01.
     """
 
     def __init__(self, reg_param: float = 0.01) -> None:
         """Initializes the OLS estimator with no estimates."""
-        self.beta0_hat: float | None = None
-        self.beta1_hat: float | None = None
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
         self.reg_param = reg_param
 
     def fit(self, x: np.ndarray, y: np.ndarray) -> None:
@@ -480,6 +480,12 @@ How do you remember or tell teammates what interface the estimators should have?
 . . .
 
 Better to be explicit about what new estimators need
+
+::: {.footer}
+
+Working with "*what estimators need*" helps us program to an *interface*, not a specific implementation
+
+:::
   
 #### Problem 2: Incorrect Type Hints
 
@@ -488,6 +494,8 @@ A smaller but annoying problem:
 - Our type hints in `SimulationRunner` don't allow for `SimpleRidge` as an estimator
 - Not a problem for execution: Python doesn't care about type hints
 - But code quality tools/IDEs will (rightfully) complain:
+
+. . .
 
 ![Figure: Issue raised by Pylance](../../images/code-screenshots/ridge-pylance.png)
 
@@ -512,19 +520,80 @@ If estimator meets protocol, it is compatible with `SimulationRunner`
 
 #### Estimator Protocol
 
+Here's how to express our two requirements:
+```{python}
+#| echo: true
+from typing import Protocol
+
+class EstimatorProtocol(Protocol):
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None: ...    # <1>
+
+    @property
+    def beta1_hat(self) -> float: ...                           # <2>
+```
+
+1. A `fit()` method that takes `x` and `y` numpy arrays
+2. A `float` attribute called `beta1_hat`
+
+
+<br>
+
+Both `SimpleOLS` and `SimpleRidge` follow our protocol
+
+::: {.footer}
+
+Notice: protocol methods do not have bodies, just use `...` (ellipsis)
+
+:::
 
 #### Protocol for DGPs
 
-Likewise for DGPs
+What about DGPs? Two requirements:
 
-#### Update Simulation Runner
+- `sample()` method with two arguments (`n_obs` and `seed`)
+- True `beta1` value (for estimation error computation)
+
+. . .
+
+
+```{python}
+#| echo: true
+
+class DGPProtocol(Protocol):
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[np.ndarray, np.ndarray]:
+        ...
+
+    @property
+    def beta1(self) -> float: ...
+```
+
+
+
+#### Updating `SimulationRunner`
+
+To use our protocols to communicate information both to readers and type checkers, just insert them in type hints and docstrings
+
+
+::: {.footer}
+
+:::
 
 ### Aside: Alternative Approach {background="#43464B"}
 
 
 #### Alternative: ABCs
 
-Protocols are not the only way
+<div class="left=color">
+
+<span class="highlight">Abstract base classes</span> provide another way to specify the desired interface contract
+
+</div>
+
+- With ABCs you define an abstract `BaseDGP` and `BaseEstimator` with abstract methods of desired form
+- Specific estimators and DGPs inherit from 
+can have  a more explicit inheritance relationship (e.g. every DGP inherits from abstract base class `BaseDGP`)
 
 One can also use abstract base classes 
 
@@ -537,7 +606,6 @@ Protocols are really about implementation
 
 ABCs
 
-can have  a more explicit inheritance relationship (e.g. every DGP inherits from abstract base class `BaseDGP`)
 
 ### Adding Lasso {background="#43464B"}
 
@@ -566,7 +634,7 @@ Not a problem: can wrap it in a compatible manner
  
 
 
-### Lecture Info {background="#43464B"}
+### Splitting Code Appropriately {background="#43464B"}
 
 
 #### Modules
@@ -584,9 +652,10 @@ project/
 │   └── dynamic.py      # DynamicNormalDGP
 ├── estimators/
 │   ├── __init__.py
-│   ├── ols-like.py     # SimpleOLS 
-├── runner.py           # SimulationRunner
-└── main.py             # CLI entry point
+│   ├── ols-like.py     # SimpleOLS, SimpleRidge, SimpleLasso
+├── main.py             # Main script that we call
+├── protocols.py        # DGPProtocol, EstimatorProtocol
+└── runner.py           # SimulationRunner
 ```
 
 ::: {.footer}

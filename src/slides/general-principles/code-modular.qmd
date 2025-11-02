@@ -581,14 +581,14 @@ class SimpleOLS:
     """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
 
     Attributes:
-        beta0_hat (float | None): Estimated intercept. None until fit is called.
-        beta1_hat (float | None): Estimated slope. None until fit is called.
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
     """
 
     def __init__(self) -> None:
         """Initializes the OLS estimator with no estimates."""
-        self.beta0_hat: float | None = None
-        self.beta1_hat: float | None = None
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
 
     def fit(self, x: np.ndarray, y: np.ndarray) -> None:
         """Fit OLS to the provided data.
