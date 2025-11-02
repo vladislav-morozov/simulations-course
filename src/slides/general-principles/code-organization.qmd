@@ -1,6 +1,6 @@
 ---
 title: "Good Simulation Code III: Organization"
-subtitle: "Bringing Together Classes and Organization Code Files"
+subtitle: "Defining Interfaces. Organizing Code Files"
 author: Vladislav Morozov  
 format:
   revealjs:
@@ -12,7 +12,7 @@ format:
     sc-sb-title: true
     incremental: true   
     logo: ../../themes/favicon.ico
-    footer: "Why Simulate and General Principles"
+    footer: "Code Design III: Interfaces. File Organization"
     footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
     theme: ../../themes/slides_theme.scss
     toc: TRUE
@@ -77,10 +77,15 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import seaborn as sns
- 
+
+plt.rcParams["font.family"] = "sans-serif"
+plt.rcParams["font.sans-serif"] = ["Arial"]
+
+BG_COLOR = "whitesmoke"
+THEME_COLOR = "#3c165c"
 ```
 
-## Scope Change {background="#00100F"}
+## Scenario: Scope Change {background="#00100F"}
  
 
 ### Reminder: Previous Simulation Setting {background="#43464B"}
@@ -227,28 +232,47 @@ class DynamicNormalDGP:
         return y[:-1], y[1:]
 ```
 
+#### Reminder: `SimpleOLS`
+
+OLS logic captured by `SimpleOLS` class:
+
+```{python}
+#| echo: true
+class SimpleOLS:
+    """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float | None): Estimated intercept. None until fit is called.
+        beta1_hat (float | None): Estimated slope. None until fit is called.
+    """
+
+    def __init__(self) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float | None = None
+        self.beta1_hat: float | None = None
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fit OLS to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+ 
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+```
+ 
+
 #### Reminder: `SimulationRunner`
 
-Our simualtion
-
-
-
+Simulation logic captured by `SimulationRunner` class:
 
 ```{python}
-
-plt.rcParams["font.family"] = "sans-serif"
-plt.rcParams["font.sans-serif"] = ["Arial"]
-
-BG_COLOR = "whitesmoke"
-THEME_COLOR = "#3c165c"
-```
-
-
-
-
-```{python}
-#| echo: true 
-#| code-line-numbers: "45-51"
+#| echo: true  
 class SimulationRunner:
     """Runs Monte Carlo simulations for a given DGP and estimator.
 
@@ -301,35 +325,6 @@ class SimulationRunner:
 
 
 
-```{python}
-class SimpleOLS:
-    """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
-
-    Attributes:
-        beta0_hat (float | None): Estimated intercept. None until fit is called.
-        beta1_hat (float | None): Estimated slope. None until fit is called.
-    """
-
-    def __init__(self) -> None:
-        """Initializes the OLS estimator with no estimates."""
-        self.beta0_hat: float | None = None
-        self.beta1_hat: float | None = None
-
-    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
-        """Fit OLS to the provided data.
-
-        Args:
-            x (np.ndarray): Independent variable (1D array).
-            y (np.ndarray): Dependent variable (1D array).
-        """
- 
-        # Add constant to x
-        X = np.column_stack([np.ones(len(x)), x])
-        # OLS estimation
-        beta_hat = np.linalg.inv(X.T @ X) @ X.T @ y
-        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
-```
- 
 
 
 
