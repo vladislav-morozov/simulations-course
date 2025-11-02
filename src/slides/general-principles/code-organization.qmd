@@ -337,7 +337,7 @@ class SimulationRunner:
 
 #### Problem: Scope Change
 
-Now imagine that the scope of the overall project changes to a broader one:
+Now imagine that the <span class="highlight">scope</span> of the overall project <span class="highlight">changes</span> to a broader one:
 
 <div class="left-color">
 
@@ -493,6 +493,22 @@ A smaller but annoying problem:
 
 
 #### Solution: Protocols  
+
+Python [protocols](https://typing.python.org/en/latest/spec/protocol.html) allow us to: 
+
+- Express that every estimator should have `fit()` and `beta1_hat`
+- Capture in one place the expectations for our estimators (and DGPs)
+- Type hint this 
+
+. . .
+
+Protocols again work like <span class="highlight">contracts</span>:
+
+<div class="left-color">
+
+If estimator meets protocol, it is compatible with `SimulationRunner`
+
+</div>
 
 #### Estimator Protocol
 
