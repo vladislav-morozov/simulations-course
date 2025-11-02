@@ -46,7 +46,7 @@ open-graph:
 
 #### Learning Outcomes
 
-This lecture is a modular approach to designing simulation code
+This lecture is a 
 
 <br>
 
@@ -62,20 +62,23 @@ By the end, you should be able to
 ::: {.nonincremental}
 
 Statistics:
+ 
+- 28.19-28.23 in @Hansen2022Econometrics regarding shrinkage
+-  29.5 in @Hansen2022Econometrics about ridge regression 
 
-- Chapter 4 of @Hansen2022Econometrics for OLS
-- Chapter 14 of @Hansen2022Econometrics for time series basics
-
-Programming
-
-- Chapter 2-3 of @Hillard2020PracticesPythonPro on basics of design
-- Chapter 26-27 of @Lutz2025LearningPythonPowerful on OOP in Python
+Programming:
+ 
+- 22 in @Lutz2025LearningPythonPowerful about modules and program structure
+- [This tutorial](https://realpython.com/python-protocol/) on protocols in Python
 
 :::
 
  
 
-### Reminder: Simulation Setting {background="#43464B"}
+## Scope Change {background="#00100F"}
+ 
+
+### Reminder: Previous Simulation Setting {background="#43464B"}
 
 
 #### Reminder: Studying OLS Bias
@@ -163,303 +166,8 @@ BG_COLOR = "whitesmoke"
 THEME_COLOR = "#3c165c"
 ```
 
-```{python}
-#| echo: true 
-def simulate_ols(
-    n_sim: int = 1000,
-    n_obs: int = 50,
-    beta0: float = 0.0,
-    beta1: float = 0.5,
-    seed: int = 1,
-    dgp_type: str = "static",
-) -> list[float]:
-    """Simulates OLS estimation for static or AR(1) DGP.
-    Args:
-        n_sim (int): Number of simulations to run. Defaults to 1000.
-        n_obs (int): Number of observations per simulation. Defaults to 100.
-        beta0 (float): True intercept value. Defaults to 0.
-        beta1 (float): True slope coefficient. Defaults to 0.5
-        seed (int): random number generator seed. Defaults to 1.
-        dgp_type (str): Type of DGP: "static" or "ar1". Defaults to "static".
 
-    Returns:
-        list[float]: List of errors of beta1 estimates for each simulation.
-    """
-
-    # Create container to store results
-    results_ols_errors = []
-
-    # InitializeRNG
-    rng = np.random.default_rng(seed)
-
-    # Core simulation loop
-    for _ in range(n_sim):
-        # 1. Draw data
-        if dgp_type == "static":
-            x = rng.normal(size=n_obs)
-            u = rng.normal(size=n_obs)
-            y = beta0 + beta1 * x + u
-        elif dgp_type == "ar1":
-            y = np.zeros(n_obs + 1)
-            u = rng.normal(size=n_obs + 1)
-            y[0] = beta0 + u[0]
-            for t in range(1, n_obs + 1):
-                y[t] = beta0 + beta1 * y[t - 1] + u[t]
-            # Use the last n_obs elements of y as and the first n_obs as x
-            x = y[:-1]  # x is y lagged (n_obs elements)
-            y = y[1:]  # y[1:] is the dependent variable (n_obs elements)
-        else:
-            # Handle the case of giving the wrong DGP value
-            raise ValueError("Invalid DGP choice")
-
-        # 2. Run OLS estimation
-        W = np.column_stack([np.ones(n_obs), x])
-        beta_hat = np.linalg.inv(W.T @ W) @ W.T @ y
-
-        # 3. Compute error
-        results_ols_errors.append(beta_hat[1] - beta1)
-
-    return results_ols_errors
-```
-
-
-#### Problem: How To Expand Simulations?
- 
-
-What if we want to <span class="highlight">expand our simulations</span>?
-
-- More distributions (e.g. heavier tails for innovations, different $X$)
-- Different models (not necessarily $Y_t = \beta_0 + \beta_1 X_t + U_t$)
-
-<br>
-
-. . .
-
-Function approach is <span class="highlight">difficult to expand</span>: would have to keep adding components and selectors to `simulate_ols()`
-
-
-#### This Lecture: Dealing With Complexity
-
-
-Today: dealing with <span class="highlight">design</span>
-
-- Untangling the different components of simulation
-- Learning a more modular structure
-- Understanding the why of it
- 
-
-## Towards a Modular Design {background="#00100F"}
- 
-
-### Identifying Component Blocks in Code {background="#43464B"}
-
-
- 
-
-#### A Step Back: What Are We Doing?
-
-There are three code tasks:
-
-1. *Data generation*: draw data from a DGP
-2. *Estimation*: apply an estimator to the data
-3. *Orchestration*: run the above many times and collect results
-
-
-<br>
-
-For now things are all jumbled up and hardcoded  by `simulate_ols()`  — <span class="highlight">monolithic design</span>
-
-
-#### Why Should The Simulation Loop Care? 
-
-<div class="left-color">
-
-The simulation loop shouldn't need to know:
-
-- How data is generated (e.g., AR(1) vs. static)
-- How estimation works (e.g., OLS vs. IV)
-
-
-
-
-</div> 
-
-It only needs to:
-
-- Get data from *something* (DGP)
-- Pass data to *something* (estimator)
-- Repeat and store results
-
-#### Why Should the Estimator and DGP Care?
-
-Same logic goes for DGP: it shouldn't care
-
-- Whether it's going to be used one time or many times in a loop
-- About how the estimator uses its data after
-
-. . .
-
-Likewise, the estimator:
-
-- Doesn't need details of the loop
-- Doesn't need to know how the `y` and `x` are created, just their form
-
-#### Conclusion: Components
-
-Overall: identified three logical units in code
-
-. . . 
-
-
-<br> 
-
-<div class="left-color">
-
-
-
-These units should be more or less independent (<span class="highlight">loosely coupled</span>) 
-
-
-</div>
-
-<br>
-
-E.g.: 
-
-- Changing DGP details should not affect loop, if loop can still sample in the same way
-- Can also then swap or add more components easily
-
-### Some Design Concepts {background="#43464B"}
-
-
-
-#### Background: Separation of Concerns
-
-
-<div class="left-color">
-
-
-Key in clear code: divide various behavious into small, manageable pieces
-
-
-</div> 
-
-
-Best way to divide — <span class="highlight">by concern</span>. This:
-
-- Reduces complexity (each part does one thing well)
-- Improves reusability (swap DGPs/estimators without rewriting everything)
-- Makes collaboration easier (different people can work on different parts)
-
-#### Interfaces: Glue Between Components
-
-
-Simulation runner only needs to know how to <span class="highlight">interface</span> with DGP and estimator:
-
-- DGP interface: Must provide a method like `sample(n_obs, seed)`
-- Estimator interface: Must provide a method like `fit(X, y)`
-
-<br>
-
-
-<div class="left-color">
-
-
-As long as a DGP/estimator implement given interface, simulation runner can use it
-
- <span class="highlight">Their implementation details do not matter to runner</span>
-
-</div> 
-
-
-#### Background: Interfaces
-
-
-
-
-Interfaces are like contracts
-
- 
-
-
-
-- DGP promises to give valid data if `sample()` is called 
-- Estimator promises to give suitable coefficients if `fit()` is called 
-
-. . .
-
-
-<br>
-
-<div class="left-color">
-
-
-Benefit: You can add new DGPs/estimators without touching the simulation runner!
-
-</div>
-
- 
-
-::: {.footer}
-
-You likely familiar with this from `statsmodels` or `scikit-learn`: always having `fit()` for all estimators and algorithms
-
-:::
-
-#### DGPs Encapsulate Their Logic
-
-Each DGP encapsulates its own logic:
-
-- AR(1) DGP handles its own loops, initial conditions, etc.
-- Static DGP just draws IID data.
-
-<br>
-
-The outside world only sees the `sample()` method that returns a sample of `X` and `y` 
-
-
-## Implementation {background="#00100F"}
- 
-### DGP and Estimator Classes {background="#43464B"}
-
-#### Approach: Classes
-
-Now want implementation with these good properties (separation of concerns, loose coupling, encapsulation)
- 
-
-. . .
-
-<div class="left-color">
-
-Will capture required logic with appropriate <span class="highlight">classes</span>
-
-</div>
-
-- Going OOP allows us to view DGPs, estimators, and simulations as objects: 
-  - Each will have some appropriate data and some logic for doing something with that data
-  - Different objects can interact using that logic
-- Simulation runner can  <span class="highlight">compose</span> DGPs and estimators
-
-
-#### What Attributes and Methods Do Our Classes Need?
-
-<div class="left-color">
-
-To define a class need to choose what data and functions its instances contain
-
-</div>
-
-- DGPs need to:
-  - Know their true `beta1` (e.g. for bias computation)
-  - Offer samples with given number of points from DGP-specific distribution
-- Estimator needs to:
-  - Compute `beta1_hat` based on data
-  - Remember computed `beta1_hat` 
-  
-#### Example: Static DGP Class
-
-```{python} 
-#| echo: true
+```{python}  
 class StaticNormalDGP:
     """A data-generating process (DGP) for a static linear model
 
@@ -495,34 +203,8 @@ class StaticNormalDGP:
         u = rng.normal(size=n_obs)
         y = self.beta0 + self.beta1 * x + u
         return x, y
-```
 
-#### Discussion of DGP Class
-
-We use a class to:
-
-- Capture a specific concern (data drawing)
-- Specify interfaces (a `sample()` method)
-- Encapsulate logic (class keeps its DGP details in `sample()`)
-
-. . .
-
-
-Example usage
-
-```{python}
-#| echo: true
-static_sampler = StaticNormalDGP(beta1=0.4)
-x, y = static_sampler.sample(n_obs=5, seed=1)
-print(f"x: {x.round(2)} \ny: {y.round(2)}")
-```
-
-#### Example: AR(1) Class
-
-A class for AR(1) with <span class="highlight">same `sample()` interface</span>
-```{python}
-#| echo: true
-#| code-line-numbers: "19-21"
+  
 class DynamicNormalDGP:
     """A data-generating process (DGP) for a dynamic linear model: y_t = beta0 + beta1*y_{t-1} + u_t.
 
@@ -562,215 +244,8 @@ class DynamicNormalDGP:
             y[t] = self.beta0 + self.beta1 * y[t - 1] + u[t]
         # Return lagged y as x and y[1:] as y
         return y[:-1], y[1:]
-
 ```
 
-#### Discussion: DGP Classes
-
-- Now `StaticNormalDGP` and `DynamicNormalDGP` capture our DGPs
-- Important: can interact with them in the <span class="highlight">same way</span>:
-  - Ask their true `beta1` value
-  - `sample()` given number of poinst with given `seed`
-- In line with what simulation loop wants, all other logic kept inside
-
-#### Same Idea: Simple Estimator Class
-
-Hide estimator logic and only provide `fit()`
-
-```{python}
-#| echo: true
-class SimpleOLS:
-    """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
-
-    Attributes:
-        beta0_hat (float | None): Estimated intercept. None until fit is called.
-        beta1_hat (float | None): Estimated slope. None until fit is called.
-    """
-
-    def __init__(self) -> None:
-        """Initializes the OLS estimator with no estimates."""
-        self.beta0_hat: float | None = None
-        self.beta1_hat: float | None = None
-
-    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
-        """Fit OLS to the provided data.
-
-        Args:
-            x (np.ndarray): Independent variable (1D array).
-            y (np.ndarray): Dependent variable (1D array).
-        """
- 
-        # Add constant to x
-        X = np.column_stack([np.ones(len(x)), x])
-        # OLS estimation
-        beta_hat = np.linalg.inv(X.T @ X) @ X.T @ y
-        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
-```
-
-#### `SimpleOLS` In Action
-
-To fit an instance of `SimpleOLS`, just pass data:
-
-```{python}
-#| echo: true
-ols = SimpleOLS()
-x, y = static_sampler.sample(n_obs=5000, seed=1)
-ols.fit(x, y)
-print(f"Estimated slope coefficient: {ols.beta1_hat:.3f}")
-```
-
-
-<br>
-
-<div class="left-color">
-
-Now ready to put things together into simulation
-
-</div>
-
-### Simulation Runner Class {background="#43464B"}
-
-#### Capturing Simulation Logic
-
-Now missing final piece — the simulation loop:
-
-- Will create appropriate `SimulationRunner` class
-- `SimulationRunner` composes DGP and estimator (part of its data)
-- With data, will run Monte Carlo simulation for given number of datasets
-
-
-
-#### Simulation Runner Implementation
-
-
-```{python}
-#| echo: true 
-class SimulationRunner:
-    """Runs Monte Carlo simulations for a given DGP and estimator.
-
-    Attributes:
-        dgp: data-generating process with a sample() method.
-        estimator: estimator with a fit() method and beta1_hat attribute.
-        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
-    """
-
-    def __init__(
-        self,
-        dgp: StaticNormalDGP | DynamicNormalDGP,
-        estimator: SimpleOLS,
-    ) -> None:
-        """Initializes the simulation runner.
-
-        Args:
-            dgp: An instance of a DGP class (must implement `sample`).
-            estimator: An instance of an estimator class (must implement `fit`).
-        """
-        self.dgp: StaticNormalDGP | DynamicNormalDGP = dgp
-        self.estimator: SimpleOLS = estimator
-        self.errors: np.ndarray | None  = None
-
-    def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
-        """Runs simulations and stores estimation errors.
-
-        Args:
-            n_sim (int): number of simulations to run.
-            n_obs (int): Number of observations per simulation.
-            first_seed (int | None): Starting random seed for reproducibility. 
-                Defaults to None.
-        """
-        # Preallocate array to hold estimation errors
-        self.errors = np.empty(n_sim)
-
-        # Run simulation
-        for sim_id in range(n_sim):
-            # Draw data
-            x, y = self.dgp.sample(n_obs, seed=first_seed + sim_id if first_seed else None)
-            # Fit model
-            self.estimator.fit(x, y)
-            # Store error
-            self.errors[sim_id] = self.estimator.beta1_hat - self.dgp.beta1
-```
-
-#### Simulation Runner in Action
-
-Simulation flow now:
-
-- Create DGP and estimator
-- Pass to `SimulationRunner` and `simulate()`
-
-```{python}
-#| echo: true
-# Initialize DGP and estimator
-static_dgp = StaticNormalDGP(beta0=0.0, beta1=0.5)
-ols_estimator = SimpleOLS()
-
-# Initialize and run simulation
-ols_static_sim = SimulationRunner(static_dgp, ols_estimator)
-ols_static_sim.simulate(n_sim=1000, n_obs=50, first_seed=1)
-
-# Summarize bias
-print(f"Average estimation error (bias): {ols_static_sim.errors.mean():.4f}")
-```
-
-#### Discussion I: What Just Happened?
- 
-<div class="left-color">
-
-DGP, estimator, and simulation runner are now only loosely connected
-
-</div>
-
-. . . 
-
-<br>
-
-Benefits:
-
-- Can add new scenarios without touching the core simulation logic
-- Different people can work on these without conflicts
-- Can reuse components elsewhere
-- Easier to read and change the code
-
-#### Discussion II: Reproducibility in `simulate()`
-
-<div class="left-color">
-
-`simulate()` ensures reproducibility with the `first_seed` argument
-
-</div>
-
-<br>
-
-- `first_seed` — seed used for first dataset
-- $i$th dataset uses seed = `first_seed` + `i`
-- Ensures different datasets in different steps 
-
-## Summarizing Results {background="#00100F"}
- 
- 
-
-#### What To Do With Results
-
-`SimulationRunner` stores raw simulation results (here: full estimation errors in `errors` )
-
-. . .
-
-<br>
-
-How these are handled — depends on what you want to do
-
-- Can add summary methods
-- Can create other objects that process run simulations (and generate figures)
- 
-. . .
-
-<div class="left-color">
-
-We will add a simple `summarize_bias()` method
-
-</div>
-
-#### Example: Adding A Summary to `SimulationRunner`
 
 ```{python}
 #| echo: true 
@@ -826,26 +301,226 @@ class SimulationRunner:
 ```
 
 
- 
-#### Example: Summarizing AR(1) Simulation
 
-For example: compute bias in dynamic model with a lot of persistence: 
+```{python}
+class SimpleOLS:
+    """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float | None): Estimated intercept. None until fit is called.
+        beta1_hat (float | None): Estimated slope. None until fit is called.
+    """
+
+    def __init__(self) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float | None = None
+        self.beta1_hat: float | None = None
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fit OLS to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+ 
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+```
+ 
+
+
+
+### Shifting Scope and Adding Other Estimators {background="#43464B"}
+
+#### Problem: Scope Change
+
+Now imagine that the scope of the overall project changes to a broader one:
+
+<div class="left-color">
+
+Comparing bias of several "near-OLS" estimators in a static and dynamic settings
+
+</div>
+ 
+- Scope changes are natural, especially in research (often based in preliminary results)
+- Need to be flexible both in statistics and code
+
+
+. . . 
+
+Can our code accommodate more estimators?
+
+#### Adding a New Estimator: Ridge
+
+
+<div class="left-color">
+
+Consider the simple *ridge* estimator:
+$$
+\hat{\bbeta} = (\bX'\bX+\lambda I)^{-1} \bX'\bY
+$$
+$\lambda$ — regularization strength
+
+</div>
+
+- Ridge — one of simpler examples of <span class="highlight">shrinkage</span> estimators
+- Ridge solves $L^2$-regularized 
+
+#### Ridge Estimator and `SimulationRunner`
+
+
+
+#### Implementation of Simple Ridge Estimator
 
 ```{python}
 #| echo: true
-# Initialize DGP and estimator
-dynamic_dgp = DynamicNormalDGP(beta0=0.0, beta1=0.95)
-ols_estimator = SimpleOLS()
+#| code-line-numbers: "1,10,14,16,27"
+class SimpleRidge:
+    """A simple ridge estimator for the linear model y = beta0 + beta1*x + u.
 
-# Initialize and run simulation
-ols_dynamic_sim = SimulationRunner(dynamic_dgp, ols_estimator)
-ols_dynamic_sim.simulate(n_sim=1000, n_obs=50, first_seed=1)
+    Attributes:
+        beta0_hat (float | None): Estimated intercept. None until fit is called.
+        beta1_hat (float | None): Estimated slope. None until fit is called.
+        reg_param (float): Strength of regularization. Defaults to 0.01.
+    """
 
-# Summarize bias
-ols_dynamic_sim.summarize_bias()
+    def __init__(self, reg_param: float = 0.01) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float | None = None
+        self.beta1_hat: float | None = None
+        self.reg_param = reg_param
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the ridge estimator to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+ 
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X + self.reg_param * np.eye(2)) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
 ```
 
+#### Bias vs. Regularization Strength
+
+```{python}
+#| echo: true
+#| code-line-numbers: "5-6,9-10"
+# Initialize DGP and estimator
+static_dgp = StaticNormalDGP(beta0=0.0, beta1=0.5)
+
+# Estimators
+ridge_weak = SimpleRidge(reg_param=0.01)
+ridge_strong = SimpleRidge(reg_param=100)
+
+# Initialize and run simulations
+sim_ridge_weak = SimulationRunner(static_dgp, ridge_weak)
+sim_ridge_strong = SimulationRunner(static_dgp, ridge_strong)
+sim_ridge_weak.simulate(n_sim=1000, n_obs=50, first_seed=1)
+sim_ridge_strong.simulate(n_sim=1000, n_obs=50, first_seed=1)
+
+# Summarize bias 
+sim_ridge_weak.summarize_bias()
+sim_ridge_strong.summarize_bias()
+```
+
+#### Technical
+
+even though type hints (recall Python does not enforce them, though code quality checks can catch them)
+
+
+duck typing saved us, but still would be nice to fix that — next time
+
+## Organizing Classes {background="#00100F"}
  
+
+### Organizing Classes with Protocols {background="#43464B"}
+
+
+####  
+
+Couple of problems
+
+- How do you communicate and remember 
+  - You can write docs: that's good, but extra effort that a lot of people do not take until later
+  - You can try to look at code: works best when it's freshly written by you, but harder otherwise
+- Our type hints
+
+#### A  
+
+#### Alternative: ABCs
+
+Protocols are not the only way
+
+One can also use abstract base classes 
+
+There is a bit more infrastructure
+
+## Organizing Files {background="#00100F"}
+ 
+
+
+### Lecture Info {background="#43464B"}
+
+
+#### Modules
+
+
+conventions differ
+
+#### A
+
+```
+project/
+├── dgps/
+│   ├── __init__.py
+│   ├── static.py       # StaticNormalDGP
+│   └── dynamic.py      # DynamicNormalDGP
+├── estimators/
+│   ├── __init__.py
+│   ├── ols-like.py     # SimpleOLS 
+├── runner.py           # SimulationRunner
+└── main.py             # CLI entry point
+```
+
+::: {.footer}
+
+See chapter 24 in @Lutz2025LearningPythonPowerful about `__init__.py`
+
+:::
+
+####
+
+makes sense
+
+- Maybe split more, maybe split less: choose what's appropriate, easy for understanding and collaboration, etc
+
+
+### Executing {background="#43464B"}
+
+
+####
+
+automatically only when
+the module is run as a script, not when it is imported. The line you add will probably test the value
+of `__name__` for the string `__main__` 
+
+#### Running
+
+
+```bash
+
+py main.py
+
+```
 
 ## Recap and Conclusions {background="#00100F"}
  
@@ -855,45 +530,14 @@ ols_dynamic_sim.summarize_bias()
 
 In this lecture we 
 
-- Discussed the benefits of a more modular structure
-- Implemented such an approach using appropriate classes
-- Talked about basic result summaries
-
-#### How To Intepret Example Code
-
-
-Choose the appropriate level of complexity for your situation:
-
-- A brief simulation with one DGP does not need deep architecture and can be done with a monolithic function (last time)
-- A complex simulation involving many scenarios and estimators would benefit from a clearer structure
-
-
-<div class="left-color">
-
-The specific implementations of today are not absolute, but an example of how to think
-
-</div>
-
-
-#### Further Improvements
-
-<br>
-
-Our simulation is in a good prototype shape, but can still improve some things:
-
-
-- Clean up relationships between DGP classes and organize them in a common family
-- Add simulation metadata (DGP name, estimator name for further purposes)
-- Tracking progress 
-
+- Discussed   
+ 
 #### Next Questions
 
 <br>
-
-- How to clean up some loose ends in existing code?
-- How to organize running many simulations?
-- How to handle simulation results?
-- How to apply these logic to deeper statistical scenarios?
+ 
+- How to organize running many simulations? 
+- How to apply this logic to deeper statistical scenarios?
 
 #### References {.allowframebreaks visibility="uncounted"}
 
