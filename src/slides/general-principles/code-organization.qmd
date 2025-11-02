@@ -417,7 +417,7 @@ class SimpleRidge:
 
 ```{python}
 #| echo: true
-#| code-line-numbers: "5-6,9-10"
+#| code-line-numbers: "4-5,8-9"
 # Initialize DGP and estimator
 static_dgp = StaticNormalDGP(beta0=0.0, beta1=0.5)
 # Estimators
@@ -725,6 +725,7 @@ Three reasons:
 
 #### A Look at `scikit-learn` Lasso
 
+In general, would use Lasso like this
 ```{python}
 
 ```
@@ -760,9 +761,9 @@ class LassoWrapper:
         Args:
             x (np.ndarray): Independent variable (1D array).
             y (np.ndarray): Dependent variable (1D array).
-        """
-        X = np.column_stack([np.ones(len(x)), x])
-        self.model.fit(X, y)
+        """ 
+        x = x.reshape(-1, 1) # sklearn expects 2d array inputs
+        self.model.fit(x, y)
         self.beta0_hat = float(self.model.intercept_)
         self.beta1_hat = float(self.model.coef_[0]) 
 
@@ -771,15 +772,23 @@ class LassoWrapper:
 #### Lasso Wrapper in Action
 
 ```{python}
+#| echo: true
+# Initialize DGP and estimator
 static_dgp = StaticNormalDGP(beta0=0.0, beta1=0.5)
-lasso = LassoWrapper(reg_param=0.001)
+# Estimators
+lasso_weak = LassoWrapper(reg_param=0.01)
+lasso_strong = LassoWrapper(reg_param=100)
 
-sim_lasso = SimulationRunner(static_dgp, lasso)
-sim_lasso.simulate(n_sim=1000, n_obs=50, first_seed=1)
-sim_lasso.summarize_bias() 
+# Initialize and run simulations
+sim_lasso_weak = SimulationRunner(static_dgp, lasso_weak)
+sim_lasso_strong = SimulationRunner(static_dgp, lasso_strong)
+sim_lasso_weak.simulate(n_sim=1000, n_obs=50, first_seed=1)
+sim_lasso_strong.simulate(n_sim=1000, n_obs=50, first_seed=1)
+# Summarize bias 
+sim_lasso_weak.summarize_bias()
+sim_lasso_strong.summarize_bias() 
 ```
-
-On average, lasso totally kills 
+ 
 
 #### Discussion
 
