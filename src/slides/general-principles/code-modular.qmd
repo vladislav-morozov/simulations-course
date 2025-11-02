@@ -149,8 +149,6 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-from typing import Tuple
 ```
 
 
@@ -480,7 +478,7 @@ class StaticNormalDGP:
 
     def sample(
         self, n_obs: int, seed: int | None = None
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Samples data from the static DGP.
 
         Args:
@@ -543,7 +541,7 @@ class DynamicNormalDGP:
 
     def sample(
         self, n_obs: int, seed: int | None = None
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Samples data from the dynamic DGP.
 
         Args:

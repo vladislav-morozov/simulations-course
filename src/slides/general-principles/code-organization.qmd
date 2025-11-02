@@ -46,16 +46,14 @@ open-graph:
 
 #### Learning Outcomes
 
-This lecture is a 
+This lecture is about organizing our code in two ways: defining interfaces and organizing our files
 
 <br>
 
 By the end, you should be able to
 
  
-- Refactor code into modular reusable classes
-- Compose DGPs and estimators into simulations
-- Understand how modularity leads to clearer, more extensible code  
+- a
 
 #### References
 
@@ -74,6 +72,13 @@ Programming:
 :::
 
  
+```{python} 
+import numpy as np
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+ 
+```
 
 ## Scope Change {background="#00100F"}
  
@@ -83,7 +88,7 @@ Programming:
 
 #### Reminder: Studying OLS Bias
 
-This time: continue studying <span class="highlight">bias of OLS estimator</span> in simple linear model:
+Recall: studied <span class="highlight">bias of OLS estimator</span> in simple linear model:
 
 $$
 Y_{t} = \beta_0 + \beta_1 X + U_t, \quad t=1, \dots, T
@@ -106,7 +111,7 @@ $$
 ::: {.column width="46%"}
 
  
-**Static**:
+**Static** (`StaticNormalDGP`):
 
 $$  \small
 Y_{t} = \beta_0 + 0.5 X_{t} + U_{t}
@@ -117,13 +122,13 @@ Covariate $X_t$ independent from $U_t$ and over time
 :::
 
   
-::: {.column width="8%"} 
+::: {.column width="2%"} 
 
 :::
 
-::: {.column width="46%"} 
+::: {.column width="52%"} 
   
-**Dynamic**:
+**Dynamic** (`DynamicNormalDGP`):
 
 $$ \small
 Y_{t} = \beta_0 + \beta_1 Y_{t-1} + U_{t}
@@ -141,30 +146,6 @@ $$
 
 - One DGP per $U_t, X_t, Y_0$: each $N(0, 1)$
 - $T=50, 200$ 
-
-#### Reminder: Current State of Simulation
-
-Last time: implemented things with a basic function
- 
-
-```{python} 
-import numpy as np
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-from typing import Tuple
-```
-
-
-```{python}
-
-plt.rcParams["font.family"] = "sans-serif"
-plt.rcParams["font.sans-serif"] = ["Arial"]
-
-BG_COLOR = "whitesmoke"
-THEME_COLOR = "#3c165c"
-```
 
 
 ```{python}  
@@ -188,7 +169,7 @@ class StaticNormalDGP:
 
     def sample(
         self, n_obs: int, seed: int | None = None
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Samples data from the static DGP.
 
         Args:
@@ -225,7 +206,7 @@ class DynamicNormalDGP:
 
     def sample(
         self, n_obs: int, seed: int | None = None
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Samples data from the dynamic DGP.
 
         Args:
@@ -245,6 +226,24 @@ class DynamicNormalDGP:
         # Return lagged y as x and y[1:] as y
         return y[:-1], y[1:]
 ```
+
+#### Reminder: `SimulationRunner`
+
+Our simualtion
+
+
+
+
+```{python}
+
+plt.rcParams["font.family"] = "sans-serif"
+plt.rcParams["font.sans-serif"] = ["Arial"]
+
+BG_COLOR = "whitesmoke"
+THEME_COLOR = "#3c165c"
+```
+
+
 
 
 ```{python}
@@ -439,7 +438,7 @@ even though type hints (recall Python does not enforce them, though code quality
 
 duck typing saved us, but still would be nice to fix that — next time
 
-## Organizing Classes {background="#00100F"}
+## Defining Interfaces {background="#00100F"}
  
 
 ### Organizing Classes with Protocols {background="#43464B"}
@@ -456,6 +455,10 @@ Couple of problems
 
 #### A  
 
+
+### Aside: Alternative Approach {background="#43464B"}
+
+
 #### Alternative: ABCs
 
 Protocols are not the only way
@@ -463,6 +466,13 @@ Protocols are not the only way
 One can also use abstract base classes 
 
 There is a bit more infrastructure
+
+#### ABCs vs. Protocolss
+
+Protocols are really about implementation
+
+ABCs
+
 
 ## Organizing Files {background="#00100F"}
  
