@@ -712,6 +712,13 @@ ols_static_sim.simulate(n_sim=1000, n_obs=50, first_seed=1)
 print(f"Average estimation error (bias): {ols_static_sim.errors.mean():.4f}")
 ```
 
+
+::: {.footer}
+
+The fact that we create and pass the DGP and estimator is an example of [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection)
+
+:::
+
 #### Discussion I: What Just Happened?
  
 <div class="left-color">
