@@ -1,4 +1,14 @@
 """
+Module for OLS-like estimators.
+
+This module contains classes for estimating simple model
+    y = b0 + b1 * x + u
+with OLS-like methods. All estimators implement the EstimatorProtocol interface.
+
+Classes:
+    SimpleOLS: ordinary least squares estimator.
+    SimpleRidge: ridge regression estimator.
+    LassoWrapper: wrapper for scikit-learn's Lasso estimator.
 """
 
 import numpy as np
