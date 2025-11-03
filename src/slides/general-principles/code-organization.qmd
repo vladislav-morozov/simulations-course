@@ -6,7 +6,7 @@ format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content="How  (lecture note slides)"/> 
+        <meta name="description" content="How to write good Monte Carlo simulation code in data science: protocols for consistent interfaces; organizing files; writing main.py (lecture note slides)"/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: "How   (lecture note slides)" 
+    description: "How to write good Monte Carlo simulation code in data science: protocols for consistent interfaces; organizing files; writing main.py (lecture note slides)" 
 ---
 
 
