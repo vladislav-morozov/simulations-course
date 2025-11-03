@@ -53,7 +53,9 @@ This lecture is about organizing our code in two ways: defining interfaces and o
 By the end, you should be able to
 
  
-- a
+- Specify desired interfaces using protocols
+- Organize simulation components in modules
+- Execute the simulation from the command line
 
 #### References
 
@@ -526,6 +528,12 @@ If estimator meets protocol, it is compatible with `SimulationRunner`
 
 </div>
 
+::: {.footer}
+
+Protocols formalize duck typing
+
+:::
+
 #### Estimator Protocol
 
 Here's how to express our two requirements:
@@ -674,7 +682,7 @@ class SimulationRunner:
 
 . . . 
 
-Protocol vs. ABCs: depends on whether you want an inheritance structure (no inheritance needed with protocols)
+Protocol vs. ABCs: depends on whether you want an inheritance structure + common logic (no inheritance needed with protocols)
 
 ::: {.footer}
 
@@ -711,7 +719,7 @@ But don't want to implement it ourselves (hard, etc.)
 
 <div class="left-color">
 
-Not a problem: can wrap it in a compatible manner
+Not a problem: can *adapt* it in a compatible manner
 
 </div>
 
@@ -759,9 +767,9 @@ print(f"Estimates: beta0: {lasso_est.intercept_:.3f}; estimated beta1: {lasso_es
 
 </div>
 
-#### Lasso Wrapper Implementation
+#### Lasso Adapter Implementation
 
-Wrapper class that aligns `Lasso` with `EstimatorProtocol`:
+Adapter class that aligns `Lasso` with `EstimatorProtocol`:
 ```{python}
 #| echo: true
 from sklearn.linear_model import Lasso as SklearnLasso 
@@ -1111,46 +1119,94 @@ Split less if:
 
 #### Towards a Main Script
 
-Today — calls a few scenarios (DGP + estimator + sample size) and prints bias summaries to the console 
+So far have modules, but still need the `main.py` <span class="highlight">script</span>
 
-(running many scenarios and handling outputs — next time)
+<div class="left-color">
 
-#### Our `main.py`
+`main.py` imports all the necessary components and actually executes the simulations. It's the <span class="highlight">entry point</span>
 
+</div>
+
+<br>
+
+- Today: just a skeleton script that runs a given scenario and prints output to console
+- Next time: running many scenarios and handling outputs
+
+#### Our First `main.py`
+
+A script with a single scenario:
 ```python
-from dgps.static import StaticNormalDGP
-from estimators.ols_like import SimpleOLS
-from runner import SimulationRunner
+from dgps.dynamic import DynamicNormalDGP
+from estimators.ols_like import LassoWrapper
+from runners import SimulationRunner
 
 if __name__ == "__main__":
-    # Initialize components
-    dgp = StaticNormalDGP(beta0=0.0, beta1=1.0)
-    estimator = SimpleOLS()
+    # Today: just one scenario
+    dgp = DynamicNormalDGP(beta0=0.0, beta1=0.95)
+    estimator = LassoWrapper(reg_param=0.04)
+    n_obs = 50
 
-    # Run simulation
+    # Run simulation for specified scenario
     runner = SimulationRunner(dgp, estimator)
-    runner.simulate(n_sim=1000, n_obs=100, seed=42)
+    runner.simulate(n_sim=1000, n_obs=n_obs, first_seed=1)
 
     # Print results
-    print(f"Bias for {dgp.__class__.__name__} + {estimator.__class__.__name__}: "
-          f"{runner.summarize_bias():.4f}")
-
+    print(
+        f"Bias for {dgp.__class__.__name__} + {estimator.__class__.__name__}: "
+    )
+    runner.summarize_bias()
 ```
 
-#### About `__name__` and `__main__`
+#### Note: About `__name__` and `__main__`
  
-the module is run as a script, not when it is imported. The line you add will probably test the value
-of `__name__` for the string `__main__` 
+- The name `if __name__ == "__main__":` is a very Python thing
+- See often in scripts executed from the command line 
+  
 
-#### Running
+<br>
 
+<div class="left-color">
 
+Ensures the code runs only when the script is executed directly, not when imported (avoids accidents)
+ 
+</div>
+
+See chapter 24-25 in @Lutz2025LearningPythonPowerful
+
+#### Running Our Simulation
+
+To execute, just call from the command line when in project root: 
 ```bash
-
 py main.py
-
+```
+or 
+```bash
+python main.py
 ```
 
+<br>
+
+Prints the following to the console:
+
+
+```
+Bias for DynamicNormalDGP + LassoWrapper: 
+Average estimation error (bias): -0.1121
+```
+
+#### Discussion: So Far and What's Next?
+
+Already in quite good shape:
+
+- Modular and extensible structure
+- Reasonable understanding of how components interact
+- Quite a bit of progress on the statistical question
+
+What's left for next time? 
+
+- How to execute many scenarios conveniently in `main.py`? 
+- How to store results of these scenarios
+  
 ## Recap and Conclusions {background="#00100F"}
  
 #### Recap
@@ -1159,13 +1215,17 @@ py main.py
 
 In this lecture we 
 
-- Discussed   
+- Discussed how to handle scope changes
+- Introduced and defined protocols for enforcing interfaces
+- Shown how to adapt external libraries 
+- Made explicit out file structure
  
 #### Next Questions
 
 <br>
  
 - How to organize running many simulations? 
+- How to deal with simulation outputs?
 - How to apply this logic to deeper statistical scenarios?
 
 #### References {.allowframebreaks visibility="uncounted"}
