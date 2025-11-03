@@ -767,8 +767,8 @@ Wrapper class that aligns `Lasso` with `EstimatorProtocol`:
 from sklearn.linear_model import Lasso as SklearnLasso 
 
 class LassoWrapper:
-    """A wrapper for scikit-learn's Lasso estimator to match the EstimatorProtocol interface
-    for model y = beta0 + beta1*x+u.
+    """A wrapper for scikit-learn's Lasso to match the EstimatorProtocol.
+    Model y = beta0 + beta1*x+u.
 
     Attributes:
         model (sklearn.linear_model.Lasso): a scikit-learn Lasso instance.
@@ -843,17 +843,87 @@ On the wrapper:
 
 #### A Recap
 
-- Three estimators 
-- Two DGPs
-- Two protocols
-- One simulation runner
+Have quite a few things implemented:
 
-#### Modules
+::: {.nonincremental}
+
+- Three estimators: `SimpleOLS`, `SimpleRidge`, `LassoWrapper`
+- Two DGPs: `StaticNormalDGP`, `DynamicNormalDGP`
+- Two protocols: `DGPProtocol`, `EstimatorProtocol`
+- `SimulationRunner`
+
+:::
 
 
-conventions differ
+. . .
 
-#### A
+So far: just displaying them from slides in a Jupyter notebook-like fashion
+
+#### Goal: Organization
+
+Good project file organization: 
+
+- Makes it easy to work in parallel on different features
+- Is self-documenting
+- Allows easy version control
+- Makes it easy to execute overall project
+
+
+<div class="left-color">
+
+Now talk about explicit file structure
+
+</div>
+
+#### Why Not a Notebook?
+
+Notebooks are great for exploration, but:
+
+- Hard to version control (diffing .ipynb files is messy)
+- Difficult to reuse code across projects
+- No clear entry point for running simulations
+
+<div class="left-color">
+
+Modules + scripts = better for production and collaboration
+
+</div>
+
+
+#### Basics: Python Program Architecture
+ 
+
+A typical Python program:
+
+- One top-level file — *script*
+  - Has main program, can be executed
+  - Example: our simulation execution
+- $\geq 0$ supplemental *module* files
+  - Libraries of tools; group components used by script
+  - Not executed (or don't do anything when executed)
+  - Example: estimators, DGPs, etc.
+ 
+
+#### Reminder: Python Modules
+
+
+Modules are the highest-level way to organize Python code
+
+. . .
+
+<br>
+
+Benefits:
+
+- Easy way to systematically organize things
+- Can reuse code
+- Avoids duplication
+- Self-contained and avoid name clashes
+- Help with encapsulation
+
+
+
+#### Overall Example File Organization
 
 ```
 project/
@@ -863,8 +933,8 @@ project/
 │   └── dynamic.py      # DynamicNormalDGP
 ├── estimators/
 │   ├── __init__.py
-│   ├── ols-like.py     # SimpleOLS, SimpleRidge, SimpleLasso
-├── main.py             # Main script that we call
+│   ├── ols-like.py     # SimpleOLS, SimpleRidge, LassoWrapper
+├── main.py             # Main script that we call from the CLI
 ├── protocols.py        # DGPProtocol, EstimatorProtocol
 └── runner.py           # SimulationRunner
 ```
@@ -875,19 +945,88 @@ See chapter 24 in @Lutz2025LearningPythonPowerful about `__init__.py`
 
 :::
 
-####
+#### Example: Estimators Module
 
-makes sense
+Group OLS-like estimator class definitions together:
 
-- Maybe split more, maybe split less: choose what's appropriate, easy for understanding and collaboration, etc
+```{.python filename="estimators/ols-like.py"} 
+# here our current estimators
+```
 
 
-### Executing {background="#43464B"}
 
 
-####
+#### Reminder: Importing From Modules
 
-automatically only when
+Can now import either the whole module (from the project root):
+
+```python
+import estimators.ols_like as ols_like
+```
+
+<br>
+
+Or can import specific estimators:
+
+
+```python
+from estimators.ols_like import SimpleOLS
+```
+
+
+#### File Organization: Discussion
+
+
+<div class="left-color">
+
+Main rule: choose what's easiest for understanding and collaboration
+
+</div>
+
+Split more if:
+
+- You have many classes (e.g., 10+ estimators)
+- Multiple people are working on the code
+
+
+Split less if:
+
+- The project is small (e.g., 2–3 estimators)
+- You want to minimize file overhead
+
+
+### `main.py` and Executing Our Simulation {background="#43464B"}
+
+#### Towards a Main Script
+
+Today — calls a few scenarios (DGP + estimator + sample size) and prints bias summaries to the console 
+
+(running many scenarios and handling outputs — next time)
+
+#### Our `main.py`
+
+```python
+from dgps.static import StaticNormalDGP
+from estimators.ols_like import SimpleOLS
+from runner import SimulationRunner
+
+if __name__ == "__main__":
+    # Initialize components
+    dgp = StaticNormalDGP(beta0=0.0, beta1=1.0)
+    estimator = SimpleOLS()
+
+    # Run simulation
+    runner = SimulationRunner(dgp, estimator)
+    runner.simulate(n_sim=1000, n_obs=100, seed=42)
+
+    # Print results
+    print(f"Bias for {dgp.__class__.__name__} + {estimator.__class__.__name__}: "
+          f"{runner.summarize_bias():.4f}")
+
+```
+
+#### About `__name__` and `__main__`
+ 
 the module is run as a script, not when it is imported. The line you add will probably test the value
 of `__name__` for the string `__main__` 
 
