@@ -78,11 +78,6 @@ plt.rcParams["font.sans-serif"] = ["Arial"]
 BG_COLOR = "whitesmoke"
 THEME_COLOR = "#3c165c"
 ```
-
-### Reminder: State of Our Simulation {background="#43464B"}
-
-
-## Scenario: Scope Change {background="#00100F"}
  
 
 ### Reminder: Previous Simulation Setting {background="#43464B"}
@@ -91,7 +86,46 @@ THEME_COLOR = "#3c165c"
 #### Reminder: Study Bias of Penalized SSR Estimators
 
 
+<div class="left-color">
+
+Talking about <span class="highlight">bias</span> of different <span class="highlight">penalized SSR-based estimators</span>  in simple linear model:
+
+$$ \small
+Y_{t} = \beta_0 + \beta_1 X + U_t, \quad t=1, \dots, T
+$$ 
+
+</div>
+
+. . . 
+
+Estimators for $\beta_1$ minimize <span class="highlight">penalized SSR</span> with form
+$$ \small
+(\hat{\beta}_0, \hat{\beta}_1) = \argmin \sum_{t=1}^T (Y_t - b_0 - b_1 X_t)^2 + \lambda \Pcal(b_0, b_1)
+$$
+$\Pcal(\cdot)$ — penalty (0 for OLS, $L^1$ for Lasso, $L^2$ for ridge)
+
 #### Reminder: File Structure
+
+::: {.nonincremental}
+
+- Already implemented some DGPs, estimators, and a simulation runner
+- Figured out a basic file structure
+
+:::
+
+```
+project/
+├── dgps/
+│   ├── __init__.py
+│   ├── static.py       # StaticNormalDGP
+│   └── dynamic.py      # DynamicNormalDGP
+├── estimators/
+│   ├── __init__.py
+│   ├── ols-like.py     # SimpleOLS, SimpleRidge, LassoWrapper
+├── main.py             # Main script that we call from the CLI
+├── protocols.py        # DGPProtocol, EstimatorProtocol
+└── runner.py           # SimulationRunner
+```
 
 
 ## Orchestrating Many Simulations {background="#00100F"}
@@ -101,20 +135,96 @@ THEME_COLOR = "#3c165c"
 
 #### Reminder: `main.py`
 
+Our script only does one scenario so far:
+```{.python filename="main.py"} 
+from dgps.dynamic import DynamicNormalDGP
+from estimators.ols_like import LassoWrapper
+from runner import SimulationRunner
 
-#### Issue: How To Run
+if __name__ == "__main__":
+    # Today: just one scenario
+    dgp = DynamicNormalDGP(beta0=0.0, beta1=0.95)
+    estimator = LassoWrapper(reg_param=0.04)
+    n_obs = 50
 
-Can add manually, but then what
+    # Run simulation for specified scenario
+    runner = SimulationRunner(dgp, estimator)
+    runner.simulate(n_sim=1000, n_obs=n_obs, first_seed=1)
 
-Problem of dealing 
+    # Print results
+    print(
+        f"Bias for {dgp.__class__.__name__} + {estimator.__class__.__name__}: "
+    )
+    runner.summarize_bias()
+```
 
+::: {.footer}
+
+
+:::
+
+#### Issue: How To Run Many Scenarios?
+ 
+Key challenge: 
+
+<div class="rounded-box">
+
+How do we run many scenarios automatically?
+
+</div>
+
+
+A problem of <span class="highlight">orchestration</span>: coordinating multiple tasks
+
+- Automatically 
+- As single workflow done in the correct order
+
+Goal: being able to focus on results
+
+#### Why Not Harcode?
+
+One way: just add all scenarios (DGPs, estimators, sample sizes) manually in `main.py`, create `SimulationRunner` for each one
+
+<div class="left-color">
+
+Not a very good approach
+
+</div>
+
+- Brittle: have to edit `main.py` for every change
+- Prone to errors 
+- Repeats code (e.g. `SimulationRunner` creation)
+- Breaks separation of concerns: job of the main script is not to say which scenarios you want today
+
+#### Questions to Answer for Orchestration
+
+<div class="left-color">
+
+- How do we actually express what a scenario is?
+- How do we execute all these scenarios?
+
+
+</div>
+
+<br>
+
+- For now: just  executing simulations and printing results to the console as before
+- Later today: dealing with outputs better
 
 ### Data Classes {background="#43464B"}
 
 #### How To Encode Scenarios?
 
+#### Creating a Collection of Scenarios
+
+- Can create manually
+- Can make automatically (e.g. as a Cartesian product)
+
 ### Putting Things Together {background="#43464B"}
 
+#### 
+
+can of course give it a method to add scenarios 
 
 #### Other Tools
 
