@@ -1138,7 +1138,7 @@ A script with a single scenario:
 ```{.python filename="main.py"} 
 from dgps.dynamic import DynamicNormalDGP
 from estimators.ols_like import LassoWrapper
-from runners import SimulationRunner
+from runner import SimulationRunner
 
 if __name__ == "__main__":
     # Today: just one scenario
