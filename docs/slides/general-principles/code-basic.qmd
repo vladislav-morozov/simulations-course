@@ -615,7 +615,7 @@ Different data drawn by `rng` in different runs of the function
 
 To get same data, need to know that:
 
-- Computers cannot generate actual random numbers
+- Computers cannot generate actual random numbers ([at least quickly and with guaranteed distribution](https://engineering.mit.edu/engage/ask-an-engineer/can-a-computer-generate-a-truly-random-number/))
 - Instead used <span class="highlight">pseudo</span>random number generators — deterministic algorithms with "good" properties
 - PseudoRNG controlled by <span class="highlight">seeds</span>
 

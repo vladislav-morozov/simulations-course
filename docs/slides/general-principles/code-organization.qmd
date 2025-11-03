@@ -1,0 +1,1234 @@
+---
+title: "Good Simulation Code III: Organization"
+subtitle: "Defining Interfaces. Organizing Code Files"
+author: Vladislav Morozov  
+format:
+  revealjs:
+    include-in-header: 
+      text: |
+        <meta name="description" content="How to write good Monte Carlo simulation code in data science: protocols for consistent interfaces; organizing files; writing main.py (lecture note slides)"/> 
+    width: 1150
+    slide-number: true
+    sc-sb-title: true
+    incremental: true   
+    logo: ../../themes/favicon.ico
+    footer: "Code Design III: Interfaces. File Organization"
+    footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
+    theme: ../../themes/slides_theme.scss
+    toc: TRUE
+    toc-depth: 2
+    toc-title: Contents
+    transition: convex
+    transition-speed: fast
+slide-level: 4
+title-slide-attributes:
+    data-background-color: "#3c165cff"
+    data-footer: " "
+filters:
+  - reveal-header 
+embed-resources: true
+include-in-header: ../../themes/mathjax.html 
+highlight-style: tango
+open-graph:
+    description: "How to write good Monte Carlo simulation code in data science: protocols for consistent interfaces; organizing files; writing main.py (lecture note slides)" 
+---
+
+
+
+
+
+
+## Introduction {background="#00100F"}
+ 
+  
+
+### Lecture Info {background="#43464B"}
+
+#### Learning Outcomes
+
+This lecture is about organizing our code in two ways: defining interfaces and organizing our files
+
+<br>
+
+By the end, you should be able to
+
+ 
+- Specify desired interfaces using protocols
+- Organize simulation components in modules
+- Execute the simulation from the command line
+
+#### References
+
+::: {.nonincremental}
+
+Statistics:
+ 
+- 28.19-28.23 in @Hansen2022Econometrics regarding shrinkage
+-  29.5 in @Hansen2022Econometrics about ridge regression 
+
+Programming:
+ 
+- 22 in @Lutz2025LearningPythonPowerful about modules and program structure
+- 13 in @Ramalho2022FluentPythonClear and [this tutorial](https://realpython.com/python-protocol/) on protocols in Python
+
+:::
+
+ 
+```{python} 
+import numpy as np
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.linear_model import Lasso as SklearnLasso
+
+plt.rcParams["font.family"] = "sans-serif"
+plt.rcParams["font.sans-serif"] = ["Arial"]
+
+BG_COLOR = "whitesmoke"
+THEME_COLOR = "#3c165c"
+```
+
+## Scenario: Scope Change {background="#00100F"}
+ 
+
+### Reminder: Previous Simulation Setting {background="#43464B"}
+
+
+#### Reminder: Studying OLS Bias
+
+Recall: so far in this block studied <span class="highlight">bias of OLS estimator</span> in simple linear model:
+
+$$
+Y_{t} = \beta_0 + \beta_1 X + U_t, \quad t=1, \dots, T
+$$ 
+<br>
+
+Metric of interest: absolute bias
+
+$$
+\text{Bias}(\hat{\beta}_1) = \E[\hat{\beta}_1] - \beta_1
+$$
+
+
+#### Reminder: Static and Dynamic DGPs 
+
+
+
+:::: {.columns}
+
+::: {.column width="46%"}
+
+ 
+**Static** (`StaticNormalDGP`):
+
+$$  \small
+Y_{t} = \beta_0 + 0.5 X_{t} + U_{t}
+$$
+
+Covariate $X_t$ independent from $U_t$ and over time
+
+:::
+
+  
+::: {.column width="2%"} 
+
+:::
+
+::: {.column width="52%"} 
+  
+**Dynamic** (`DynamicNormalDGP`):
+
+$$ \small
+Y_{t} = \beta_0 + \beta_1 Y_{t-1} + U_{t}
+$$
+
+Dependence: $\beta_1$ value
+
+$$  \small
+\beta_1 \in \curl{0, 0.5, 0.95}
+$$
+
+:::
+
+::::
+
+- One DGP per $U_t, X_t, Y_0$: each $N(0, 1)$
+- $T=50, 200$ 
+
+
+```{python}  
+class StaticNormalDGP:
+    """A data-generating process (DGP) for a static linear model
+
+    Attributes:
+        beta0 (float): Intercept term.
+        beta1 (float): Slope coefficient.
+    """
+
+    def __init__(self, beta0: float = 0.0, beta1: float = 0.5) -> None:
+        """Initializes the DGP with intercept and slope.
+
+        Args:
+            beta0 (float): Intercept term. Defaults to 0.0.
+            beta1 (float): Slope coefficient. Defaults to 1.0.
+        """
+        self.beta0: float = beta0
+        self.beta1: float = beta1
+
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Samples data from the static DGP.
+
+        Args:
+            n_obs (int): Number of observations to sample.
+            seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+        Returns:
+            tuple: (x, y) arrays, each of length n_obs.
+        """
+        rng = np.random.default_rng(seed)
+        x = rng.normal(size=n_obs)
+        u = rng.normal(size=n_obs)
+        y = self.beta0 + self.beta1 * x + u
+        return x, y
+
+  
+class DynamicNormalDGP:
+    """A data-generating process (DGP) for a dynamic linear model: y_t = beta0 + beta1*y_{t-1} + u_t.
+
+    Attributes:
+        beta0 (float): Intercept term.
+        beta1 (float): AR(1) coefficient.
+    """
+
+    def __init__(self, beta0: float = 0.0, beta1: float = 0.5):
+        """Initializes the DGP with intercept and AR(1) coefficient.
+
+        Args:
+            beta0 (float): Intercept term. Defaults to 0.0.
+            beta1 (float): AR(1) coefficient. Defaults to 0.5.
+        """
+        self.beta0: float = beta0
+        self.beta1: float = beta1
+
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Samples data from the dynamic DGP.
+
+        Args:
+            n_obs (int): Number of observations to sample.
+            seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+        Returns:
+            tuple: (x, y) arrays, each of length n_obs.
+                  x is y_{t-1} (lagged y), and y is y_t.
+        """
+        rng = np.random.default_rng(seed)
+        y = np.zeros(n_obs + 1)  # Extra observation for lag
+        u = rng.normal(size=n_obs + 1)
+        y[0] = self.beta0 + u[0]  # Initial condition
+        for t in range(1, n_obs + 1):
+            y[t] = self.beta0 + self.beta1 * y[t - 1] + u[t]
+        # Return lagged y as x and y[1:] as y
+        return y[:-1], y[1:]
+```
+
+#### Reminder: `SimpleOLS`
+
+OLS logic captured by `SimpleOLS` class:
+
+```{python}
+#| echo: true
+class SimpleOLS:
+    """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
+    """
+
+    def __init__(self) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fit OLS to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+ 
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+```
+ 
+::: {.footer}
+
+Notice: has `beta1_hat` attribute and `fit()` method
+
+:::
+
+#### Reminder: `SimulationRunner`
+
+Simulation logic captured by `SimulationRunner` class:
+
+```{python}
+#| echo: true  
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and estimator.
+
+    Attributes:
+        dgp: Data-generating process with a sample method.
+        estimator: Estimator with a fit method and beta1_hat attribute.
+        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+    """
+
+    def __init__(
+        self,
+        dgp: "StaticNormalDGP" | "DynamicNormalDGP",
+        estimator: SimpleOLS,
+    ) -> None:
+        """Initializes the simulation runner.
+
+        Args:
+            dgp: An instance of a DGP class (must implement sample).
+            estimator: An instance of an estimator class (must implement fit).
+        """
+        self.dgp = dgp
+        self.estimator = estimator
+        self.errors = None
+
+    def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
+        """Runs simulations and stores estimation errors.
+
+        Args:
+            n_sim (int): number of simulations to run.
+            n_obs (int): Number of observations per simulation.
+            first_seed (int | None): Random seed for reproducibility. Defaults to None.
+        """
+        # Preallocate array to hold estimation errors
+        self.errors = np.empty(n_sim)
+
+        # Run simulation
+        for sim_id in range(n_sim):
+            # Draw data
+            x, y = self.dgp.sample(n_obs, seed=first_seed + sim_id if first_seed else None)
+            # Fit model
+            self.estimator.fit(x, y)
+            # Store error
+            self.errors[sim_id] = self.estimator.beta1_hat - self.dgp.beta1
+
+    def summarize_bias(self) -> None:
+        """Prints the average estimation error (bias) for beta1. 
+        """ 
+        print(f"Average estimation error (bias): {np.mean(self.errors):.4f}")
+```
+
+
+::: {.footer}
+
+Notice the type hintsfor `dgp` and `estimator`
+
+:::
+
+
+
+
+
+### Shifting Scope and Adding a New Estimator {background="#43464B"}
+
+#### Problem: Scope Change
+
+Now imagine that the <span class="highlight">scope</span> of the overall project <span class="highlight">changes</span> to a broader one:
+
+<div class="left-color">
+
+New goal: comparing bias of several "near-OLS" estimators in a static and dynamic settings
+
+</div>
+ 
+- Scope changes are natural, especially in "experimental" scenarios
+- Need to be flexible both in statistics and code
+
+
+. . . 
+
+How to proceed? 
+
+#### Add a New Estimator (Ridge)
+
+First OLS-like estimator is <span class="highlight">ridge</span>
+<div class="left-color">
+
+
+$$ \small
+\hat{\bbeta}^{Ridge} = (\bX'\bX+\lambda I)^{-1} \bX'\bY
+$$
+</div>
+
+- Ridge — one of simpler examples of <span class="highlight">shrinkage</span> estimators
+- Shrinkage strength controlled by $\lambda \geq 0$
+- Minimizes sum of squared residuals with $L^2$ penalty:
+$$ \small
+\hat{\bbeta}^{Ridge} = \argmin \sum_{t=1}^T (Y_t - b_0 - b_1 X_t)^2 + \lambda \norm{(b_0, b_1)}_2^2
+$$
+
+
+#### Implementation of Simple Ridge Estimator
+
+Implement ridge with same interface as `SimpleOLS`:
+```{python}
+#| echo: true
+#| code-line-numbers: "1,10,13,14,16,27"
+class SimpleRidge:
+    """A simple ridge estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
+        reg_param (float): Strength of regularization. Defaults to 0.01.
+    """
+
+    def __init__(self, reg_param: float = 0.01) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+        self.reg_param = reg_param
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the ridge estimator to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+ 
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X + self.reg_param * np.eye(2)) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+```
+
+
+
+
+#### Bias vs. Regularization Strength
+
+```{python}
+#| echo: true
+#| code-line-numbers: "4-5,8-9"
+# Initialize DGP and estimator
+static_dgp = StaticNormalDGP(beta0=0.0, beta1=0.5)
+# Estimators
+ridge_weak = SimpleRidge(reg_param=0.01)
+ridge_strong = SimpleRidge(reg_param=100)
+
+# Initialize and run simulations
+sim_ridge_weak = SimulationRunner(static_dgp, ridge_weak)
+sim_ridge_strong = SimulationRunner(static_dgp, ridge_strong)
+sim_ridge_weak.simulate(n_sim=1000, n_obs=50, first_seed=1)
+sim_ridge_strong.simulate(n_sim=1000, n_obs=50, first_seed=1)
+# Summarize bias 
+sim_ridge_weak.summarize_bias()
+sim_ridge_strong.summarize_bias()
+```
+
+<div class="left-color">
+
+More regularization $\Rightarrow$ more bias
+
+</div>
+
+## Defining Interfaces {background="#00100F"}
+ 
+
+### Organizing Classes with Protocols {background="#43464B"}
+
+#### Results for Ridge: Discussion
+
+<div class="rounded-box">
+
+`SimulationRunner` works with new `SimpleRidge`, even though `SimulationRunner` was made with `SimpleOLS` in mind
+
+</div>
+
+Why?
+
+- `SimpleOLS` and `SimpleRidge` look same to `SimulationRunner`: same `fit()` method and `beta1_hat` 
+- Example of <span class="highlight">duck typing</span> in action
+
+. . . 
+
+<div class="left-color">
+
+$\Rightarrow$ can we just keep adding new estimators to answer new expanded study question?
+
+</div>
+
+#### Problem 1: Communicating Estimator Interface
+
+Problem with "just adding":
+<div class="left-color">
+
+How do you remember or tell teammates what interface the estimators should have?
+
+</div>
+
+
+- *Could write docs*: good, but extra effort that a lot of people do not take until later
+- *Could look at how `SimulationRunner` uses the estimator*: works best it's your fresh code. Otherwise harder, and can miss something
+
+. . .
+
+Better to be explicit about what new estimators need
+
+::: {.footer}
+
+Working with "*what estimators need*" helps us program to an *interface*, not a specific implementation
+
+:::
+  
+#### Problem 2: Incorrect Type Hints
+
+A smaller but annoying problem:
+
+- Our type hints in `SimulationRunner` don't allow for `SimpleRidge` as an estimator
+- Not a problem for execution: Python doesn't care about type hints
+- But code quality tools/IDEs will (rightfully) complain:
+
+. . .
+
+![Figure: code problem raised by Pylance/Pyright](../../images/code-screenshots/ridge-pylance.png)
+
+
+#### Solution: Protocols  
+
+Python [protocols](https://typing.python.org/en/latest/spec/protocol.html) allow us to: 
+
+- Express that `SimulationRunner` expects estimators to have `fit()` and `beta1_hat`
+- Capture in one place the expectations for our estimators (and DGPs)
+- Type hint this 
+
+. . .
+
+Protocols again work like <span class="highlight">contracts</span>:
+
+<div class="left-color">
+
+If estimator meets protocol, it is compatible with `SimulationRunner`
+
+</div>
+
+::: {.footer}
+
+Protocols formalize duck typing
+
+:::
+
+#### Estimator Protocol
+
+Here's how to express our two requirements:
+```{python}
+#| echo: true
+from typing import Protocol
+
+class EstimatorProtocol(Protocol):
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None: ...    # <1>
+
+    @property
+    def beta1_hat(self) -> float: ...                           # <2>
+```
+
+1. A `fit()` method that takes `x` and `y` numpy arrays
+2. A `float` attribute called `beta1_hat`
+
+
+<br>
+
+Both `SimpleOLS` and `SimpleRidge` follow our protocol
+
+::: {.footer}
+
+Notice: protocol methods do not have bodies, just use `...` (ellipsis)
+
+:::
+
+#### Protocol for DGPs
+
+What about DGPs? Two requirements:
+
+- `sample()` method with two arguments (`n_obs` and `seed`)
+- True `beta1` value (for estimation error computation)
+
+. . .
+
+Same approach: 
+
+```{python}
+#| echo: true
+
+class DGPProtocol(Protocol):
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[np.ndarray, np.ndarray]:
+        ...
+
+    @property
+    def beta1(self) -> float: ...
+```
+
+#### How To Use Protocols?
+
+To repeat:
+
+<div class="left-color">
+
+Protocols communicate information about interfaces both to readers and type checkers — like a <span class="highlight">checklist</span>
+
+</div>
+
+Now modify `SimulationRunner` to make this explicit:
+
+- Insert `DGPProtocol` as type hint for `dgp` argument
+- Insert `EstimatorProtocol` as type hint for `estimator` argument
+
+. . .
+
+
+Seeing a `Protocol` in type hints suggests that some particular interface is expected here (e.g. `fit()` and `beta1_hat`)
+
+#### Updating `SimulationRunner`
+
+Updated implementation with protocols in place:
+```{python}
+#| echo: true
+#| code-line-numbers: "12-13,21-22"
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and estimator.
+
+    Attributes:
+        dgp: data-generating process with a sample() method and beta1 attribute.
+        estimator: estimator with a fit() method and beta1_hat attribute.
+        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+    """
+
+    def __init__(
+        self,
+        dgp: DGPProtocol,
+        estimator: EstimatorProtocol,
+    ) -> None:
+        """Initializes the simulation runner.
+
+        Args:
+            dgp: An instance of a DGP class (must implement `sample`).
+            estimator: An instance of an estimator class (must implement `fit`).
+        """
+        self.dgp: DGPProtocol = dgp
+        self.estimator: EstimatorProtocol = estimator
+        self.errors: np.ndarray = np.empty(0)
+
+    def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
+        """Runs simulations and stores estimation errors.
+
+        Args:
+            n_sim (int): number of simulations to run.
+            n_obs (int): Number of observations per simulation.
+            first_seed (int | None): Starting random seed for reproducibility.
+                Defaults to None.
+        """
+        # Preallocate array to hold estimation errors
+        self.errors = np.empty(n_sim)
+
+        # Run simulation
+        for sim_id in range(n_sim):
+            # Draw data
+            x, y = self.dgp.sample(
+                n_obs, seed=first_seed + sim_id if first_seed else None
+            )
+            # Fit model
+            self.estimator.fit(x, y)
+            # Store error
+            self.errors[sim_id] = self.estimator.beta1_hat - self.dgp.beta1
+
+    def summarize_bias(self) -> None:
+        """Prints the average estimation error (bias) for beta1. 
+        """ 
+        print(f"Average estimation error (bias): {np.mean(self.errors):.4f}")
+```
+
+::: {.footer}
+
+:::
+ 
+#### Aside: Alternative Approach with ABCs
+
+<div class="left-color">
+
+<span class="highlight">Abstract base classes</span> provide another way to specify the desired interface contract
+
+</div>
+
+- With ABCs you define an abstract `BaseDGP` and `BaseEstimator` with abstract methods of desired form
+- Concrete estimators and DGPs inherit from from bases and implement `sample()` and `fit()`
+
+. . . 
+
+Protocol vs. ABCs: depends on whether you want an inheritance structure + common logic (no inheritance needed with protocols)
+
+::: {.footer}
+
+See chapter 13 of @Ramalho2022FluentPythonClear on this point
+
+::: 
+
+### Adding Lasso Following Our Protocols {background="#43464B"}
+
+
+#### Lasso
+
+Another penalized SSR ("OLS-like") estimator for $\beta_1$ is *lasso*, which solves:
+$$ \small
+\hat{\bbeta}^{Lasso} = \argmin \sum_{t=1}^T (Y_t - b_0 - b_1 X_t)^2 + \lambda \norm{(b_0, b_1)}_1
+$$
+
+
+- Lasso penalizes $L^1$ norm of $(b_0, b_1)$, not $L^2$ like ridge
+- Want to add to our simulation under new scope
+
+
+#### How to Add Lasso?
+
+- Unlike ridge, $\hat{\bbeta}^{Lasso}$ has no closed-form solution
+- Can implement numerical minimization logic ourselves
+
+. . .
+
+But don't want to implement it ourselves (hard, etc.)
+
+- There is already a well-optimized implemenation in `scikit-learn`
+- Problem: `scikit-learn` lasso does not follow our protocol
+
+<div class="left-color">
+
+Not a problem: can *adapt* it in a compatible manner
+
+</div>
+
+#### Point of This Section
+
+Why are we discussing this lasso example?
+ 
+
+<br>
+
+Three reasons:
+
+
+- Seeing how our protocol guides us and serves as a contract
+- Seeing how you can make use of existing things from other sources
+- Seeing another new estimator
+
+#### A Look at `scikit-learn` Lasso
+ 
+
+In general, would use `scikit-learn` Lasso somewhat like this:
+```{python}
+#| echo: true
+from sklearn.linear_model import Lasso
+x, y = static_dgp.sample(5000)
+x = x.reshape(-1, 1)           # scikit-learn expects 2D arrays
+lasso_est = Lasso(alpha=0.05)  # alpha - regularization parameter
+lasso_est.fit(x, y);
+```
+
+. . . 
+
+
+Now can `predict()` ("intended" usage of `scikit-learn)` or access estimated coefficients (what we need):
+```{python}
+#| echo: true
+print(f"Estimates: beta0: {lasso_est.intercept_:.3f}; estimated beta1: {lasso_est.coef_[0]:.3f}")
+```
+
+. . .
+
+<div class="left-color">
+
+`Lasso` has different interface: `fit()` expects 2d array (before we had 1d); estimates stored in `intercept_` and `coef_` 
+
+</div>
+
+#### Lasso Adapter Implementation
+
+Adapter class that aligns `Lasso` with `EstimatorProtocol`:
+```{python}
+#| echo: true
+from sklearn.linear_model import Lasso as SklearnLasso 
+
+class LassoWrapper:
+    """A wrapper for scikit-learn's Lasso to match the EstimatorProtocol.
+    Model y = beta0 + beta1*x+u.
+
+    Attributes:
+        model (sklearn.linear_model.Lasso): a scikit-learn Lasso instance.
+        beta0_hat (float): Estimated intercept. Initialized as np.nan.
+        beta1_hat (float): Estimated slope. Initialized as np.nan.
+    """
+
+    def __init__(self, reg_param: float = 1.0) -> None:
+        """Initializes the Lasso wrapper with a scikit-learn Lasso model.
+
+        Args:
+            reg_param (float): Regularization strength (alpha). Defaults to 1.0.
+        """
+        self.model = SklearnLasso(alpha=reg_param)
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the Lasso model to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """ 
+        x = x.reshape(-1, 1) # sklearn expects 2d array inputs
+        self.model.fit(x, y)
+        self.beta0_hat = float(self.model.intercept_)
+        self.beta1_hat = float(self.model.coef_[0]) 
+
+```
+
+#### Lasso Wrapper in Action
+
+Now works like `SimpleRidge`:
+```{python}
+#| echo: true 
+#| code-line-numbers: ""
+# Estimators 
+lasso_strong = LassoWrapper(reg_param=100)
+# Simulations and results  
+sim_lasso_strong = SimulationRunner(static_dgp, lasso_strong)
+sim_lasso_strong.simulate(n_sim=1000, n_obs=50, first_seed=1) 
+sim_lasso_strong.summarize_bias() 
+print(f"Variance of estimation error: {sim_lasso_strong.errors.var()}")
+```
+ 
+<div class="left-color">
+
+Statistical conclusion: strong regularization totally kills $\beta_1$: always have $\hat{\beta}^{Lasso}_1=0$
+
+</div>
+
+#### Adding Lasso: Discussion
+
+On protocols:
+
+- Our `LassoWrapper` conforms to the `EstimationProtocol`
+- $\Rightarrow$ didn't need to change `SimulationRunner` at all, all of its docs and type hints are valid
+- Can now freely add as many estimators and DGPs as necessary without touching core logic
+
+. . . 
+
+On the wrapper:
+
+- A technique for making use of external implementations 
+
+## Organizing Files {background="#00100F"}
+ 
+
+
+### Splitting Code Appropriately {background="#43464B"}
+
+#### A Recap
+
+Have quite a few things implemented:
+
+::: {.nonincremental}
+
+- Three estimators: `SimpleOLS`, `SimpleRidge`, `LassoWrapper`
+- Two DGPs: `StaticNormalDGP`, `DynamicNormalDGP`
+- Two protocols: `DGPProtocol`, `EstimatorProtocol`
+- `SimulationRunner`
+
+:::
+
+
+. . .
+
+So far: just displaying them from slides in a Jupyter notebook-like fashion
+
+#### Goal: Organization
+
+Good project file organization: 
+
+- Makes it easy to work in parallel on different features
+- Is self-documenting
+- Allows easy version control
+- Makes it easy to execute overall project
+
+
+<div class="left-color">
+
+Now talk about explicit file structure
+
+</div>
+
+#### Why Not a Notebook?
+
+Notebooks are great for exploration, but:
+
+- Hard to version control (diffing .ipynb files is messy)
+- Difficult to reuse code across projects
+- No clear entry point for running simulations
+
+<br>
+
+<div class="left-color">
+
+Modules + scripts = better for  production and collaboration
+
+</div>
+
+
+#### Basics: Python Program Architecture
+ 
+
+A typical Python program:
+
+- One top-level file — *script*
+  - Has main program, can be executed
+  - Example: our simulation execution
+- $\geq 0$ supplemental *module* files
+  - Libraries of tools; group components used by script
+  - Not executed (or don't do anything when executed)
+  - Example: estimators, DGPs, etc.
+ 
+
+#### Reminder: Python Modules
+
+
+Modules are the highest-level way to organize Python code
+
+. . .
+
+<br>
+
+Benefits:
+
+- Easy way to systematically organize things
+- Can reuse code
+- Avoids duplication
+- Self-contained and avoid name clashes
+- Help with encapsulation
+
+
+
+#### Overall Example File Organization
+
+```
+project/
+├── dgps/
+│   ├── __init__.py
+│   ├── static.py       # StaticNormalDGP
+│   └── dynamic.py      # DynamicNormalDGP
+├── estimators/
+│   ├── __init__.py
+│   ├── ols-like.py     # SimpleOLS, SimpleRidge, LassoWrapper
+├── main.py             # Main script that we call from the CLI
+├── protocols.py        # DGPProtocol, EstimatorProtocol
+└── runner.py           # SimulationRunner
+```
+
+::: {.footer}
+
+See chapter 24 in @Lutz2025LearningPythonPowerful about `__init__.py`
+
+:::
+
+#### Example: Estimators Module
+
+Group OLS-like estimator class definitions together:
+
+```{.python filename="estimators/ols-like.py"} 
+"""
+Module for OLS-like estimators.
+
+This module contains classes for estimating simple model
+    y = b0 + b1 * x + u
+with OLS-like methods. All estimators implement the EstimatorProtocol interface.
+
+Classes:
+    SimpleOLS: ordinary least squares estimator.
+    SimpleRidge: ridge regression estimator.
+    LassoWrapper: wrapper for scikit-learn's Lasso estimator.
+"""
+
+import numpy as np
+from sklearn.linear_model import Lasso as SklearnLasso
+
+
+class SimpleOLS:
+    """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
+    """
+
+    def __init__(self) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fit OLS to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+
+
+class SimpleRidge:
+    """A simple ridge estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
+        reg_param (float): Strength of regularization. Defaults to 0.01.
+    """
+
+    def __init__(self, reg_param: float = 0.01) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+        self.reg_param = reg_param
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the ridge estimator to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X + self.reg_param * np.eye(2)) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+
+
+class LassoWrapper:
+    """A wrapper for scikit-learn's Lasso to match the EstimatorProtocol.
+    Model y = beta0 + beta1*x+u.
+
+    Attributes:
+        model (sklearn.linear_model.Lasso): a scikit-learn Lasso instance.
+        beta0_hat (float): Estimated intercept. Initialized as np.nan.
+        beta1_hat (float): Estimated slope. Initialized as np.nan.
+    """
+
+    def __init__(self, reg_param: float = 1.0) -> None:
+        """Initializes the Lasso wrapper with a scikit-learn Lasso model.
+
+        Args:
+            reg_param (float): Regularization strength (alpha). Defaults to 1.0.
+        """
+        self.model = SklearnLasso(alpha=reg_param)
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the Lasso model to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+        x = x.reshape(-1, 1)  # sklearn expects 2d array inputs
+        self.model.fit(x, y)
+        self.beta0_hat = float(self.model.intercept_)
+        self.beta1_hat = float(self.model.coef_[0])
+
+```
+
+
+::: {.footer}
+
+
+:::
+
+
+#### Reminder: Importing From Modules
+
+Can now import either the whole module (from the project root):
+
+```python
+import estimators.ols_like as ols_like
+```
+
+<br>
+
+Or can import specific estimators:
+
+
+```python
+from estimators.ols_like import SimpleOLS
+```
+
+
+#### File Organization: Discussion
+
+
+<div class="left-color">
+
+Main rule: choose what's easiest for understanding and collaboration
+
+</div>
+
+Split more if:
+
+- You have many classes (e.g., 10+ estimators)
+- Multiple people are working on the code
+
+
+Split less if:
+
+- The project is small (e.g., 2–3 estimators)
+- You want to minimize file overhead
+
+
+### `main.py` and Executing Our Simulation {background="#43464B"}
+
+#### Towards a Main Script
+
+So far have modules, but still need the `main.py` <span class="highlight">script</span>
+
+<div class="left-color">
+
+`main.py` imports all the necessary components and actually executes the simulations. It's the <span class="highlight">entry point</span>
+
+</div>
+
+<br>
+
+- Today: just a skeleton script that runs a given scenario and prints output to console
+- Next time: running many scenarios and handling outputs
+
+#### Our First `main.py`
+
+A script with a single scenario:
+```python
+from dgps.dynamic import DynamicNormalDGP
+from estimators.ols_like import LassoWrapper
+from runners import SimulationRunner
+
+if __name__ == "__main__":
+    # Today: just one scenario
+    dgp = DynamicNormalDGP(beta0=0.0, beta1=0.95)
+    estimator = LassoWrapper(reg_param=0.04)
+    n_obs = 50
+
+    # Run simulation for specified scenario
+    runner = SimulationRunner(dgp, estimator)
+    runner.simulate(n_sim=1000, n_obs=n_obs, first_seed=1)
+
+    # Print results
+    print(
+        f"Bias for {dgp.__class__.__name__} + {estimator.__class__.__name__}: "
+    )
+    runner.summarize_bias()
+```
+
+#### Note: About `__name__` and `__main__`
+ 
+- The name `if __name__ == "__main__":` is a very Python thing
+- See often in scripts executed from the command line 
+  
+
+<br>
+
+<div class="left-color">
+
+Ensures the code runs only when the script is executed directly, not when imported (avoids accidents)
+ 
+</div>
+
+See chapter 24-25 in @Lutz2025LearningPythonPowerful
+
+#### Running Our Simulation
+
+To execute, just call from the command line when in project root: 
+```bash
+py main.py
+```
+or 
+```bash
+python main.py
+```
+
+<br>
+
+Prints the following to the console:
+
+
+```
+Bias for DynamicNormalDGP + LassoWrapper: 
+Average estimation error (bias): -0.1121
+```
+
+#### Discussion: So Far and What's Next?
+
+Already in quite good shape:
+
+- Modular and extensible structure
+- Reasonable understanding of how components interact
+- Quite a bit of progress on the statistical question
+
+What's left for next time? 
+
+- How to execute many scenarios conveniently in `main.py`? 
+- How to store results of these scenarios
+  
+## Recap and Conclusions {background="#00100F"}
+ 
+#### Recap
+
+<br>
+
+In this lecture we 
+
+- Discussed how to handle scope changes
+- Introduced and defined protocols for enforcing interfaces
+- Shown how to adapt external libraries 
+- Made explicit out file structure
+ 
+#### Next Questions
+
+<br>
+ 
+- How to organize running many simulations? 
+- How to deal with simulation outputs?
+- How to apply this logic to deeper statistical scenarios?
+
+#### References {.allowframebreaks visibility="uncounted"}
+
+::: {#refs}
+:::
