@@ -1,0 +1,171 @@
+---
+title: "Good Simulation Code IV: Orchestration"
+subtitle: "SUBTITLE"
+author: Vladislav Morozov  
+format:
+  revealjs:
+    include-in-header: 
+      text: |
+        <meta name="description" content="How to write good Monte Carlo simulation code in data science:   (lecture note slides)"/> 
+    width: 1150
+    slide-number: true
+    sc-sb-title: true
+    incremental: true   
+    logo: ../../themes/favicon.ico
+    footer: "Code Design IV: Orchestration"
+    footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
+    theme: ../../themes/slides_theme.scss
+    toc: TRUE
+    toc-depth: 2
+    toc-title: Contents
+    transition: convex
+    transition-speed: fast
+slide-level: 4
+title-slide-attributes:
+    data-background-color: "#3c165cff"
+    data-footer: " "
+filters:
+  - reveal-header 
+embed-resources: true
+include-in-header: ../../themes/mathjax.html 
+highlight-style: tango
+open-graph:
+    description: "How to write good Monte Carlo simulation code in data science:  (lecture note slides)" 
+---
+
+
+
+
+
+
+## Introduction {background="#00100F"}
+ 
+  
+
+### Lecture Info {background="#43464B"}
+
+#### Learning Outcomes
+
+This lecture is about 
+
+<br>
+
+By the end, you should be able to
+
+ 
+- A
+
+#### References
+
+::: {.nonincremental}
+
+ 
+Programming:
+ 
+- Chapter 5 in @Ramalho2022FluentPythonClear about data classes
+- 
+:::
+
+ 
+```{python} 
+import numpy as np
+
+import matplotlib.pyplot as plt 
+
+plt.rcParams["font.family"] = "sans-serif"
+plt.rcParams["font.sans-serif"] = ["Arial"]
+
+BG_COLOR = "whitesmoke"
+THEME_COLOR = "#3c165c"
+```
+
+### Reminder: State of Our Simulation {background="#43464B"}
+
+
+## Scenario: Scope Change {background="#00100F"}
+ 
+
+### Reminder: Previous Simulation Setting {background="#43464B"}
+
+
+#### Reminder: Study Bias of Penalized SSR Estimators
+
+
+#### Reminder: File Structure
+
+
+## Orchestrating Many Simulations {background="#00100F"}
+ 
+### Problem Statement {background="#43464B"}
+
+
+#### Reminder: `main.py`
+
+
+#### Issue: How To Run
+
+Can add manually, but then what
+
+Problem of dealing 
+
+
+### Data Classes {background="#43464B"}
+
+#### How To Encode Scenarios?
+
+### Putting Things Together {background="#43464B"}
+
+
+#### Other Tools
+
+Our approach 
+
+`snakemake`
+
+
+## Simulation Outputs {background="#00100F"}
+ 
+ 
+
+#### So Far
+
+So far prints to the console
+
+Usually not what we want
+
+#### Common Approach
+
+Quite typical — export whole raw simulation results
+
+####
+
+Ours are not large, so export 
+
+  
+## Recap and Conclusions {background="#00100F"}
+ 
+#### Recap
+
+<br>
+
+In this lecture we 
+
+- Discussed  
+
+
+#### Further Improvements
+
+Can keep adding things to code:
+
+- Logging and progress tracking
+- Improve robustness of code by adding error handling
+- Parallelize to take advantage
+- Custom output handler classes 
+
+#### Block Recap
+
+
+#### References {.allowframebreaks visibility="uncounted"}
+
+::: {#refs}
+:::
