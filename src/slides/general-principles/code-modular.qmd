@@ -46,7 +46,7 @@ open-graph:
 
 #### Learning Outcomes
 
-This lecture is a modular approach to designing simulation code
+This lecture is about a modular approach to designing simulation code
 
 <br>
 
@@ -149,8 +149,6 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-from typing import Tuple
 ```
 
 
@@ -480,7 +478,7 @@ class StaticNormalDGP:
 
     def sample(
         self, n_obs: int, seed: int | None = None
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Samples data from the static DGP.
 
         Args:
@@ -543,7 +541,7 @@ class DynamicNormalDGP:
 
     def sample(
         self, n_obs: int, seed: int | None = None
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Samples data from the dynamic DGP.
 
         Args:
@@ -583,14 +581,14 @@ class SimpleOLS:
     """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
 
     Attributes:
-        beta0_hat (float | None): Estimated intercept. None until fit is called.
-        beta1_hat (float | None): Estimated slope. None until fit is called.
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
     """
 
     def __init__(self) -> None:
         """Initializes the OLS estimator with no estimates."""
-        self.beta0_hat: float | None = None
-        self.beta1_hat: float | None = None
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
 
     def fit(self, x: np.ndarray, y: np.ndarray) -> None:
         """Fit OLS to the provided data.
@@ -667,7 +665,7 @@ class SimulationRunner:
         """
         self.dgp: StaticNormalDGP | DynamicNormalDGP = dgp
         self.estimator: SimpleOLS = estimator
-        self.errors: np.ndarray | None  = None
+        self.errors: np.ndarray = np.empty(0)
 
     def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
         """Runs simulations and stores estimation errors.
@@ -711,6 +709,13 @@ ols_static_sim.simulate(n_sim=1000, n_obs=50, first_seed=1)
 # Summarize bias
 print(f"Average estimation error (bias): {ols_static_sim.errors.mean():.4f}")
 ```
+
+
+::: {.footer}
+
+The fact that we create and pass the DGP and estimator is an example of [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection)
+
+:::
 
 #### Discussion I: What Just Happened?
  
@@ -893,7 +898,7 @@ Our simulation is in a good prototype shape, but can still improve some things:
 - How to clean up some loose ends in existing code?
 - How to organize running many simulations?
 - How to handle simulation results?
-- How to apply these logic to deeper statistical scenarios?
+- How to apply this logic to deeper statistical scenarios?
 
 #### References {.allowframebreaks visibility="uncounted"}
 

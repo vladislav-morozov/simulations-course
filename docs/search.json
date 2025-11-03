@@ -110,6 +110,83 @@
     ]
   },
   {
+    "objectID": "slides/general-principles/code-organization.html#introduction",
+    "href": "slides/general-principles/code-organization.html#introduction",
+    "title": "Good Simulation Code III: Organization",
+    "section": "Introduction",
+    "text": "Introduction",
+    "crumbs": [
+      "Structuring Your Code",
+      "Good Simulation Code III: Organization"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/code-organization.html#scenario-scope-change",
+    "href": "slides/general-principles/code-organization.html#scenario-scope-change",
+    "title": "Good Simulation Code III: Organization",
+    "section": "Scenario: Scope Change",
+    "text": "Scenario: Scope Change",
+    "crumbs": [
+      "Structuring Your Code",
+      "Good Simulation Code III: Organization"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/code-organization.html#defining-interfaces",
+    "href": "slides/general-principles/code-organization.html#defining-interfaces",
+    "title": "Good Simulation Code III: Organization",
+    "section": "Defining Interfaces",
+    "text": "Defining Interfaces",
+    "crumbs": [
+      "Structuring Your Code",
+      "Good Simulation Code III: Organization"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/code-organization.html#organizing-files",
+    "href": "slides/general-principles/code-organization.html#organizing-files",
+    "title": "Good Simulation Code III: Organization",
+    "section": "Organizing Files",
+    "text": "Organizing Files",
+    "crumbs": [
+      "Structuring Your Code",
+      "Good Simulation Code III: Organization"
+    ]
+  },
+  {
+    "objectID": "slides/general-principles/code-organization.html#recap-and-conclusions",
+    "href": "slides/general-principles/code-organization.html#recap-and-conclusions",
+    "title": "Good Simulation Code III: Organization",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Structuring Your Code",
+      "Good Simulation Code III: Organization"
+    ]
+  },
+  {
+    "objectID": "slides/organizational/intro.html#content-and-motivation",
+    "href": "slides/organizational/intro.html#content-and-motivation",
+    "title": "Course Introduction",
+    "section": "Content and Motivation",
+    "text": "Content and Motivation",
+    "crumbs": [
+      "Course Info",
+      "Course Introduction"
+    ]
+  },
+  {
+    "objectID": "slides/organizational/intro.html#course-logistics",
+    "href": "slides/organizational/intro.html#course-logistics",
+    "title": "Course Introduction",
+    "section": "Course Logistics",
+    "text": "Course Logistics",
+    "crumbs": [
+      "Course Info",
+      "Course Introduction"
+    ]
+  },
+  {
     "objectID": "slides/general-principles/intro-to-simulations.html#introduction",
     "href": "slides/general-principles/intro-to-simulations.html#introduction",
     "title": "Why Monte Carlo? General Principles",
@@ -151,28 +228,6 @@
     "crumbs": [
       "Course Info",
       "Why Monte Carlo? General Principles"
-    ]
-  },
-  {
-    "objectID": "slides/organizational/intro.html#content-and-motivation",
-    "href": "slides/organizational/intro.html#content-and-motivation",
-    "title": "Course Introduction",
-    "section": "Content and Motivation",
-    "text": "Content and Motivation",
-    "crumbs": [
-      "Course Info",
-      "Course Introduction"
-    ]
-  },
-  {
-    "objectID": "slides/organizational/intro.html#course-logistics",
-    "href": "slides/organizational/intro.html#course-logistics",
-    "title": "Course Introduction",
-    "section": "Course Logistics",
-    "text": "Course Logistics",
-    "crumbs": [
-      "Course Info",
-      "Course Introduction"
     ]
   },
   {
