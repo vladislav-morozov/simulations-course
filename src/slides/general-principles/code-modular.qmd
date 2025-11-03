@@ -665,7 +665,7 @@ class SimulationRunner:
         """
         self.dgp: StaticNormalDGP | DynamicNormalDGP = dgp
         self.estimator: SimpleOLS = estimator
-        self.errors: np.ndarray | None  = None
+        self.errors: np.ndarray = np.empty(0)
 
     def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
         """Runs simulations and stores estimation errors.
