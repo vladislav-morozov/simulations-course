@@ -1135,7 +1135,7 @@ So far have modules, but still need the `main.py` <span class="highlight">script
 #### Our First `main.py`
 
 A script with a single scenario:
-```python
+```{.python filename="main.py"} 
 from dgps.dynamic import DynamicNormalDGP
 from estimators.ols_like import LassoWrapper
 from runners import SimulationRunner
