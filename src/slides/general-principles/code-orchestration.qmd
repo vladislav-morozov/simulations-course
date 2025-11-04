@@ -554,7 +554,7 @@ Can now define example instance:
 example_scenario = SimulationScenario(
     name="static_ols_n100",
     dgp=StaticNormalDGP,
-    dgp_params={"beta0": 0.0, "beta1": 1.0},
+    dgp_params={"beta0": 0.0, "beta1": 0.5},
     estimator=SimpleOLS,
     estimator_params={},
     sample_size=50, 
@@ -600,25 +600,201 @@ print(f"Bias for {example_scenario.name}: {runner.errors.mean():.4f}")
 ### Collections of Scenarios {background="#43464B"}
 
 
-#### Creating a Collection of Scenarios
+#### How To Create Many Scenarios?
 
-- Can create manually: a file that creates desired instances and packs them somehow
-- Can make automatically (e.g. as a Cartesian product of list of DGPs, sample sizes, estimators)
+Two main ways: 
 
-Depends on your goal: whether you want all possible combinations (beware of exponential growth) or some specific ones (beware of missing a desired combination)
+- Manually: a file that creates desired instances and packs them somehow
+- Automatically (e.g. as a Cartesian product of list of DGPs, sample sizes, estimators)
 
-#### Manual Approach
+
+
+<div class="left-color">
+
+
+Choice depends on your goal: 
+
+- All combinations (beware of exponential growth)
+- Specific ones (beware of missing a desired combination)
+
+</div>
+
+#### Where To Store Scenarios
+
+A couple of options:
+
+- In a Python array (e.g. list of scenarios)
+- In an external config file (e.g. a YAML)
+
+
+. . . 
+
+<br>
+
+For now: a Python list coming from a `scenarios.py` file is fine for us
+
+
+
+#### Example Manual Approach
+
+Just make a list of all the scenarios you want:
+
+```{.python filename="scenarios.py"}
+#| echo: true
+scenarios = [
+    SimulationScenario(
+        name="static_ols_n100",
+        dgp=StaticNormalDGP,
+        dgp_params={"beta0": 0.0, "beta1": 0.5},
+        estimator=SimpleOLS,
+        estimator_params={},
+        sample_size=50, 
+    ),
+    SimulationScenario(
+        name="dynamic_lasso_n50",
+        dgp=DynamicNormalDGP,
+        dgp_params={"beta0": 0.0, "beta1": 0.95},
+        estimator=LassoWrapper,
+        estimator_params={"alpha": 0.1},
+        sample_size=200, 
+    )
+]
+```
+
+::: {.footer}
+
+
+:::
+
+
 
 
 #### Creating All Possible Combinations
 
+Other extreme: all possible combinations of scenario characteristics
+
+<br> 
+
+. . . 
+
+Creation steps:
+
+1. Create lists/sets of DGPs, estimator, sample sizes
+2. Take Cartesian product
+3. Store results in a list
+
+::: {.footer}
+
+
+One can think of other combinations that lie between manual lists and full-on Cartesian productss
+
+:::
+
+#### `scenarios.py` With All Possible Combinations:
+
+```{.python filename="scenarios.py"}
+#| echo: true
+from itertools import product
+
+# Define lists of components 
+dgps = [
+    (StaticNormalDGP, {"beta0": 0.0, "beta1": 1.0}, 'static'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.1}, 'dynamic_low_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.5}, 'dynamic_mid_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.95}, 'dynamic_high_pers'),
+]
+estimators = [
+    (SimpleOLS, {}),
+    (LassoWrapper, {"alpha": 0.1}),
+    (SimpleRidge, {"alpha": 0.1})
+]
+sample_sizes = [50, 200]
+
+# Generate all combinations
+scenarios = [
+    SimulationScenario(
+        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_n{size}",
+        dgp=dgp_class,
+        dgp_params=dgp_params,
+        estimator=estimator_class,
+        estimator_params=estimator_params,
+        sample_size=size, 
+    )
+    for (dgp_class, dgp_params, dgp_descr), (estimator_class, estimator_params), size
+    in product(dgps, estimators, sample_sizes)
+]
+```
+
+```{python}
+from itertools import product
+
+# Define lists of components
+dgps = [
+    (StaticNormalDGP, {"beta0": 0.0, "beta1": 1.0}, 'static'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.1}, 'dynamic_low_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.5}, 'dynamic_mid_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.95}, 'dynamic_high_pers'),
+]
+estimators = [
+    (SimpleOLS, {}),
+    (LassoWrapper, {"alpha": 0.1}),
+    (SimpleRidge, {"alpha": 0.1})
+]
+sample_sizes = [50, 200]
+
+# Generate all combinations
+scenarios = [
+    SimulationScenario(
+        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_n{size}",
+        dgp=dgp_class,
+        dgp_params=dgp_params,
+        estimator=estimator_class,
+        estimator_params=estimator_params,
+        sample_size=size, 
+    )
+    for (dgp_class, dgp_params, dgp_descr), (estimator_class, estimator_params), size
+    in product(dgps, estimators, sample_sizes)
+]
+```
 
 #### Our Choice
 
-We want all possible combinations — simplest approach is then to follow a suitable Cartesian product and automate generating a list of scenarios.
+Here: choose automatic approach
 
-#### Resulting File and File Structure
+```{python}
+#| echo: true
+len(scenarios)
+```
 
+Would be annoying to write all these by hand
+
+<br>
+
+Note:
+
+<div class="left-color">
+
+In reality often some hybrid: manually create set of pairs (DGP, estimator), take product with some sizes (not all possible DGP-estimator pairs)
+
+</div>
+
+#### Resulting File Structure
+
+Now have added a new `scenarios.py` file to our folder:
+```
+project/
+├── dgps/
+│   ├── __init__.py
+│   ├── static.py
+│   └── dynamic.py       
+├── estimators/
+│   ├── __init__.py
+│   └── ols-like.py       
+├── protocols.py
+├── runner.py
+├── scenarios.py       # New: Defines SimulationScenario and collections
+└── main.py
+```
 
 
 ## Running Many Scenarios {background="#00100F"}
@@ -675,6 +851,11 @@ Can keep adding things to code:
 - Improve robustness of code by adding error handling
 - Parallelize to take advantage
 - Custom output handler classes 
+
+Project could also benefit from more reproducibility:
+
+- Getting the right environment for reproduciblity?
+- Not having to rerun all the simulations every time?
 
 #### Block Recap
 
