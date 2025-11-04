@@ -943,7 +943,7 @@ project/
 │   └── dynamic.py      # DynamicNormalDGP
 ├── estimators/
 │   ├── __init__.py
-│   ├── ols-like.py     # SimpleOLS, SimpleRidge, LassoWrapper
+│   └── ols-like.py     # SimpleOLS, SimpleRidge, LassoWrapper
 ├── main.py             # Main script that we call from the CLI
 ├── protocols.py        # DGPProtocol, EstimatorProtocol
 └── runner.py           # SimulationRunner
