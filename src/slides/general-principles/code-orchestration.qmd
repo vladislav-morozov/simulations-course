@@ -69,6 +69,7 @@ Programming:
  
 ```{python} 
 import numpy as np
+import pandas as pd
 
 import matplotlib.pyplot as plt 
 
@@ -869,8 +870,7 @@ class SimulationOrchestrator:
     """Simple simulation orchestration class without any result handling
     """
     def __init__(self, scenarios: list[SimulationScenario]):
-        self.scenarios = scenarios
-        self.results = []
+        self.scenarios = scenarios 
 
     def run_all(self):
         for scenario in scenarios: 
@@ -894,8 +894,7 @@ class SimulationOrchestrator:
     """Simple simulation orchestration class without any result handling
     """
     def __init__(self, scenarios: list[SimulationScenario]):
-        self.scenarios = scenarios
-        self.results = []
+        self.scenarios = scenarios 
 
     def run_all(self):
         for scenario in scenarios: 
@@ -935,31 +934,107 @@ A total victory:
 - Full execution of all simulations
 
 
-Can talk about further improvements, handling results, but we've got a <span class="highlight">extensible and broadly-applicable</span> core
+
+<br>
+
+Can talk about further improvements, handling results, but we have a <span class="highlight">extensible and broadly-applicable</span> core
 
 ## Simulation Outputs {background="#00100F"}
  
  
 
-#### So Far
+#### More On Handling Results
 
-So far prints to the console
+So far: just printing bias values to the console
 
-Usually not what we want
+<div class="left-color">
 
-#### Common Approach
+More typical: export results in some nice tabular/text form
 
-Quite typical — export whole raw simulation results, particularly in simulations where individual runs are expensive
+</div>
 
-Can export as a CSV without adding to `SimulationOrchestrator`
-
-Or could add a `results` fields to `Orchestrator`
-
-####
-
-Ours are not large, so export 
-
+- Often: whole raw simulation results, particularly in simulations where individual runs are expensive
+- Also: summaries
+  - Summary tables
+  - Plots
   
+#### Here: Simple Example
+ 
+<br>
+
+Here: just brief example
+
+- Store summary bias results on the `orchestrator`
+- Somehow export them from `main.py`
+
+#### Updated `SimulationOrchestrator` Class
+
+
+```{python} 
+#| echo: true
+#| code-line-numbers: "6,22"
+class SimulationOrchestrator:
+    """Simulation orchestrator that stores results in a dictionary
+    """
+    def __init__(self, scenarios: list[SimulationScenario]):
+        self.scenarios = scenarios
+        self.summary_results = {}
+
+    def run_all(self):
+        for scenario in scenarios: 
+            # Create DGP and estimator
+            dgp = scenario.dgp(**scenario.dgp_params)
+            estimator = scenario.estimator(**scenario.estimator_params)
+
+            # Run the simulation
+            runner = SimulationRunner(dgp, estimator)
+            runner.simulate(
+                n_sim=scenario.n_simulations, 
+                n_obs=scenario.sample_size, 
+                first_seed=scenario.first_seed,
+            )
+            # Save results
+            self.summary_results[scenario.name] = runner.errors.mean()
+```
+
+#### Results Handling Discussion
+
+- Here: took a quicker solution: the `SimulationOrchestrator` implementation knows that its handling bias
+- But can make more loosely coupled
+  - Add a `summarize()` method to `SimulationRunner` that knows what to export
+  - `orchestrator` will just receive whatever `summarize()` gives
+  - Would make `orchestrator` even more reusable
+  
+#### Changing `main.py`
+
+```{.python filename="main.py"} 
+import pandas as pd
+
+from orchestrator import SimulationOrchestrator 
+from scenarios import scenarios                                             
+
+if __name__ == "__main__":
+    # Create and execute simulations 
+    orchestrator = SimulationOrchestrator(scenarios)                         
+    orchestrator.run_all()
+
+    # Results logic (print or export as pd.Series)
+    print(pd.Series(orchestrator.summary_results))
+```
+Here for simplicity: print the `Series`, but would generally `to_csv()`
+
+#### Executing Results
+
+Executing the script now prints the results for all scenarios!
+```{.sh}
+python main.py
+```
+```{python}
+orchestrator = SimulationOrchestrator(scenarios)                         
+orchestrator.run_all()
+pd.Series(orchestrator.summary_results)
+```
+
 ## Recap and Conclusions {background="#00100F"}
  
 #### Recap
