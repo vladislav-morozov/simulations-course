@@ -74,6 +74,8 @@ import matplotlib.pyplot as plt
 
 from typing import Protocol
 
+from sklearn.linear_model import Lasso as SklearnLasso
+
 plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams["font.sans-serif"] = ["Arial"]
 
@@ -384,8 +386,7 @@ from dgps.dynamic import DynamicNormalDGP
 from estimators.ols_like import LassoWrapper
 from runner import SimulationRunner
 
-if __name__ == "__main__":
-    # Today: just one scenario
+if __name__ == "__main__": 
     dgp = DynamicNormalDGP(beta0=0.0, beta1=0.95)
     estimator = LassoWrapper(reg_param=0.04)
     n_obs = 50
@@ -574,8 +575,8 @@ estimator = example_scenario.estimator(**example_scenario.estimator_params)
 # Run the simulation
 runner = SimulationRunner(dgp, estimator)
 runner.simulate(
-    n_obs=example_scenario.n_simulations, 
-    n_sim=example_scenario.sample_size, 
+    n_sim=example_scenario.n_simulations, 
+    n_obs=example_scenario.sample_size, 
     first_seed=example_scenario.first_seed,
 )
 # Print results
@@ -705,8 +706,8 @@ dgps = [
 ]
 estimators = [
     (SimpleOLS, {}),
-    (LassoWrapper, {"alpha": 0.1}),
-    (SimpleRidge, {"alpha": 0.1})
+    (LassoWrapper, {"reg_param": 0.1}),
+    (SimpleRidge, {"reg_param": 0.1})
 ]
 sample_sizes = [50, 200]
 
@@ -731,14 +732,14 @@ from itertools import product
 # Define lists of components
 dgps = [
     (StaticNormalDGP, {"beta0": 0.0, "beta1": 1.0}, 'static'),
-    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.1}, 'dynamic_low_pers'),
-    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.5}, 'dynamic_mid_pers'),
-    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.95}, 'dynamic_high_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.1}, 'low_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.5}, 'mid_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.95}, 'high_pers'),
 ]
 estimators = [
     (SimpleOLS, {}),
-    (LassoWrapper, {"alpha": 0.1}),
-    (SimpleRidge, {"alpha": 0.1})
+    (LassoWrapper, {"reg_param": 0.1}),
+    (SimpleRidge, {"reg_param": 0.1})
 ]
 sample_sizes = [50, 200]
 
@@ -797,21 +798,144 @@ project/
 ```
 
 
-## Running Many Scenarios {background="#00100F"}
+## Running Many Scenarios. `SimulationOrchestrator` Class {background="#00100F"}
+ 
+ 
+#### What's Left?
+
+So far:
+
+- All the simulation infrastructure (runner, DGPs, estimators)
+- Scenario list
+
+
+
+<br> 
+
+
+
+<div class="left-color">
+
+Goal: want all scenarios executed when we run
+
+```{.sh}
+python main.py
+```
+
+</div>
+
+#### What Should It Do? 
+
+<div class="left-color">
+
+A simple simulation orchestrator:
+
+- Should ingest list of scenarios
+- Run all of the scenarios:
+  - For each scenario, create a SimulationRunner
+  - `simulate()`
+  - Store the results somehow
+- Do something with the final results
  
 
-### `SimulationOrchestrator` Class {background="#43464B"}
+</div>
 
-#### 
+More advanced: can parallelize/distribute computation, etc.
 
-can of course give it a method to add scenarios 
+#### How Should Our `main.py` Look Like?
 
-#### Other Tools
+```{.python filename="main.py"} 
+from orchestrator import SimulationOrchestrator 
+from scenarios import scenarios                                             # <1>
 
-Our approach 
+if __name__ == "__main__":
+    # Create and execute simulations 
+    orchestrator = SimulationOrchestrator(scenarios)                        # <2>
+    orchestrator.run_all()
 
-`snakemake`
+    # Results logic
+    ...                                                                     # <3>
+```
 
+1. Get scenarios
+2. Run them all
+3. Do something with the results
+
+
+#### Simple `SimulationOrchestrator` Class Definition
+
+```{.python filename="orchestrator.py"} 
+class SimulationOrchestrator:
+    """Simple simulation orchestration class without any result handling
+    """
+    def __init__(self, scenarios: list[SimulationScenario]):
+        self.scenarios = scenarios
+        self.results = []
+
+    def run_all(self):
+        for scenario in scenarios: 
+            # Create DGP and estimator
+            dgp = scenario.dgp(**scenario.dgp_params)
+            estimator = scenario.estimator(**scenario.estimator_params)
+
+            # Run the simulation
+            runner = SimulationRunner(dgp, estimator)
+            runner.simulate(
+                n_sim=scenario.n_simulations, 
+                n_obs=scenario.sample_size, 
+                first_seed=scenario.first_seed,
+            )
+            # Print results
+            print(f"Bias for {scenario.name}: {runner.errors.mean():.4f}")
+```
+
+```{python} 
+class SimulationOrchestrator:
+    """Simple simulation orchestration class without any result handling
+    """
+    def __init__(self, scenarios: list[SimulationScenario]):
+        self.scenarios = scenarios
+        self.results = []
+
+    def run_all(self):
+        for scenario in scenarios: 
+            # Create DGP and estimator
+            dgp = scenario.dgp(**scenario.dgp_params)
+            estimator = scenario.estimator(**scenario.estimator_params)
+
+            # Run the simulation
+            runner = SimulationRunner(dgp, estimator)
+            runner.simulate(
+                n_sim=scenario.n_simulations, 
+                n_obs=scenario.sample_size, 
+                first_seed=scenario.first_seed,
+            )
+            # Print results
+            print(f"Bias for {scenario.name}: {runner.errors.mean():.4f}")
+```
+ 
+
+#### Executing `main.py`
+
+Executing the script now prints the results for all scenarios!
+```{.sh}
+python main.py
+```
+```{python}
+orchestrator = SimulationOrchestrator(scenarios)                         
+orchestrator.run_all()
+```
+
+#### Discussion
+
+A total victory:
+
+- Clean, well-focused files and implementation
+- Automatic collection and construction of scenarios
+- Full execution of all simulations
+
+
+Can talk about further improvements, handling results, but we've got a <span class="highlight">extensible and broadly-applicable</span> core
 
 ## Simulation Outputs {background="#00100F"}
  
@@ -825,7 +949,11 @@ Usually not what we want
 
 #### Common Approach
 
-Quite typical — export whole raw simulation results
+Quite typical — export whole raw simulation results, particularly in simulations where individual runs are expensive
+
+Can export as a CSV without adding to `SimulationOrchestrator`
+
+Or could add a `results` fields to `Orchestrator`
 
 ####
 
