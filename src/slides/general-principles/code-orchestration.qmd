@@ -72,6 +72,8 @@ import numpy as np
 
 import matplotlib.pyplot as plt 
 
+from typing import Protocol
+
 plt.rcParams["font.family"] = "sans-serif"
 plt.rcParams["font.sans-serif"] = ["Arial"]
 
@@ -104,6 +106,249 @@ $$ \small
 $$
 $\Pcal(\cdot)$ — penalty (0 for OLS, $L^1$ for Lasso, $L^2$ for ridge)
 
+
+
+```{python}  
+class StaticNormalDGP:
+    """A data-generating process (DGP) for a static linear model
+
+    Attributes:
+        beta0 (float): Intercept term.
+        beta1 (float): Slope coefficient.
+    """
+
+    def __init__(self, beta0: float = 0.0, beta1: float = 0.5) -> None:
+        """Initializes the DGP with intercept and slope.
+
+        Args:
+            beta0 (float): Intercept term. Defaults to 0.0.
+            beta1 (float): Slope coefficient. Defaults to 1.0.
+        """
+        self.beta0: float = beta0
+        self.beta1: float = beta1
+
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Samples data from the static DGP.
+
+        Args:
+            n_obs (int): Number of observations to sample.
+            seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+        Returns:
+            tuple: (x, y) arrays, each of length n_obs.
+        """
+        rng = np.random.default_rng(seed)
+        x = rng.normal(size=n_obs)
+        u = rng.normal(size=n_obs)
+        y = self.beta0 + self.beta1 * x + u
+        return x, y
+
+  
+class DynamicNormalDGP:
+    """A data-generating process (DGP) for a dynamic linear model: y_t = beta0 + beta1*y_{t-1} + u_t.
+
+    Attributes:
+        beta0 (float): Intercept term.
+        beta1 (float): AR(1) coefficient.
+    """
+
+    def __init__(self, beta0: float = 0.0, beta1: float = 0.5):
+        """Initializes the DGP with intercept and AR(1) coefficient.
+
+        Args:
+            beta0 (float): Intercept term. Defaults to 0.0.
+            beta1 (float): AR(1) coefficient. Defaults to 0.5.
+        """
+        self.beta0: float = beta0
+        self.beta1: float = beta1
+
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Samples data from the dynamic DGP.
+
+        Args:
+            n_obs (int): Number of observations to sample.
+            seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+        Returns:
+            tuple: (x, y) arrays, each of length n_obs.
+                  x is y_{t-1} (lagged y), and y is y_t.
+        """
+        rng = np.random.default_rng(seed)
+        y = np.zeros(n_obs + 1)  # Extra observation for lag
+        u = rng.normal(size=n_obs + 1)
+        y[0] = self.beta0 + u[0]  # Initial condition
+        for t in range(1, n_obs + 1):
+            y[t] = self.beta0 + self.beta1 * y[t - 1] + u[t]
+        # Return lagged y as x and y[1:] as y
+        return y[:-1], y[1:]
+
+
+class SimpleOLS:
+    """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
+    """
+
+    def __init__(self) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fit OLS to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+
+
+class SimpleRidge:
+    """A simple ridge estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
+        reg_param (float): Strength of regularization. Defaults to 0.01.
+    """
+
+    def __init__(self, reg_param: float = 0.01) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+        self.reg_param = reg_param
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the ridge estimator to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X + self.reg_param * np.eye(2)) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+
+
+class LassoWrapper:
+    """A wrapper for scikit-learn's Lasso to match the EstimatorProtocol.
+    Model y = beta0 + beta1*x+u.
+
+    Attributes:
+        model (sklearn.linear_model.Lasso): a scikit-learn Lasso instance.
+        beta0_hat (float): Estimated intercept. Initialized as np.nan.
+        beta1_hat (float): Estimated slope. Initialized as np.nan.
+    """
+
+    def __init__(self, reg_param: float = 1.0) -> None:
+        """Initializes the Lasso wrapper with a scikit-learn Lasso model.
+
+        Args:
+            reg_param (float): Regularization strength (alpha). Defaults to 1.0.
+        """
+        self.model = SklearnLasso(alpha=reg_param)
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the Lasso model to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+        x = x.reshape(-1, 1)  # sklearn expects 2d array inputs
+        self.model.fit(x, y)
+        self.beta0_hat = float(self.model.intercept_)
+        self.beta1_hat = float(self.model.coef_[0])
+
+
+
+class EstimatorProtocol(Protocol):
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None: ...
+
+    @property
+    def beta1_hat(self) -> float: ...
+
+
+class DGPProtocol(Protocol):
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[np.ndarray, np.ndarray]: ...
+
+    @property
+    def beta1(self) -> float: ...
+
+
+
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and estimator.
+
+    Attributes:
+        dgp: data-generating process with a sample() method and beta1 attribute.
+        estimator: estimator with a fit() method and beta1_hat attribute.
+        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+    """
+
+    def __init__(
+        self,
+        dgp: DGPProtocol,
+        estimator: EstimatorProtocol,
+    ) -> None:
+        """Initializes the simulation runner.
+
+        Args:
+            dgp: An instance of a DGP class (must implement `sample`).
+            estimator: An instance of an estimator class (must implement `fit`).
+        """
+        self.dgp: DGPProtocol = dgp
+        self.estimator: EstimatorProtocol = estimator
+        self.errors: np.ndarray = np.empty(0)
+
+    def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
+        """Runs simulations and stores estimation errors.
+
+        Args:
+            n_sim (int): number of simulations to run.
+            n_obs (int): Number of observations per simulation.
+            first_seed (int | None): Starting random seed for reproducibility.
+                Defaults to None.
+        """
+        # Preallocate array to hold estimation errors
+        self.errors = np.empty(n_sim)
+
+        # Run simulation
+        for sim_id in range(n_sim):
+            # Draw data
+            x, y = self.dgp.sample(
+                n_obs, seed=first_seed + sim_id if first_seed else None
+            )
+            # Fit model
+            self.estimator.fit(x, y)
+            # Store error
+            self.errors[sim_id] = self.estimator.beta1_hat - self.dgp.beta1
+
+    def summarize_bias(self) -> None:
+        """Prints the average estimation error (bias) for beta1."""
+        print(f"Average estimation error (bias): {self.errors.mean():.4f}")
+```
+
+
 #### Reminder: File Structure
 
 ::: {.nonincremental}
@@ -128,8 +373,6 @@ project/
 ```
 
 
-## Orchestrating Many Simulations {background="#00100F"}
- 
 ### Problem Statement {background="#43464B"}
 
 
@@ -196,31 +439,192 @@ Not a very good approach
 - Repeats code (e.g. `SimulationRunner` creation)
 - Breaks separation of concerns: job of the main script is not to say which scenarios you want today
 
-#### Questions to Answer for Orchestration
+#### Questions to Answer Today
 
 <div class="left-color">
 
-- How do we actually express what a scenario is?
+- How do we capture what a scenario is?
 - How do we execute all these scenarios?
-
+- What do we do with the outputs?
 
 </div>
 
 <br>
 
-- For now: just  executing simulations and printing results to the console as before
-- Later today: dealing with outputs better
+- First: just executing simulations and printing results to the console as before
+- Second: dealing with outputs better
 
-### Data Classes {background="#43464B"}
+
+
+## Expressing Simulation Scenarios {background="#00100F"}
+ 
+### `SimulationScenario` Class {background="#43464B"}
+
+
+#### What's A Simulation Scenario
+
+<div class="color-left">
+
+"Scenario" — collection of characteristics that uniquely define a setting for `SimulationRunner`
+
+</div>
+
+<br>
+
+Our case has three characteristics:
+
+- DGP
+- Estimator
+- Sample size
+
 
 #### How To Encode Scenarios?
 
+- Implicitly 
+- Explicitly in an object with suitable info:
+  - Dictionaries
+  - Named tuples (through `collections.namedtuple()` or `typing.NamedTuple`)
+  - Data classes
+
+. . .
+
+<div class="color-left">
+
+Generally good practice to be explicit (know if something goes wrong; clearer code)
+
+</div>
+
+
+
+#### Reminder About Data Classes
+
+- "Data class"  — class that's just a collection of fields with little extra functionality
+- Here: use `@dataclasses.dataclass` like in the EPP class (but be aware of other simpler options)
+
+. . . 
+
+To define: add `@dataclass` decorator, add attributes with type annotations 
+
+```{python}
+#| echo: true
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class SimulationScenario:       # Simple example
+    dgp: DGPProtocol
+    estimator: EstimatorProtocol
+    sample_size: int
+```
+
+::: {.footer}
+
+ 
+:::
+
+
+#### `SimulationScenario` Data Class Definition
+
+A richer definition:
+```{python} 
+#| echo: true
+@dataclass
+class SimulationScenario:
+    """A single simulation scenario: DGP, estimator, and sample size."""
+    name: str               # For readability  
+    dgp: DGPProtocol 
+    dgp_params: dict        # E.g. betas go here
+    estimator: EstimatorProtocol
+    estimator_params: dict  # E.g. reg_params go here
+    sample_size: int
+    n_simulations: int = 1000
+    first_seed: int = 1
+```
+ 
+- Self-documenting 
+- A `dataclass` comes with `__init__`, `__eq__` and other useful methods practically for free
+- See chapter 5 in @Ramalho2022FluentPythonClear
+ 
+
+
+#### Example `SimulationScenario`
+
+Can now define example instance: 
+```{python} 
+#| echo: true
+example_scenario = SimulationScenario(
+    name="static_ols_n100",
+    dgp=StaticNormalDGP,
+    dgp_params={"beta0": 0.0, "beta1": 1.0},
+    estimator=SimpleOLS,
+    estimator_params={},
+    sample_size=50, 
+)
+
+```
+
+
+#### Using `SimulationScenario` with `SimulationRunner`
+
+```{python}
+#| echo: true
+# Initialize the scenario
+dgp = example_scenario.dgp(**example_scenario.dgp_params)
+estimator = example_scenario.estimator(**example_scenario.estimator_params)
+
+# Run the simulation
+runner = SimulationRunner(dgp, estimator)
+runner.simulate(
+    n_obs=example_scenario.n_simulations, 
+    n_sim=example_scenario.sample_size, 
+    first_seed=example_scenario.first_seed,
+)
+# Print results
+print(f"Bias for {example_scenario.name}: {runner.errors.mean():.4f}")
+```
+
+<div class="left-color">
+
+`example_scenario` contains <span class="highlight">all</span> the information necessary for `SimulationRunner`
+
+</div>
+
+
+::: {.footer}
+
+`**example_scenario.dgp_params` is an example of dictionary unpacking; here for using keyword arguments
+
+::: 
+
+
+
+### Collections of Scenarios {background="#43464B"}
+
+
 #### Creating a Collection of Scenarios
 
-- Can create manually
-- Can make automatically (e.g. as a Cartesian product)
+- Can create manually: a file that creates desired instances and packs them somehow
+- Can make automatically (e.g. as a Cartesian product of list of DGPs, sample sizes, estimators)
 
-### Putting Things Together {background="#43464B"}
+Depends on your goal: whether you want all possible combinations (beware of exponential growth) or some specific ones (beware of missing a desired combination)
+
+#### Manual Approach
+
+
+#### Creating All Possible Combinations
+
+
+#### Our Choice
+
+We want all possible combinations — simplest approach is then to follow a suitable Cartesian product and automate generating a list of scenarios.
+
+#### Resulting File and File Structure
+
+
+
+## Running Many Scenarios {background="#00100F"}
+ 
+
+### `SimulationOrchestrator` Class {background="#43464B"}
 
 #### 
 
