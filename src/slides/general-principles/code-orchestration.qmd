@@ -379,9 +379,9 @@ project/
 ### Problem Statement {background="#43464B"}
 
 
-#### Reminder: `main.py`
+#### Reminder: `main.py` with Only One Scenario
+ 
 
-Our script only does one scenario so far:
 ```{.python filename="main.py"} 
 from dgps.dynamic import DynamicNormalDGP
 from estimators.ols_like import LassoWrapper
@@ -486,7 +486,7 @@ Our case has three characteristics:
 - Explicitly in an object with suitable info:
   - Dictionaries
   - Named tuples (through `collections.namedtuple()` or `typing.NamedTuple`)
-  - Data classes
+  - @dataclasses.dataclass
 
 . . .
 
@@ -505,7 +505,7 @@ Generally good practice to be explicit (know if something goes wrong; clearer co
 
 . . . 
 
-To define: add `@dataclass` decorator, add attributes with type annotations 
+To create: `@dataclass` and attributes with types 
 
 ```{python}
 #| echo: true
@@ -513,8 +513,8 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class SimulationScenario:       # Simple example
-    dgp: DGPProtocol
-    estimator: EstimatorProtocol
+    dgp: type[DGPProtocol]
+    estimator: type[EstimatorProtocol]
     sample_size: int
 ```
 
@@ -525,17 +525,16 @@ class SimulationScenario:       # Simple example
 
 
 #### `SimulationScenario` Data Class Definition
-
-A richer definition:
+ 
 ```{python} 
 #| echo: true
-@dataclass
+@dataclass(frozen=True)
 class SimulationScenario:
     """A single simulation scenario: DGP, estimator, and sample size."""
     name: str               # For readability  
-    dgp: DGPProtocol 
+    dgp: type[DGPProtocol] 
     dgp_params: dict        # E.g. betas go here
-    estimator: EstimatorProtocol
+    estimator: type[EstimatorProtocol]
     estimator_params: dict  # E.g. reg_params go here
     sample_size: int
     n_simulations: int = 1000
@@ -544,9 +543,13 @@ class SimulationScenario:
  
 - Self-documenting 
 - A `dataclass` comes with `__init__`, `__eq__` and other useful methods practically for free
-- See chapter 5 in @Ramalho2022FluentPythonClear
- 
 
+ 
+::: {.footer}
+
+The `type[Class]` type annotation means we want a class, not an instance of it. See [here](https://adamj.eu/tech/2021/05/16/python-type-hints-return-class-not-instance/)
+
+:::
 
 #### Example `SimulationScenario`
 
@@ -564,6 +567,7 @@ example_scenario = SimulationScenario(
 
 ```
 
+Note about our implementation: passed *class* to `SimulationScenario` (e.g. `StaticNormalDGP`, not instance with `StaticNormalDGP()`)
 
 #### Using `SimulationScenario` with `SimulationRunner`
 
@@ -602,12 +606,11 @@ print(f"Bias for {example_scenario.name}: {runner.errors.mean():.4f}")
 ### Collections of Scenarios {background="#43464B"}
 
 
-#### How To Create Many Scenarios?
+#### Two Ways To Create Many Scenarios
+ 
 
-Two main ways: 
-
-- Manually: a file that creates desired instances and packs them somehow
-- Automatically (e.g. as a Cartesian product of list of DGPs, sample sizes, estimators)
+1. *Manually*: a file that creates desired instances and packs them somehow
+2. *Automatically* (e.g. as a Cartesian product of list of DGPs, sample sizes, estimators)
 
 
 
@@ -626,7 +629,7 @@ Choice depends on your goal:
 A couple of options:
 
 - In a Python array (e.g. list of scenarios)
-- In an external config file (e.g. a YAML)
+- In an external config file (e.g. a YAML config)
 
 
 . . . 
@@ -637,12 +640,9 @@ For now: a Python list coming from a `scenarios.py` file is fine for us
 
 
 
-#### Example Manual Approach
+#### Manual Example: List of Scenarios
 
-Just make a list of all the scenarios you want:
-
-```{.python filename="scenarios.py"}
-#| echo: true
+```{.python filename="scenarios.py"} 
 scenarios = [
     SimulationScenario(
         name="static_ols_n100",
@@ -694,8 +694,7 @@ One can think of other combinations that lie between manual lists and full-on Ca
 
 #### `scenarios.py` With All Possible Combinations:
 
-```{.python filename="scenarios.py"}
-#| echo: true
+```{.python filename="scenarios.py"} 
 from itertools import product
 
 # Define lists of components 
@@ -794,7 +793,7 @@ project/
 │   └── ols-like.py       
 ├── protocols.py
 ├── runner.py
-├── scenarios.py       # New: Defines SimulationScenario and collections
+├── scenarios.py       # New: Defines SimulationScenario and scenarios list
 └── main.py
 ```
 
@@ -834,9 +833,8 @@ A simple simulation orchestrator:
 - Should ingest list of scenarios
 - Run all of the scenarios:
   - For each scenario, create a SimulationRunner
-  - `simulate()`
-  - Store the results somehow
-- Do something with the final results
+  - `simulate()` 
+- Do something with the results
  
 
 </div>
