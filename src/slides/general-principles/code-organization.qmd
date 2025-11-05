@@ -293,7 +293,7 @@ class SimulationRunner:
 
     def __init__(
         self,
-        dgp: "StaticNormalDGP" | "DynamicNormalDGP",
+        dgp: StaticNormalDGP | DynamicNormalDGP,
         estimator: SimpleOLS,
     ) -> None:
         """Initializes the simulation runner.
@@ -335,7 +335,7 @@ class SimulationRunner:
 
 ::: {.footer}
 
-Notice the type hintsfor `dgp` and `estimator`
+Notice the type hints for `dgp` and `estimator`
 
 :::
 
