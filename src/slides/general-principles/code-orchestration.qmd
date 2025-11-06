@@ -568,7 +568,7 @@ Can now define example instance:
 ```{python} 
 #| echo: true
 example_scenario = SimulationScenario(
-    name="static_ols_n100",
+    name="static_ols_n50",
     dgp=StaticNormalDGP,
     dgp_params={"beta0": 0.0, "beta1": 0.5},
     estimator=SimpleOLS,
@@ -663,7 +663,7 @@ For now: a Python list coming from a `scenarios.py` file is fine for us
 ```{.python filename="scenarios.py"} 
 scenarios = [
     SimulationScenario(
-        name="static_ols_n100",
+        name="static_ols_n50",
         dgp=StaticNormalDGP,
         dgp_params={"beta0": 0.0, "beta1": 0.5},
         estimator=SimpleOLS,
@@ -671,7 +671,7 @@ scenarios = [
         sample_size=50, 
     ),
     SimulationScenario(
-        name="dynamic_lasso_n50",
+        name="dynamic_lasso_n200",
         dgp=DynamicNormalDGP,
         dgp_params={"beta0": 0.0, "beta1": 0.95},
         estimator=LassoWrapper,
