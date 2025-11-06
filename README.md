@@ -50,7 +50,7 @@ This course covers the following points:
 
 ### Simulations
 
-This course is self-contained with respect to simulations, and the lecture materials serve as the primary reference. For some further references and philosophical perspectives, one may also consult
+This course is self-contained with respect to simulations, and the lecture materials serve as the primary reference. Fors some philosophical perspectives, one may also consult
  
 - Dormann, Carsten F., and Aaron M. Ellison. 2025. *Statistics by Simulation: A Synthetic Data Approach*. Princeton University Press.
 
