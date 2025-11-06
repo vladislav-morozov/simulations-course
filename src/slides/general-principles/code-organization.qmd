@@ -293,7 +293,7 @@ class SimulationRunner:
 
     def __init__(
         self,
-        dgp: "StaticNormalDGP" | "DynamicNormalDGP",
+        dgp: StaticNormalDGP | DynamicNormalDGP,
         estimator: SimpleOLS,
     ) -> None:
         """Initializes the simulation runner.
@@ -335,7 +335,7 @@ class SimulationRunner:
 
 ::: {.footer}
 
-Notice the type hintsfor `dgp` and `estimator`
+Notice the type hints for `dgp` and `estimator`
 
 :::
 
@@ -502,7 +502,7 @@ Working with "*what estimators need*" helps us program to an *interface*, not a 
 A smaller but annoying problem:
 
 - Our type hints in `SimulationRunner` don't allow for `SimpleRidge` as an estimator
-- Not a problem for execution: Python doesn't care about type hints
+- Not a problem for execution, Python doesn't check
 - But code quality tools/IDEs will (rightfully) complain:
 
 . . .
@@ -587,19 +587,17 @@ class DGPProtocol(Protocol):
 ```
 
 #### How To Use Protocols?
-
-To repeat:
-
+ 
 <div class="left-color">
 
-Protocols communicate information about interfaces both to readers and type checkers — like a <span class="highlight">checklist</span>
+Protocols communicate information about interfaces both to readers and type checkers — a <span class="highlight">contract</span>
 
 </div>
 
 Now modify `SimulationRunner` to make this explicit:
 
 - Insert `DGPProtocol` as type hint for `dgp` argument
-- Insert `EstimatorProtocol` as type hint for `estimator` argument
+- Insert `EstimatorProtocol` as type hint for `estimator`
 
 . . .
 
@@ -650,9 +648,13 @@ class SimulationRunner:
 
         # Run simulation
         for sim_id in range(n_sim):
+            # Update current seed if first_seed is not None
+            if first_seed:
+                current_seed = first_seed + sim_id
+
             # Draw data
             x, y = self.dgp.sample(
-                n_obs, seed=first_seed + sim_id if first_seed else None
+                n_obs, seed=current_seed
             )
             # Fit model
             self.estimator.fit(x, y)
@@ -740,7 +742,7 @@ Three reasons:
 #### A Look at `scikit-learn` Lasso
  
 
-In general, would use `scikit-learn` Lasso somewhat like this:
+In general, would use `scikit-learn` Lasso like this:
 ```{python}
 #| echo: true
 from sklearn.linear_model import Lasso
@@ -943,11 +945,15 @@ project/
 │   └── dynamic.py      # DynamicNormalDGP
 ├── estimators/
 │   ├── __init__.py
-│   ├── ols-like.py     # SimpleOLS, SimpleRidge, LassoWrapper
+│   └── ols-like.py     # SimpleOLS, SimpleRidge, LassoWrapper
 ├── main.py             # Main script that we call from the CLI
 ├── protocols.py        # DGPProtocol, EstimatorProtocol
 └── runner.py           # SimulationRunner
 ```
+
+- `main.py` — does main logic
+- Other `.py` files — modules (libraries) of tools
+- Can also have a `.ipynb` file for experimenting that also relies on same `.py` modules
 
 ::: {.footer}
 
@@ -1135,10 +1141,10 @@ So far have modules, but still need the `main.py` <span class="highlight">script
 #### Our First `main.py`
 
 A script with a single scenario:
-```python
+```{.python filename="main.py"} 
 from dgps.dynamic import DynamicNormalDGP
 from estimators.ols_like import LassoWrapper
-from runners import SimulationRunner
+from runner import SimulationRunner
 
 if __name__ == "__main__":
     # Today: just one scenario
@@ -1175,13 +1181,17 @@ See chapter 24-25 in @Lutz2025LearningPythonPowerful
 
 #### Running Our Simulation
 
-To execute, just call from the command line when in project root: 
+To execute, call from the command line when in project root: 
 ```bash
 py main.py
 ```
 or 
 ```bash
 python main.py
+```
+or (depending on your system/Python)
+```bash
+python3 main.py
 ```
 
 <br>
