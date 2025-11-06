@@ -1,7 +1,7 @@
 ---
-description: "This course covers the basics of writing and evaluating Monte Carlo simulations in data science: best practices, Python implementations"
+description: "This course covers the basics of writing and evaluating Monte Carlo simulations in data science: best practices and Python implementations"
 open-graph:
-    description: "This course covers the basics of writing and evaluating Monte Carlo simulations in data science: best practices, Python implementations" 
+    description: "This course covers the basics of writing and evaluating Monte Carlo simulations in data science: best practices and Python implementations" 
 ---
 
 # Fundamentals of Monte Carlo Simulations in Data Science
@@ -37,6 +37,16 @@ open-graph:
 
 ## Course Content
  
+### Motivation
+
+How do we know if a new causal inference method actually estimates the effects of interest? Does a machine learning algorithm generalize well across different sample sizes? What happens when a statistical tool is applied outside its original setting?
+
+Simulations provide answers to such questions. These "laboratories" of econometrics and statistics allow us to test methods in controlled environments, building confidence in their real-world applicability.
+
+This research module focuses on the design, implementation, and interpretation of Monte Carlo simulations. It prepares students to write a rigorous master's thesis in econometrics and statistics, while equipping them with the skills to critically evaluate methods in diverse data science contexts, applied and theoretical. The focus is mainly practical and numerical, with the in-class simulations built in Python.
+
+### Key Contents
+
 This course covers the following points:
 
 - The role of simulations in evaluating statistical methods.
