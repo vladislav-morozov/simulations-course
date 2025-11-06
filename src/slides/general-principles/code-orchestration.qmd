@@ -1,12 +1,12 @@
 ---
 title: "Good Simulation Code IV: Orchestration"
-subtitle: "SUBTITLE"
+subtitle: "Data Classes for Scenarios. Running Many Simulations"
 author: Vladislav Morozov  
 format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content="How to write good Monte Carlo simulation code in data science:   (lecture note slides)"/> 
+        <meta name="description" content="How to write good Monte Carlo simulation code in data science: orchestrating execution of many simulation scenarios; data classes (lecture note slides)"/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: "How to write good Monte Carlo simulation code in data science:  (lecture note slides)" 
+    description: "How to write good Monte Carlo simulation code in data science: orchestrating execution of many simulation scenarios; data classes (lecture note slides)" 
 ---
 
 
@@ -46,16 +46,21 @@ open-graph:
 
 #### Learning Outcomes
 
-This lecture is about 
+This lecture is about making our code execute many simulation scenarios
 
 <br>
 
 By the end, you should be able to
 
  
-- A
+- Capture simulation scenarios in data classes
+- Automatically and manually build collections of simulation scenarios
+- Implement a simulation orchestrator class for running many simulations
+
 
 #### References
+
+<br>
 
 ::: {.nonincremental}
 
@@ -63,7 +68,8 @@ By the end, you should be able to
 Programming:
  
 - Chapter 5 in @Ramalho2022FluentPythonClear about data classes
-- 
+- Chapter 39 in @Lutz2025LearningPythonPowerful on decorators
+- Chapter 6 in @Lau2023LearningDataScience for a refresher on pandas
 :::
 
  
@@ -337,10 +343,15 @@ class SimulationRunner:
 
         # Run simulation
         for sim_id in range(n_sim):
+            # Update current seed if first_seed is not None
+            if first_seed:
+                current_seed = first_seed + sim_id
+
             # Draw data
             x, y = self.dgp.sample(
-                n_obs, seed=first_seed + sim_id if first_seed else None
+                n_obs, seed=current_seed
             )
+
             # Fit model
             self.estimator.fit(x, y)
             # Store error
@@ -426,9 +437,9 @@ A problem of <span class="highlight">orchestration</span>: coordinating multiple
 
 Goal: being able to focus on results
 
-#### Why Not Harcode?
+#### Why Not Hardcode?
 
-One way: just add all scenarios (DGPs, estimators, sample sizes) manually in `main.py`, create `SimulationRunner` for each one
+One way: add all combos (DGPs, estimators, sample sizes) manually in `main.py`, create `SimulationRunner` for each one
 
 <div class="left-color">
 
@@ -454,7 +465,7 @@ Not a very good approach
 <br>
 
 - First: just executing simulations and printing results to the console as before
-- Second: dealing with outputs better
+- Second: basics of dealing with outputs
 
 
 
@@ -486,7 +497,7 @@ Our case has three characteristics:
 - Explicitly in an object with suitable info:
   - Dictionaries
   - Named tuples (through `collections.namedtuple()` or `typing.NamedTuple`)
-  - @dataclasses.dataclass
+  - `@dataclasses.dataclass`
 
 . . .
 
@@ -500,7 +511,7 @@ Generally good practice to be explicit (know if something goes wrong; clearer co
 
 #### Reminder About Data Classes
 
-- "Data class"  — class that's just a collection of fields with little extra functionality
+- "Data class" — class that's just a collection of fields with little extra functionality
 - Here: use `@dataclasses.dataclass` like in the EPP class (but be aware of other simpler options)
 
 . . . 
@@ -542,7 +553,7 @@ class SimulationScenario:
 ```
  
 - Self-documenting 
-- A `dataclass` comes with `__init__`, `__eq__` and other useful methods practically for free
+- A `dataclass` comes with `__init__`, a nice `__eq__` and other useful methods practically for free
 
  
 ::: {.footer}
@@ -566,8 +577,14 @@ example_scenario = SimulationScenario(
 )
 
 ```
+ 
+ 
+::: {.footer}
 
-Note about our implementation: passed *class* to `SimulationScenario` (e.g. `StaticNormalDGP`, not instance with `StaticNormalDGP()`)
+
+Note how we passed a *class* to `SimulationScenario` (e.g. `StaticNormalDGP`, not instance with `StaticNormalDGP()`)
+
+:::
 
 #### Using `SimulationScenario` with `SimulationRunner`
 
@@ -609,7 +626,7 @@ print(f"Bias for {example_scenario.name}: {runner.errors.mean():.4f}")
 #### Two Ways To Create Many Scenarios
  
 
-1. *Manually*: a file that creates desired instances and packs them somehow
+1. *Manually*: a file that explicitly specifies the desired scenarios
 2. *Automatically* (e.g. as a Cartesian product of list of DGPs, sample sizes, estimators)
 
 
@@ -619,8 +636,9 @@ print(f"Bias for {example_scenario.name}: {runner.errors.mean():.4f}")
 
 Choice depends on your goal: 
 
-- All combinations (beware of exponential growth)
+
 - Specific ones (beware of missing a desired combination)
+- All combinations (beware of exponential growth)
 
 </div>
 
@@ -657,7 +675,7 @@ scenarios = [
         dgp=DynamicNormalDGP,
         dgp_params={"beta0": 0.0, "beta1": 0.95},
         estimator=LassoWrapper,
-        estimator_params={"alpha": 0.1},
+        estimator_params={"reg_param": 0.1},
         sample_size=200, 
     )
 ]
@@ -688,7 +706,7 @@ Creation steps:
 ::: {.footer}
 
 
-One can think of other combinations that lie between manual lists and full-on Cartesian productss
+One can think of other combinations that lie between manual lists and full-on Cartesian products
 
 :::
 
@@ -831,7 +849,7 @@ python main.py
 A simple simulation orchestrator:
 
 - Should ingest list of scenarios
-- Run all of the scenarios:
+- Run all the scenarios:
   - For each scenario, create a SimulationRunner
   - `simulate()` 
 - Do something with the results
@@ -935,7 +953,7 @@ A total victory:
 
 <br>
 
-Can talk about further improvements, handling results, but we have a <span class="highlight">extensible and broadly-applicable</span> core
+Can talk about further improvements, handling results, but we have an <span class="highlight">extensible and broadly-applicable</span> core
 
 ## Simulation Outputs {background="#00100F"}
  
@@ -1041,7 +1059,9 @@ pd.Series(orchestrator.summary_results)
 
 In this lecture we 
 
-- Discussed  
+- Discussed how to specify a simulation scenario
+- Talked about how to construct a list of many scenarios
+- Implemented a simple orchestrator that pulls together scenarios and executes them
 
 
 #### Further Improvements
@@ -1055,10 +1075,27 @@ Can keep adding things to code:
 
 Project could also benefit from more reproducibility:
 
-- Getting the right environment for reproduciblity?
+- Getting the right environment for reproducibility?
 - Not having to rerun all the simulations every time?
 
 #### Block Recap
+
+<div class="left-color">
+
+This block: structuring and thinking about simulation *code*
+
+</div>
+
+Overall design: 
+
+- Starting simple with functions
+- Going modular for more complex scenarios
+
+Quality of life features:
+
+- Scenario builders
+- Orchestrator 
+  
 
 
 #### References {.allowframebreaks visibility="uncounted"}
