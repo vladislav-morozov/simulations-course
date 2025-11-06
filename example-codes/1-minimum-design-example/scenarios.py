@@ -39,7 +39,7 @@ class SimulationScenario:
 # Define lists of components
 dgps = [
     (StaticNormalDGP, {"beta0": 0.0, "beta1": 1.0}, "static"),
-    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.1}, "low_pers"),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.0}, "low_pers"),
     (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.5}, "mid_pers"),
     (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.95}, "high_pers"),
 ]
@@ -53,7 +53,7 @@ sample_sizes = [50, 200]
 # Generate all combinations
 scenarios = [
     SimulationScenario(
-        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_n{size}",
+        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_T{size}",
         dgp=dgp_class,
         dgp_params=dgp_params,
         estimator=estimator_class,
