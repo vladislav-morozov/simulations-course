@@ -10,6 +10,9 @@
 
 Learning the practice of Monte Carlo simulations in data science (offered as part of the Research Module in Econometrics and Statistics). 
 
+[![DOI](https://zenodo.org/badge/1054345573.svg)](https://doi.org/10.5281/zenodo.17543412)
+
+
 ## Motivation
 
 How do we know if a new causal inference method actually estimates the effects of interest? Does a machine learning algorithm generalize well across different sample sizes? What happens when a statistical tool is applied outside its original setting?
