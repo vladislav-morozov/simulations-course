@@ -718,7 +718,7 @@ from itertools import product
 # Define lists of components 
 dgps = [
     (StaticNormalDGP, {"beta0": 0.0, "beta1": 1.0}, 'static'),
-    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.1}, 'dynamic_low_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.0}, 'dynamic_low_pers'),
     (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.5}, 'dynamic_mid_pers'),
     (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.95}, 'dynamic_high_pers'),
 ]
