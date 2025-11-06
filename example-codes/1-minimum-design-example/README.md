@@ -10,7 +10,12 @@ $$
 
 Key technical goal of this simulation: demonstrate a modular framework for organizing and running Monte Carlo simulations.
 
-Accompanying lectures: first block.
+Accompanying lectures:
+
+- [Good Simulation Code I: Starting with Functions](https://vladislav-morozov.github.io/simulations-course/slides/general-principles/code-basic.html)
+- [Good Simulation Code II: Modular Approachs](https://vladislav-morozov.github.io/simulations-course/slides/general-principles/code-modular.html)
+- [Good Simulation Code III: Organization](https://vladislav-morozov.github.io/simulations-course/slides/general-principles/code-organization.html)
+- [Good Simulation Code IV: Orchestration](https://vladislav-morozov.github.io/simulations-course/slides/general-principles/code-orchestration.html)
 
 ## Estimators and DGPs
 
