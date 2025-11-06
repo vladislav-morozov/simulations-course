@@ -1,18 +1,27 @@
-from dgps.dynamic import DynamicNormalDGP
-from estimators.ols_like import LassoWrapper
-from runners import SimulationRunner
+"""
+Entry point for running simulation on bias of simple linear model.
+
+Overall goal of simulation: evaluate bias of OLS-like estimators in simple model
+    y = b0 + b1 * x + u
+Scenarios consider: several estimators, static vs. dynamic DGPs, various sample 
+sizes.
+
+Usage:
+    python main.py
+
+Output:
+    A pandas Series of bias results for each scenario, printed to the console.
+"""
+
+import pandas as pd
+
+from orchestrator import SimulationOrchestrator 
+from scenarios import scenarios                                             
 
 if __name__ == "__main__":
-    # Initialize components
-    dgp = DynamicNormalDGP(beta0=0.0, beta1=0.95)
-    estimator = LassoWrapper(reg_param=0.04)
+    # Create and execute simulations 
+    orchestrator = SimulationOrchestrator(scenarios)                         
+    orchestrator.run_all()
 
-    # Run simulation
-    runner = SimulationRunner(dgp, estimator)
-    runner.simulate(n_sim=1000, n_obs=50, first_seed=1)
-
-    # Print results
-    print(
-        f"Bias for {dgp.__class__.__name__} + {estimator.__class__.__name__}: "
-    )
-    runner.summarize_bias()
+    # Results logic (print or export as pd.Series)
+    print(pd.Series(orchestrator.summary_results))
