@@ -1,5 +1,5 @@
 """
-Module for running Monte Carlo simulations.
+Module for executing a given Monte Carlo scenario.
 
 This module contains the SimulationRunner class, which executes a scenario
 by combining a DGP and an estimator. It handles data generation, estimation,

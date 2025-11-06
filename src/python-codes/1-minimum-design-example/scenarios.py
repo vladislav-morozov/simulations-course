@@ -1,3 +1,18 @@
+"""
+Module for defining simulation scenarios.
+
+This module contains scenarios for simulations on the simple model:
+    y = b0 + b1 * x + u
+The scenarios evaluate several OLS-like estimators under static and dynamic DGPs
+with two different sample sizes.
+
+Classes:
+    SimpleOLS: ordinary least squares estimator.
+
+Variables:
+    scenarios (list): list of scenarios to un.
+"""
+
 from dataclasses import dataclass
 from itertools import product
 

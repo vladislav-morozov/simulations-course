@@ -1,3 +1,13 @@
+"""
+Module for executing many Monte Carlo scenario.
+
+This module contains the SimulationOrchestrator class, which executes a 
+supplied collection of SimulationScenario objects.
+
+Classes:
+    SimulationOrchestrator: runs simulation scenarios and stores summaries.
+"""
+
 from scenarios import SimulationScenario
 from runner import SimulationRunner
 
