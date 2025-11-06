@@ -568,7 +568,7 @@ Can now define example instance:
 ```{python} 
 #| echo: true
 example_scenario = SimulationScenario(
-    name="static_ols_n100",
+    name="static_ols_T50",
     dgp=StaticNormalDGP,
     dgp_params={"beta0": 0.0, "beta1": 0.5},
     estimator=SimpleOLS,
@@ -663,7 +663,7 @@ For now: a Python list coming from a `scenarios.py` file is fine for us
 ```{.python filename="scenarios.py"} 
 scenarios = [
     SimulationScenario(
-        name="static_ols_n100",
+        name="static_ols_T50",
         dgp=StaticNormalDGP,
         dgp_params={"beta0": 0.0, "beta1": 0.5},
         estimator=SimpleOLS,
@@ -671,7 +671,7 @@ scenarios = [
         sample_size=50, 
     ),
     SimulationScenario(
-        name="dynamic_lasso_n50",
+        name="dynamic_lasso_T200",
         dgp=DynamicNormalDGP,
         dgp_params={"beta0": 0.0, "beta1": 0.95},
         estimator=LassoWrapper,
@@ -718,7 +718,7 @@ from itertools import product
 # Define lists of components 
 dgps = [
     (StaticNormalDGP, {"beta0": 0.0, "beta1": 1.0}, 'static'),
-    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.1}, 'dynamic_low_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.0}, 'dynamic_low_pers'),
     (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.5}, 'dynamic_mid_pers'),
     (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.95}, 'dynamic_high_pers'),
 ]
@@ -732,7 +732,7 @@ sample_sizes = [50, 200]
 # Generate all combinations
 scenarios = [
     SimulationScenario(
-        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_n{size}",
+        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_T{size}",
         dgp=dgp_class,
         dgp_params=dgp_params,
         estimator=estimator_class,
@@ -764,7 +764,7 @@ sample_sizes = [50, 200]
 # Generate all combinations
 scenarios = [
     SimulationScenario(
-        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_n{size}",
+        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_T{size}",
         dgp=dgp_class,
         dgp_params=dgp_params,
         estimator=estimator_class,
