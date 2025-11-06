@@ -1,0 +1,1104 @@
+---
+title: "Good Simulation Code IV: Orchestration"
+subtitle: "Data Classes for Scenarios. Running Many Simulations"
+author: Vladislav Morozov  
+format:
+  revealjs:
+    include-in-header: 
+      text: |
+        <meta name="description" content="How to write good Monte Carlo simulation code in data science: orchestrating execution of many simulation scenarios; data classes (lecture note slides)"/> 
+    width: 1150
+    slide-number: true
+    sc-sb-title: true
+    incremental: true   
+    logo: ../../themes/favicon.ico
+    footer: "Code Design IV: Orchestration"
+    footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
+    theme: ../../themes/slides_theme.scss
+    toc: TRUE
+    toc-depth: 2
+    toc-title: Contents
+    transition: convex
+    transition-speed: fast
+slide-level: 4
+title-slide-attributes:
+    data-background-color: "#3c165cff"
+    data-footer: " "
+filters:
+  - reveal-header 
+embed-resources: true
+include-in-header: ../../themes/mathjax.html 
+highlight-style: tango
+open-graph:
+    description: "How to write good Monte Carlo simulation code in data science: orchestrating execution of many simulation scenarios; data classes (lecture note slides)" 
+---
+
+
+
+
+
+
+## Introduction {background="#00100F"}
+ 
+  
+
+### Lecture Info {background="#43464B"}
+
+#### Learning Outcomes
+
+This lecture is about making our code execute many simulation scenarios
+
+<br>
+
+By the end, you should be able to
+
+ 
+- Capture simulation scenarios in data classes
+- Automatically and manually build collections of simulation scenarios
+- Implement a simulation orchestrator class for running many simulations
+
+
+#### References
+
+<br>
+
+::: {.nonincremental}
+
+ 
+Programming:
+ 
+- Chapter 5 in @Ramalho2022FluentPythonClear about data classes
+- Chapter 39 in @Lutz2025LearningPythonPowerful on decorators
+- Chapter 6 in @Lau2023LearningDataScience for a refresher on pandas
+:::
+
+ 
+```{python} 
+import numpy as np
+import pandas as pd
+
+import matplotlib.pyplot as plt 
+
+from typing import Protocol
+
+from sklearn.linear_model import Lasso as SklearnLasso
+
+plt.rcParams["font.family"] = "sans-serif"
+plt.rcParams["font.sans-serif"] = ["Arial"]
+
+BG_COLOR = "whitesmoke"
+THEME_COLOR = "#3c165c"
+```
+ 
+
+### Reminder: Previous Simulation Setting {background="#43464B"}
+
+
+#### Reminder: Study Bias of Penalized SSR Estimators
+
+
+<div class="left-color">
+
+Talking about <span class="highlight">bias</span> of different <span class="highlight">penalized SSR-based estimators</span>  in simple linear model:
+
+$$ \small
+Y_{t} = \beta_0 + \beta_1 X + U_t, \quad t=1, \dots, T
+$$ 
+
+</div>
+
+. . . 
+
+Estimators for $\beta_1$ minimize <span class="highlight">penalized SSR</span> with form
+$$ \small
+(\hat{\beta}_0, \hat{\beta}_1) = \argmin \sum_{t=1}^T (Y_t - b_0 - b_1 X_t)^2 + \lambda \Pcal(b_0, b_1)
+$$
+$\Pcal(\cdot)$ — penalty (0 for OLS, $L^1$ for Lasso, $L^2$ for ridge)
+
+
+
+```{python}  
+class StaticNormalDGP:
+    """A data-generating process (DGP) for a static linear model
+
+    Attributes:
+        beta0 (float): Intercept term.
+        beta1 (float): Slope coefficient.
+    """
+
+    def __init__(self, beta0: float = 0.0, beta1: float = 0.5) -> None:
+        """Initializes the DGP with intercept and slope.
+
+        Args:
+            beta0 (float): Intercept term. Defaults to 0.0.
+            beta1 (float): Slope coefficient. Defaults to 1.0.
+        """
+        self.beta0: float = beta0
+        self.beta1: float = beta1
+
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Samples data from the static DGP.
+
+        Args:
+            n_obs (int): Number of observations to sample.
+            seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+        Returns:
+            tuple: (x, y) arrays, each of length n_obs.
+        """
+        rng = np.random.default_rng(seed)
+        x = rng.normal(size=n_obs)
+        u = rng.normal(size=n_obs)
+        y = self.beta0 + self.beta1 * x + u
+        return x, y
+
+  
+class DynamicNormalDGP:
+    """A data-generating process (DGP) for a dynamic linear model: y_t = beta0 + beta1*y_{t-1} + u_t.
+
+    Attributes:
+        beta0 (float): Intercept term.
+        beta1 (float): AR(1) coefficient.
+    """
+
+    def __init__(self, beta0: float = 0.0, beta1: float = 0.5):
+        """Initializes the DGP with intercept and AR(1) coefficient.
+
+        Args:
+            beta0 (float): Intercept term. Defaults to 0.0.
+            beta1 (float): AR(1) coefficient. Defaults to 0.5.
+        """
+        self.beta0: float = beta0
+        self.beta1: float = beta1
+
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Samples data from the dynamic DGP.
+
+        Args:
+            n_obs (int): Number of observations to sample.
+            seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+        Returns:
+            tuple: (x, y) arrays, each of length n_obs.
+                  x is y_{t-1} (lagged y), and y is y_t.
+        """
+        rng = np.random.default_rng(seed)
+        y = np.zeros(n_obs + 1)  # Extra observation for lag
+        u = rng.normal(size=n_obs + 1)
+        y[0] = self.beta0 + u[0]  # Initial condition
+        for t in range(1, n_obs + 1):
+            y[t] = self.beta0 + self.beta1 * y[t - 1] + u[t]
+        # Return lagged y as x and y[1:] as y
+        return y[:-1], y[1:]
+
+
+class SimpleOLS:
+    """A simple OLS estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
+    """
+
+    def __init__(self) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fit OLS to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+
+
+class SimpleRidge:
+    """A simple ridge estimator for the linear model y = beta0 + beta1*x + u.
+
+    Attributes:
+        beta0_hat (float): Estimated intercept. NaN until fit is called.
+        beta1_hat (float): Estimated slope. NaN until fit is called.
+        reg_param (float): Strength of regularization. Defaults to 0.01.
+    """
+
+    def __init__(self, reg_param: float = 0.01) -> None:
+        """Initializes the OLS estimator with no estimates."""
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+        self.reg_param = reg_param
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the ridge estimator to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+
+        # Add constant to x
+        X = np.column_stack([np.ones(len(x)), x])
+        # OLS estimation
+        beta_hat = np.linalg.inv(X.T @ X + self.reg_param * np.eye(2)) @ X.T @ y
+        self.beta0_hat, self.beta1_hat = beta_hat[0], beta_hat[1]
+
+
+class LassoWrapper:
+    """A wrapper for scikit-learn's Lasso to match the EstimatorProtocol.
+    Model y = beta0 + beta1*x+u.
+
+    Attributes:
+        model (sklearn.linear_model.Lasso): a scikit-learn Lasso instance.
+        beta0_hat (float): Estimated intercept. Initialized as np.nan.
+        beta1_hat (float): Estimated slope. Initialized as np.nan.
+    """
+
+    def __init__(self, reg_param: float = 1.0) -> None:
+        """Initializes the Lasso wrapper with a scikit-learn Lasso model.
+
+        Args:
+            reg_param (float): Regularization strength (alpha). Defaults to 1.0.
+        """
+        self.model = SklearnLasso(alpha=reg_param)
+        self.beta0_hat: float = np.nan
+        self.beta1_hat: float = np.nan
+
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+        """Fits the Lasso model to the provided data.
+
+        Args:
+            x (np.ndarray): Independent variable (1D array).
+            y (np.ndarray): Dependent variable (1D array).
+        """
+        x = x.reshape(-1, 1)  # sklearn expects 2d array inputs
+        self.model.fit(x, y)
+        self.beta0_hat = float(self.model.intercept_)
+        self.beta1_hat = float(self.model.coef_[0])
+
+
+
+class EstimatorProtocol(Protocol):
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None: ...
+
+    @property
+    def beta1_hat(self) -> float: ...
+
+
+class DGPProtocol(Protocol):
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[np.ndarray, np.ndarray]: ...
+
+    @property
+    def beta1(self) -> float: ...
+
+
+
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and estimator.
+
+    Attributes:
+        dgp: data-generating process with a sample() method and beta1 attribute.
+        estimator: estimator with a fit() method and beta1_hat attribute.
+        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+    """
+
+    def __init__(
+        self,
+        dgp: DGPProtocol,
+        estimator: EstimatorProtocol,
+    ) -> None:
+        """Initializes the simulation runner.
+
+        Args:
+            dgp: An instance of a DGP class (must implement `sample`).
+            estimator: An instance of an estimator class (must implement `fit`).
+        """
+        self.dgp: DGPProtocol = dgp
+        self.estimator: EstimatorProtocol = estimator
+        self.errors: np.ndarray = np.empty(0)
+
+    def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
+        """Runs simulations and stores estimation errors.
+
+        Args:
+            n_sim (int): number of simulations to run.
+            n_obs (int): Number of observations per simulation.
+            first_seed (int | None): Starting random seed for reproducibility.
+                Defaults to None.
+        """
+        # Preallocate array to hold estimation errors
+        self.errors = np.empty(n_sim)
+
+        # Run simulation
+        for sim_id in range(n_sim):
+            # Update current seed if first_seed is not None
+            if first_seed:
+                current_seed = first_seed + sim_id
+
+            # Draw data
+            x, y = self.dgp.sample(
+                n_obs, seed=current_seed
+            )
+
+            # Fit model
+            self.estimator.fit(x, y)
+            # Store error
+            self.errors[sim_id] = self.estimator.beta1_hat - self.dgp.beta1
+
+    def summarize_bias(self) -> None:
+        """Prints the average estimation error (bias) for beta1."""
+        print(f"Average estimation error (bias): {self.errors.mean():.4f}")
+```
+
+
+#### Reminder: File Structure
+
+::: {.nonincremental}
+
+- Already implemented some DGPs, estimators, and a simulation runner
+- Figured out a basic file structure
+
+:::
+
+```
+project/
+├── dgps/
+│   ├── __init__.py
+│   ├── static.py       # StaticNormalDGP
+│   └── dynamic.py      # DynamicNormalDGP
+├── estimators/
+│   ├── __init__.py
+│   ├── ols-like.py     # SimpleOLS, SimpleRidge, LassoWrapper
+├── main.py             # Main script that we call from the CLI
+├── protocols.py        # DGPProtocol, EstimatorProtocol
+└── runner.py           # SimulationRunner
+```
+
+
+### Problem Statement {background="#43464B"}
+
+
+#### Reminder: `main.py` with Only One Scenario
+ 
+
+```{.python filename="main.py"} 
+from dgps.dynamic import DynamicNormalDGP
+from estimators.ols_like import LassoWrapper
+from runner import SimulationRunner
+
+if __name__ == "__main__": 
+    dgp = DynamicNormalDGP(beta0=0.0, beta1=0.95)
+    estimator = LassoWrapper(reg_param=0.04)
+    n_obs = 50
+
+    # Run simulation for specified scenario
+    runner = SimulationRunner(dgp, estimator)
+    runner.simulate(n_sim=1000, n_obs=n_obs, first_seed=1)
+
+    # Print results
+    print(
+        f"Bias for {dgp.__class__.__name__} + {estimator.__class__.__name__}: "
+    )
+    runner.summarize_bias()
+```
+
+::: {.footer}
+
+
+:::
+
+#### Issue: How To Run Many Scenarios?
+ 
+Key challenge: 
+
+<div class="rounded-box">
+
+How do we run many scenarios automatically?
+
+</div>
+
+
+A problem of <span class="highlight">orchestration</span>: coordinating multiple tasks
+
+- Automatically 
+- As single workflow done in the correct order
+
+Goal: being able to focus on results
+
+#### Why Not Hardcode?
+
+One way: add all combos (DGPs, estimators, sample sizes) manually in `main.py`, create `SimulationRunner` for each one
+
+<div class="left-color">
+
+Not a very good approach
+
+</div>
+
+- Brittle: have to edit `main.py` for every change
+- Prone to errors 
+- Repeats code (e.g. `SimulationRunner` creation)
+- Breaks separation of concerns: job of the main script is not to say which scenarios you want today
+
+#### Questions to Answer Today
+
+<div class="left-color">
+
+- How do we capture what a scenario is?
+- How do we execute all these scenarios?
+- What do we do with the outputs?
+
+</div>
+
+<br>
+
+- First: just executing simulations and printing results to the console as before
+- Second: basics of dealing with outputs
+
+
+
+## Expressing Simulation Scenarios {background="#00100F"}
+ 
+### `SimulationScenario` Class {background="#43464B"}
+
+
+#### What's A Simulation Scenario
+
+<div class="color-left">
+
+"Scenario" — collection of characteristics that uniquely define a setting for `SimulationRunner`
+
+</div>
+
+<br>
+
+Our case has three characteristics:
+
+- DGP
+- Estimator
+- Sample size
+
+
+#### How To Encode Scenarios?
+
+- Implicitly 
+- Explicitly in an object with suitable info:
+  - Dictionaries
+  - Named tuples (through `collections.namedtuple()` or `typing.NamedTuple`)
+  - `@dataclasses.dataclass`
+
+. . .
+
+<div class="color-left">
+
+Generally good practice to be explicit (know if something goes wrong; clearer code)
+
+</div>
+
+
+
+#### Reminder About Data Classes
+
+- "Data class" — class that's just a collection of fields with little extra functionality
+- Here: use `@dataclasses.dataclass` like in the EPP class (but be aware of other simpler options)
+
+. . . 
+
+To create: `@dataclass` and attributes with types 
+
+```{python}
+#| echo: true
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class SimulationScenario:       # Simple example
+    dgp: type[DGPProtocol]
+    estimator: type[EstimatorProtocol]
+    sample_size: int
+```
+
+::: {.footer}
+
+ 
+:::
+
+
+#### `SimulationScenario` Data Class Definition
+ 
+```{python} 
+#| echo: true
+@dataclass(frozen=True)
+class SimulationScenario:
+    """A single simulation scenario: DGP, estimator, and sample size."""
+    name: str               # For readability  
+    dgp: type[DGPProtocol] 
+    dgp_params: dict        # E.g. betas go here
+    estimator: type[EstimatorProtocol]
+    estimator_params: dict  # E.g. reg_params go here
+    sample_size: int
+    n_simulations: int = 1000
+    first_seed: int = 1
+```
+ 
+- Self-documenting 
+- A `dataclass` comes with `__init__`, a nice `__eq__` and other useful methods practically for free
+
+ 
+::: {.footer}
+
+The `type[Class]` type annotation means we want a class, not an instance of it. See [here](https://adamj.eu/tech/2021/05/16/python-type-hints-return-class-not-instance/)
+
+:::
+
+#### Example `SimulationScenario`
+
+Can now define example instance: 
+```{python} 
+#| echo: true
+example_scenario = SimulationScenario(
+    name="static_ols_n100",
+    dgp=StaticNormalDGP,
+    dgp_params={"beta0": 0.0, "beta1": 0.5},
+    estimator=SimpleOLS,
+    estimator_params={},
+    sample_size=50, 
+)
+
+```
+ 
+ 
+::: {.footer}
+
+
+Note how we passed a *class* to `SimulationScenario` (e.g. `StaticNormalDGP`, not instance with `StaticNormalDGP()`)
+
+:::
+
+#### Using `SimulationScenario` with `SimulationRunner`
+
+```{python}
+#| echo: true
+# Initialize the scenario
+dgp = example_scenario.dgp(**example_scenario.dgp_params)
+estimator = example_scenario.estimator(**example_scenario.estimator_params)
+
+# Run the simulation
+runner = SimulationRunner(dgp, estimator)
+runner.simulate(
+    n_sim=example_scenario.n_simulations, 
+    n_obs=example_scenario.sample_size, 
+    first_seed=example_scenario.first_seed,
+)
+# Print results
+print(f"Bias for {example_scenario.name}: {runner.errors.mean():.4f}")
+```
+
+<div class="left-color">
+
+`example_scenario` contains <span class="highlight">all</span> the information necessary for `SimulationRunner`
+
+</div>
+
+
+::: {.footer}
+
+`**example_scenario.dgp_params` is an example of dictionary unpacking; here for using keyword arguments
+
+::: 
+
+
+
+### Collections of Scenarios {background="#43464B"}
+
+
+#### Two Ways To Create Many Scenarios
+ 
+
+1. *Manually*: a file that explicitly specifies the desired scenarios
+2. *Automatically* (e.g. as a Cartesian product of list of DGPs, sample sizes, estimators)
+
+
+
+<div class="left-color">
+
+
+Choice depends on your goal: 
+
+
+- Specific ones (beware of missing a desired combination)
+- All combinations (beware of exponential growth)
+
+</div>
+
+#### Where To Store Scenarios
+
+A couple of options:
+
+- In a Python array (e.g. list of scenarios)
+- In an external config file (e.g. a YAML config)
+
+
+. . . 
+
+<br>
+
+For now: a Python list coming from a `scenarios.py` file is fine for us
+
+
+
+#### Manual Example: List of Scenarios
+
+```{.python filename="scenarios.py"} 
+scenarios = [
+    SimulationScenario(
+        name="static_ols_n100",
+        dgp=StaticNormalDGP,
+        dgp_params={"beta0": 0.0, "beta1": 0.5},
+        estimator=SimpleOLS,
+        estimator_params={},
+        sample_size=50, 
+    ),
+    SimulationScenario(
+        name="dynamic_lasso_n50",
+        dgp=DynamicNormalDGP,
+        dgp_params={"beta0": 0.0, "beta1": 0.95},
+        estimator=LassoWrapper,
+        estimator_params={"reg_param": 0.1},
+        sample_size=200, 
+    )
+]
+```
+
+::: {.footer}
+
+
+:::
+
+
+
+
+#### Creating All Possible Combinations
+
+Other extreme: all possible combinations of scenario characteristics
+
+<br> 
+
+. . . 
+
+Creation steps:
+
+1. Create lists/sets of DGPs, estimator, sample sizes
+2. Take Cartesian product
+3. Store results in a list
+
+::: {.footer}
+
+
+One can think of other combinations that lie between manual lists and full-on Cartesian products
+
+:::
+
+#### `scenarios.py` With All Possible Combinations:
+
+```{.python filename="scenarios.py"} 
+from itertools import product
+
+# Define lists of components 
+dgps = [
+    (StaticNormalDGP, {"beta0": 0.0, "beta1": 1.0}, 'static'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.1}, 'dynamic_low_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.5}, 'dynamic_mid_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.95}, 'dynamic_high_pers'),
+]
+estimators = [
+    (SimpleOLS, {}),
+    (LassoWrapper, {"reg_param": 0.1}),
+    (SimpleRidge, {"reg_param": 0.1})
+]
+sample_sizes = [50, 200]
+
+# Generate all combinations
+scenarios = [
+    SimulationScenario(
+        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_n{size}",
+        dgp=dgp_class,
+        dgp_params=dgp_params,
+        estimator=estimator_class,
+        estimator_params=estimator_params,
+        sample_size=size, 
+    )
+    for (dgp_class, dgp_params, dgp_descr), (estimator_class, estimator_params), size
+    in product(dgps, estimators, sample_sizes)
+]
+```
+
+```{python}
+from itertools import product
+
+# Define lists of components
+dgps = [
+    (StaticNormalDGP, {"beta0": 0.0, "beta1": 1.0}, 'static'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.1}, 'low_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.5}, 'mid_pers'),
+    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.95}, 'high_pers'),
+]
+estimators = [
+    (SimpleOLS, {}),
+    (LassoWrapper, {"reg_param": 0.1}),
+    (SimpleRidge, {"reg_param": 0.1})
+]
+sample_sizes = [50, 200]
+
+# Generate all combinations
+scenarios = [
+    SimulationScenario(
+        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_n{size}",
+        dgp=dgp_class,
+        dgp_params=dgp_params,
+        estimator=estimator_class,
+        estimator_params=estimator_params,
+        sample_size=size, 
+    )
+    for (dgp_class, dgp_params, dgp_descr), (estimator_class, estimator_params), size
+    in product(dgps, estimators, sample_sizes)
+]
+```
+
+#### Our Choice
+
+Here: choose automatic approach
+
+```{python}
+#| echo: true
+len(scenarios)
+```
+
+Would be annoying to write all these by hand
+
+<br>
+
+Note:
+
+<div class="left-color">
+
+In reality often some hybrid: manually create set of pairs (DGP, estimator), take product with some sizes (not all possible DGP-estimator pairs)
+
+</div>
+
+#### Resulting File Structure
+
+Now have added a new `scenarios.py` file to our folder:
+```
+project/
+├── dgps/
+│   ├── __init__.py
+│   ├── static.py
+│   └── dynamic.py       
+├── estimators/
+│   ├── __init__.py
+│   └── ols-like.py       
+├── protocols.py
+├── runner.py
+├── scenarios.py       # New: Defines SimulationScenario and scenarios list
+└── main.py
+```
+
+
+## Running Many Scenarios. `SimulationOrchestrator` Class {background="#00100F"}
+ 
+ 
+#### What's Left?
+
+So far:
+
+- All the simulation infrastructure (runner, DGPs, estimators)
+- Scenario list
+
+
+
+<br> 
+
+
+
+<div class="left-color">
+
+Goal: want all scenarios executed when we run
+
+```{.sh}
+python main.py
+```
+
+</div>
+
+#### What Should It Do? 
+
+<div class="left-color">
+
+A simple simulation orchestrator:
+
+- Should ingest list of scenarios
+- Run all the scenarios:
+  - For each scenario, create a SimulationRunner
+  - `simulate()` 
+- Do something with the results
+ 
+
+</div>
+
+More advanced: can parallelize/distribute computation, etc.
+
+#### How Should Our `main.py` Look Like?
+
+```{.python filename="main.py"} 
+from orchestrator import SimulationOrchestrator 
+from scenarios import scenarios                                             # <1>
+
+if __name__ == "__main__":
+    # Create and execute simulations 
+    orchestrator = SimulationOrchestrator(scenarios)                        # <2>
+    orchestrator.run_all()
+
+    # Results logic
+    ...                                                                     # <3>
+```
+
+1. Get scenarios
+2. Run them all
+3. Do something with the results
+
+
+#### Simple `SimulationOrchestrator` Class Definition
+
+```{.python filename="orchestrator.py"} 
+class SimulationOrchestrator:
+    """Simple simulation orchestration class without any result handling
+    """
+    def __init__(self, scenarios: list[SimulationScenario]):
+        self.scenarios = scenarios 
+
+    def run_all(self):
+        for scenario in scenarios: 
+            # Create DGP and estimator
+            dgp = scenario.dgp(**scenario.dgp_params)
+            estimator = scenario.estimator(**scenario.estimator_params)
+
+            # Run the simulation
+            runner = SimulationRunner(dgp, estimator)
+            runner.simulate(
+                n_sim=scenario.n_simulations, 
+                n_obs=scenario.sample_size, 
+                first_seed=scenario.first_seed,
+            )
+            # Print results
+            print(f"Bias for {scenario.name}: {runner.errors.mean():.4f}")
+```
+
+```{python} 
+class SimulationOrchestrator:
+    """Simple simulation orchestration class without any result handling
+    """
+    def __init__(self, scenarios: list[SimulationScenario]):
+        self.scenarios = scenarios 
+
+    def run_all(self):
+        for scenario in scenarios: 
+            # Create DGP and estimator
+            dgp = scenario.dgp(**scenario.dgp_params)
+            estimator = scenario.estimator(**scenario.estimator_params)
+
+            # Run the simulation
+            runner = SimulationRunner(dgp, estimator)
+            runner.simulate(
+                n_sim=scenario.n_simulations, 
+                n_obs=scenario.sample_size, 
+                first_seed=scenario.first_seed,
+            )
+            # Print results
+            print(f"Bias for {scenario.name}: {runner.errors.mean():.4f}")
+```
+ 
+
+#### Executing `main.py`
+
+Executing the script now prints the results for all scenarios!
+```{.sh}
+python main.py
+```
+```{python}
+orchestrator = SimulationOrchestrator(scenarios)                         
+orchestrator.run_all()
+```
+
+#### Discussion
+
+A total victory:
+
+- Clean, well-focused files and implementation
+- Automatic collection and construction of scenarios
+- Full execution of all simulations
+
+
+
+<br>
+
+Can talk about further improvements, handling results, but we have an <span class="highlight">extensible and broadly-applicable</span> core
+
+## Simulation Outputs {background="#00100F"}
+ 
+ 
+
+#### More On Handling Results
+
+So far: just printing bias values to the console
+
+<div class="left-color">
+
+More typical: export results in some nice tabular/text form
+
+</div>
+
+- Often: whole raw simulation results, particularly in simulations where individual runs are expensive
+- Also: summaries
+  - Summary tables
+  - Plots
+  
+#### Here: Simple Example
+ 
+<br>
+
+Here: just brief example
+
+- Store summary bias results on the `orchestrator`
+- Somehow export them from `main.py`
+
+#### Updated `SimulationOrchestrator` Class
+
+
+```{python} 
+#| echo: true
+#| code-line-numbers: "6,22"
+class SimulationOrchestrator:
+    """Simulation orchestrator that stores results in a dictionary
+    """
+    def __init__(self, scenarios: list[SimulationScenario]):
+        self.scenarios = scenarios
+        self.summary_results = {}
+
+    def run_all(self):
+        for scenario in scenarios: 
+            # Create DGP and estimator
+            dgp = scenario.dgp(**scenario.dgp_params)
+            estimator = scenario.estimator(**scenario.estimator_params)
+
+            # Run the simulation
+            runner = SimulationRunner(dgp, estimator)
+            runner.simulate(
+                n_sim=scenario.n_simulations, 
+                n_obs=scenario.sample_size, 
+                first_seed=scenario.first_seed,
+            )
+            # Save results
+            self.summary_results[scenario.name] = runner.errors.mean()
+```
+
+#### Results Handling Discussion
+
+- Here: took a quicker solution: the `SimulationOrchestrator` implementation knows that its handling bias
+- But can make more loosely coupled
+  - Add a `summarize()` method to `SimulationRunner` that knows what to export
+  - `orchestrator` will just receive whatever `summarize()` gives
+  - Would make `orchestrator` even more reusable
+  
+#### Changing `main.py`
+
+```{.python filename="main.py"} 
+import pandas as pd
+
+from orchestrator import SimulationOrchestrator 
+from scenarios import scenarios                                             
+
+if __name__ == "__main__":
+    # Create and execute simulations 
+    orchestrator = SimulationOrchestrator(scenarios)                         
+    orchestrator.run_all()
+
+    # Results logic (print or export as pd.Series)
+    print(pd.Series(orchestrator.summary_results))
+```
+Here for simplicity: print the `Series`, but would generally `to_csv()`
+
+#### Executing Results
+
+Executing the script now prints the results for all scenarios!
+```{.sh}
+python main.py
+```
+```{python}
+orchestrator = SimulationOrchestrator(scenarios)                         
+orchestrator.run_all()
+pd.Series(orchestrator.summary_results)
+```
+
+## Recap and Conclusions {background="#00100F"}
+ 
+#### Recap
+
+<br>
+
+In this lecture we 
+
+- Discussed how to specify a simulation scenario
+- Talked about how to construct a list of many scenarios
+- Implemented a simple orchestrator that pulls together scenarios and executes them
+
+
+#### Further Improvements
+
+Can keep adding things to code:
+
+- Logging and progress tracking
+- Improve robustness of code by adding error handling
+- Parallelize to take advantage
+- Custom output handler classes 
+
+Project could also benefit from more reproducibility:
+
+- Getting the right environment for reproducibility?
+- Not having to rerun all the simulations every time?
+
+#### Block Recap
+
+<div class="left-color">
+
+This block: structuring and thinking about simulation *code*
+
+</div>
+
+Overall design: 
+
+- Starting simple with functions
+- Going modular for more complex scenarios
+
+Quality of life features:
+
+- Scenario builders
+- Orchestrator 
+  
+
+
+#### References {.allowframebreaks visibility="uncounted"}
+
+::: {#refs}
+:::
