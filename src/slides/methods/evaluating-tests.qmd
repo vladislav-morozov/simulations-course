@@ -41,6 +41,14 @@ open-graph:
 ## Introduction {background="#00100F"}
  
   
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+
+from scipy.stats import chi2
+BG_COLOR = "whitesmoke"
+THEME_COLOR = "#3c165c"
+```
 
 ### Lecture Info {background="#43464B"}
 
@@ -270,94 +278,80 @@ Give preference to tests that
 
 #### How Testing Works in General
 
-*How do we construct a test/decision rule?*
+<div class="left-color"> 
+
+How do we construct a test/decision rule?
+
+</div>
 
 <br>
 
 . . .
 
-The basic approach to testing is surprisingly simple
+Basic approach:
 
-1. Pick a "statistic" (=some known function of the data) that behaves "differently" under $H_0$ and $H_1$
-2. Is the observed value of the statistic compatible with $H_0$? 
+1. Pick a "statistic" (=some known function of the data) that behaves "<span class="highlight">differently</span>" under $H_0$ and $H_1$
+2. Is the observed value of the statistic <span class="highlight">compatible</span> with $H_0$? 
    - No $\Rightarrow$ reject $H_0$ in favor or $H_1$
    - Yes $\Rightarrow$ do not reject $H_0$
 
 
-#### Picking a Statistic
+
+
+
+
+#### Measuring Compatibility with $H_0$
+
+<div class="left-color">
+
+Recall: compare with <span class="highlight">critical values</span> to measure compatibility with $H_0$
+
+</div>
+
+<br>
+
+Critical values chosen to guarantee
+
+- Exact size (when possible)
+- Asymptotic size (otherwise) 
+
+At least in the limit, the test should not falsely reject $H_0$ "too much"
+
+::: {.footer}
+
+The asymptotic size $\alpha$ of the test $T$ is $\alpha = \lim_{N\to\infty} \max_{\theta\in\Theta_0}  P(T(X_1, \dots, X_N)=\text{Reject }H_0|\theta)$
+
+:::
+ 
+
+#### Reminder: Main Classes of Statistics
 
 - In principle, can pick any statistic. Some are more "standard"
 - For testing hypotheses about coefficients, there are three main classes:
   - Wald statistics: need only *unrestricted* estimates 
   - Lagrange multiplier (LM): need *restricted* estimates 
   - Likelihood ratio (LR): need both
-
-. . .
  
 
-::: {.callout-note appearance="minimal"}
+#### Example I: $t$-Test for $H_0: \theta_k=0$ vs. $H_1: \theta_k\neq 0$
+ 
 
-Wald tests easiest to work with in linear models, but others have their uses in different contexts 
-:::
-
-
-
-#### Asymptotic Size
-
-- In finite samples, usually cannot control size exactly
-- But can require it asymptotically
-
-
-<div class="rounded-box">
-
-::: {#def-vector-inference-asy-significane}
-
-The asymptotic size $\alpha$ of the test $T$ is 
-$$
-\alpha = \lim_{N\to\infty} \max_{\theta\in\Theta_0}  P(T(X_1, \dots, X_N)=\text{Reject }H_0|\theta) 
-$$
-
-:::
-
-</div>
-
-#### Convergence of $\hat{\beta}_2$
-
-Recall asymptotic distribution result for OLS estimator
-$$\small
-\sqrt{N}\left( \hat{\bbeta}- \bbeta \right) \xrightarrow{d} N(0, \avar(\hat{\bbeta}))
-$$
-
-. . . 
-
-It implies (why?) that
+Suppose that have estimator $\hat{\theta}_k$ such that
 $$ \small
-\dfrac{\hat{\beta}_2 - \beta_2}{\sqrt{ \avar(\hat{\beta}_2)/N }  } \xrightarrow{d} N\left(0, 1\right)
+\sqrt{N}(\hat{\theta}_k-\theta_k)\xrightarrow{d} N(0, \avar(\hat{\theta}_k))
 $$
-where $\avar(\hat{\beta}_2)$ is the (2, 2) element of $\avar(\hat{\bbeta})$
 
 
-#### $t$-statistic
-
-- Let $\widehat{\avar}(\hat{\bbeta})$ be a consistent estimator of $\avar(\hat{\bbeta})$
-- Let $H_0: \beta_2 = 0$ be true
-
-. . .
-
-By Slutsky's theorem (why?) it holds that
+Will base the test on the <span class="highlight">$t$-statistic</span>:
 $$ \small
-t = \dfrac{\hat{\beta}_2}{\sqrt{ \widehat{\avar}(\hat{\beta}_2)/N }  } \xrightarrow{d} N\left(0, 1\right)
+t = \dfrac{\hat{\theta}_k}{\sqrt{ \widehat{\avar}(\hat{\theta}_k)/N }  }
 $$
-$\sqrt{ \widehat{\avar}(\hat{\beta}_2)/N }$ — <span class="highlight">standard error</span> of $\hat{\beta}_2$
 
-::: footer
 
-:::
+#### Example I: Definition of $t$-Test  
 
-#### Decision Rule: Test  {#sec-ols-inference-t-test}
 
 We call the following the <span class="highlight">asymptotic size $\alpha$ $t$-test</span>:
-
 
 <br>
 
@@ -371,6 +365,102 @@ Let $z_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)$. Then
 
 </div>
 
+ 
+
+#### Example II: Wald Test for $H_0: \bR\btheta =\bc$ vs. $H_1: \bR\btheta \neq \bc$
+ 
+Let $\btheta= (\theta_0, \theta_1, \dots, \theta_p$, $\bR$ some matrix, $\bc$ some vector.
+
+Suppose that have estimator $\hat{\btheta}$ such that
+$$ \small
+\sqrt{N}(\hat{\btheta}-\btheta)\xrightarrow{d} N(0, \avar(\hat{\btheta}))
+$$
+
+
+Will base the test on the <span class="highlight">Wald statistic</span>:
+$$ \small
+W = N\left(  \bR\hat{\bbeta}-\bq   \right)'\left(\bR\widehat{\avar}(\bbeta)\bR'\right)^{-1}\left(  \bR\hat{\bbeta}-\bq   \right)
+$$ 
+
+#### Example II: Definition of Wald Test
+
+We call the following the <span class="highlight">asymptotic size $\alpha$ Wald-test</span>:
+
+
+<br>
+
+<div class="rounded-box">
+
+Let $c_{1-\alpha}$ solve $P(\chi^2_k\leq c_{1-\alpha})=1-\alpha$ where $k$ is the number of rows and rank of $\bR$. Then
+
+- Reject $H_0$ if $W>c_{1-\alpha}$
+- Do not reject $H_0$ if $W\leq c_{1-\alpha}$
+
+
+</div>
+
+#### Plot: PDF of $\chi^2_k$ and Rejection Region (Shaded)
+
+```{python}
+
+
+# Parameters for the chi-squared distribution
+df = 5
+
+# Generate the x values for the PDF
+x_vals = np.linspace(0, 20, 1000)
+
+# Compute the PDF values
+pdf_vals = chi2.pdf(x_vals, df)
+
+# Compute the 95th quantile
+quantile_95 = chi2.ppf(0.95, df)
+
+# Set up the figure and the axes
+fig, ax = plt.subplots(figsize=(15, 6))
+fig.patch.set_facecolor(BG_COLOR)
+fig.patch.set_edgecolor(THEME_COLOR)
+fig.patch.set_linewidth(5)
+
+# Plot the PDF
+ax.plot(x_vals, pdf_vals, label=f'PDF of $\\chi^2_k$ distribution', color=THEME_COLOR)
+
+# Fill the area under the PDF to the right of the 95th quantile
+ax.fill_between(x_vals, pdf_vals, where=(x_vals >= quantile_95), color='darkorange', alpha=0.3)
+
+# Mark the 95th quantile
+ax.axvline(quantile_95, color='red', linestyle='--', label="$c_{1-\\alpha}$")
+
+# Set the labels and title 
+ax.set_ylabel('Density') 
+ax.legend(loc='upper right')
+ax.set_ylim(0, 0.17)
+ax.set_xlim(0, 20)
+ax.set_xticklabels([])
+ax.set_yticklabels([])
+ax.set_facecolor(BG_COLOR)
+
+# Show the plot
+plt.show()
+
+```
+ 
+## Preparing Simulation: Joint vs. Multiple Tests {background="#00100F"}
+
+### Choosing a Basic Scenario {background="#43464B"}
+
+
+### Background: Joint and Multiple Test {background="#43464B"}
+
+
+
+#### Formalizing The Question
+
+#### 1
+
+
+
+#### Multiple Test Approach
 
 ## Simulating Hypothesis Test Performance {background="#00100F"}
  
