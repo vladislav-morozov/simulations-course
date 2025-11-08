@@ -67,7 +67,69 @@ By the end, you should be able to
 
 :::
 
-  
+### Simulation Questions {background="#43464B"}
+
+
+#### Model and Hypothesis of Interest
+
+
+#### Motivating Question for Simulation
+
+Learn ba
+
+
+<div class="left-color">
+
+When testing multiple hypotheses in a regression, why do we use simultaneous (joint) tests instead of just adjusting the $p$-values from separate $t$-tests?
+
+</div>
+
+#### 
+
+Example image: decision region
+
+
+## Theory Essentials for Hypothesis Testings {background="#00100F"}
+ 
+
+### Definitions {background="#43464B"}
+
+####
+
+### Tests and Test Statistics {background="#43464B"}
+
+
+#### Example: Wald Test
+
+
+#### Example: Multiple $t$-Test
+
+## Simulating Hypothesis Test Performance {background="#00100F"}
+ 
+
+#### Technique: Reference Scenario
+
+Today: trying to understand something 
+
+Try to include a "reference" nice scenario
+
+and vary something 
+
+
+#### Effects for DGP
+
+
+#### Aside: On Code Structure
+
+Will keep using the code structure developed in 
+
+actually many DGPs from one class. Creation of multiple things — handled by `scenarios.py`
+
+## Simulation Results {background="#00100F"}
+ 
+#### 
+
+Now have a larger array of simulation results. 
 
 ## Recap and Conclusions {background="#00100F"}
  
@@ -78,6 +140,8 @@ By the end, you should be able to
 In this lecture we 
 
 - Discussed  
+
+
 
 
 #### References {.allowframebreaks visibility="uncounted"}
