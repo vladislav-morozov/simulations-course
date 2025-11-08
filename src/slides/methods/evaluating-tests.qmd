@@ -1,5 +1,5 @@
 ---
-title: "TITLE"
+title: "Evaluating Hypothesis Tests"
 subtitle: "SUBTITLE"
 author: Vladislav Morozov  
 format:
@@ -12,7 +12,7 @@ format:
     sc-sb-title: true
     incremental: true   
     logo: ../../themes/favicon.ico
-    footer: "FOOTER"
+    footer: "Evaluating Hypothesis Tests"
     footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
     theme: ../../themes/slides_theme.scss
     toc: TRUE
@@ -46,7 +46,7 @@ open-graph:
 
 #### Learning Outcomes
 
-This lecture is about making our code execute many simulation scenarios
+This lecture is about evaluating hypothesis tests
 
 <br>
 
@@ -67,42 +67,310 @@ By the end, you should be able to
 
 :::
 
-### Simulation Questions {background="#43464B"}
+### Motivating Example Question {background="#43464B"}
 
-
-#### Model and Hypothesis of Interest
-
-
-#### Motivating Question for Simulation
-
-Learn ba
-
+#### Setting: Joint Hypotheses
+ 
+Often want to test <span class="highlight">joint hypotheses</span>: hypotheses that involve several statements about parameters at the same time:
 
 <div class="left-color">
-
-When testing multiple hypotheses in a regression, why do we use simultaneous (joint) tests instead of just adjusting the $p$-values from separate $t$-tests?
+$$
+\begin{aligned}
+& H_0: \text{for all $k$ the statement $A_k$ is true} \quad \text{vs.} \\
+&  H_1: \text{for at least some $k$ the statement $A_k$ is not true}
+\end{aligned}
+$$
 
 </div>
 
-#### 
+<br>
 
-Example image: decision region
+Example: null that some coefficients are zero
+$$
+\begin{aligned}
+H_0: \theta_k = 0, \quad k=1, \dots, p
+\end{aligned}
+$$
 
+#### Motivating Question for Simulation
+
+Two example approaches:
+
+- With a simultaneous (joint) test (e.g. Wald/$F$, LM, LR)
+- Testing each component separately (e.g. with a $t$-test) and combining the results (with adjusted $p$-values)
+
+. . . 
+
+
+<br>
+
+Question of today:
+
+<div class="left-color">
+
+When do we generally use the first approach? 
+
+</div>
+ 
+#### Goals for Today:
+
+How to answer this question? 
+
+<br>
+
+Today talk about
+
+- What matters for comparing hypothesis tests
+- How to simulate tests
+- How to interpret results
 
 ## Theory Essentials for Hypothesis Testings {background="#00100F"}
  
 
 ### Definitions {background="#43464B"}
 
-####
+
+
+#### Basic Setup: Hypotheses
+
+Suppose that we have a model with some parameters $\theta$ (of whatever nature)
+
+<div class="left-color">
+
+Two competing *hypotheses* (statements about parameters $\theta$)
+$$
+H_0: \theta\in \Theta_0 \text{  vs.  } H_1: \theta \in \Theta_1 
+$$
+for some non-intersecting $\Theta_0$ and $\Theta_1$
+
+</div>
+
+#### Examples of Hypotheses
+
+Example: linear model of the form:
+
+$$\small
+Y_i  = \sum_{k=0}^{p} \beta_k X_i^{(k)}
+$$
+
+- Hypothesis on one parameter: $H_0: \beta_k \leq 0$ vs. $H_1: \beta_k >0$
+- Hypothesis about many parameters: 
+$$ \small
+H_0: \beta_0= \dots = \beta_p =0 \quad \text{ vs. } H_1: \beta_k\neq 0 \text{ for some }k
+$$
+
+#### Definition of a Test
+
+A test is a *decision rule*: you see the sample and then you decide in favor of $H_0$ or $H_1$
+
+
+. . . 
+
+<br>
+
+Formally:
+
+<div class="rounded-box">
+
+::: {#def-vector-inference-test}
+
+A test $T$ is a function of the sample $(X_1, \dots, X_N)$ to the space $\{ \text{Reject } H_0$,  $\text{Do not reject }H_0 \}$
+
+:::
+
+</div>
+
+
+
+
+#### Power
+
+<br>
+
+Key property of a hypothesis test: 
+<div class="rounded-box">
+
+::: {#def-vector-inference-power}
+
+The power function $\text{Power}_T(\theta)$ of the test $T$ is the probability that $T$ rejects if $\theta$ is the true parameter value:
+$$
+\text{Power}_T(\theta) = P(T(X_1, \dots, X_N)=\text{Reject }H_0|\theta)
+$$
+
+:::
+
+</div>
+
+ 
+
+#### Test Size
+
+Maximal power under the null has a special name 
+<div class="rounded-box">
+
+::: {#def-vector-inference-size}
+
+The <span class="highlight"> size </span> $\alpha$ of the test $T$ is 
+$$
+\alpha = \max_{\theta\in\Theta_0} \text{Power}_T(\theta)
+$$
+
+:::
+
+</div>
+
+In other words, the probability of falsely rejecting the null — <span class="highlight">type I error</span>
+
+
+#### What Defines a Good Test? 
+
+The best possible test has perfect detection:
+
+- Never rejects under $H_0$
+- Always reject under $H_1$
+
+. . . 
+
+<br>
+
+Usually impossible in practice. Instead, we ask
+
+- Not too much false rejection under $H_0$ (e.g. $\leq 5\%$ of the time)
+- As much rejection as possible under $H_1$ 
+ 
+
+#### Role of Size and Power
+
+
+<div class="rounded-box">
+
+Power function — key metric in comparing tests
+
+</div>
+
+<br>
+
+::: {.nonincremental}
+
+ 
+
+Give preference to tests that
+
+- Control size correctly 
+- Reject alternative more often (=use data more efficiently)
+
+:::
 
 ### Tests and Test Statistics {background="#43464B"}
 
+ 
+ 
+ 
 
-#### Example: Wald Test
+
+#### How Testing Works in General
+
+*How do we construct a test/decision rule?*
+
+<br>
+
+. . .
+
+The basic approach to testing is surprisingly simple
+
+1. Pick a "statistic" (=some known function of the data) that behaves "differently" under $H_0$ and $H_1$
+2. Is the observed value of the statistic compatible with $H_0$? 
+   - No $\Rightarrow$ reject $H_0$ in favor or $H_1$
+   - Yes $\Rightarrow$ do not reject $H_0$
 
 
-#### Example: Multiple $t$-Test
+#### Picking a Statistic
+
+- In principle, can pick any statistic. Some are more "standard"
+- For testing hypotheses about coefficients, there are three main classes:
+  - Wald statistics: need only *unrestricted* estimates 
+  - Lagrange multiplier (LM): need *restricted* estimates 
+  - Likelihood ratio (LR): need both
+
+. . .
+ 
+
+::: {.callout-note appearance="minimal"}
+
+Wald tests easiest to work with in linear models, but others have their uses in different contexts 
+:::
+
+
+
+#### Asymptotic Size
+
+- In finite samples, usually cannot control size exactly
+- But can require it asymptotically
+
+
+<div class="rounded-box">
+
+::: {#def-vector-inference-asy-significane}
+
+The asymptotic size $\alpha$ of the test $T$ is 
+$$
+\alpha = \lim_{N\to\infty} \max_{\theta\in\Theta_0}  P(T(X_1, \dots, X_N)=\text{Reject }H_0|\theta) 
+$$
+
+:::
+
+</div>
+
+#### Convergence of $\hat{\beta}_2$
+
+Recall asymptotic distribution result for OLS estimator
+$$\small
+\sqrt{N}\left( \hat{\bbeta}- \bbeta \right) \xrightarrow{d} N(0, \avar(\hat{\bbeta}))
+$$
+
+. . . 
+
+It implies (why?) that
+$$ \small
+\dfrac{\hat{\beta}_2 - \beta_2}{\sqrt{ \avar(\hat{\beta}_2)/N }  } \xrightarrow{d} N\left(0, 1\right)
+$$
+where $\avar(\hat{\beta}_2)$ is the (2, 2) element of $\avar(\hat{\bbeta})$
+
+
+#### $t$-statistic
+
+- Let $\widehat{\avar}(\hat{\bbeta})$ be a consistent estimator of $\avar(\hat{\bbeta})$
+- Let $H_0: \beta_2 = 0$ be true
+
+. . .
+
+By Slutsky's theorem (why?) it holds that
+$$ \small
+t = \dfrac{\hat{\beta}_2}{\sqrt{ \widehat{\avar}(\hat{\beta}_2)/N }  } \xrightarrow{d} N\left(0, 1\right)
+$$
+$\sqrt{ \widehat{\avar}(\hat{\beta}_2)/N }$ — <span class="highlight">standard error</span> of $\hat{\beta}_2$
+
+::: footer
+
+:::
+
+#### Decision Rule: Test  {#sec-ols-inference-t-test}
+
+We call the following the <span class="highlight">asymptotic size $\alpha$ $t$-test</span>:
+
+
+<br>
+
+<div class="rounded-box">
+
+Let $z_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)$. Then
+
+- Reject $H_0$ is $\abs{t}>z_{1-\alpha/2}$
+- Do not reject $H_0$ is $\abs{t}\leq z_{1-\alpha/2}$
+
+
+</div>
+
 
 ## Simulating Hypothesis Test Performance {background="#00100F"}
  
@@ -114,6 +382,25 @@ Today: trying to understand something
 Try to include a "reference" nice scenario
 
 and vary something 
+
+
+
+#### Reference Scenario: Simple Linear Model
+
+Simple linear model:
+$$
+Y_i = \theta_0 + \theta_1 X_i^{(1)} + \theta_0 X_{i}^{(2)} + U_i
+$$
+
+
+. . . 
+
+<br>
+
+Very simple kind of joint hypothesis:
+$$
+H_0: \theta_1 = \theta_2 = 0
+$$
 
 
 #### Effects for DGP
