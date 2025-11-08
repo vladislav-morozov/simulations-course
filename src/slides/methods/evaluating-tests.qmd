@@ -479,7 +479,7 @@ See [this xckd](https://xkcd.com/882/) on multiple comparisons
 
 ::: 
 
-### Choosing a Basic Scenario {background="#43464B"}
+### Choosing a Basic DGP {background="#43464B"}
 
 #### Recap
  
@@ -533,11 +533,21 @@ $$
 H_0: \theta_1 = \theta_2 = 0
 $$
 
+ 
+### Choosing Tests {background="#43464B"}
 
-#### Effects for DGP
 
-#### 
+#### Which Tests to Use?
 
+In our case: think about what everyone uses
+
+- Wald/$F$ test
+- $t$ tests
+
+
+do that
+
+#### Bonferroni Correction
 
 
 ## Simulating Hypothesis Test Performance {background="#00100F"}
