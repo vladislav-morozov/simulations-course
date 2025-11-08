@@ -71,7 +71,7 @@ By the end, you should be able to
 ::: {.nonincremental}
 
  
-- SOmething
+- [My slides from undergraduate econometrics](https://vladislav-morozov.github.io/econometrics-2/slides/vector/ols-inference.html) for some more theory and examples on linear hypothesis tests
 
 :::
 
@@ -447,24 +447,59 @@ plt.show()
  
 ## Preparing Simulation: Joint vs. Multiple Tests {background="#00100F"}
 
+### Background: Joint and Multiple Tests {background="#43464B"}
+
+
+#### Definition
+
+$$
+t_k = \dfrac{\sqrt{n}\hat{\beta_k}}{\widehat{\avar}(\hat{\beta}_k)}
+$$
+A test for our $H_0$ rejects if $\max\lbrace |{t}_1|, |{t}_2| \rbrace$ exceeds some prespecified critical value $c_{\alpha}$.
+
+
+#### Multiple Comparisons Problem
+
+ 
+Key question: how do you set the critical value $c_{\alpha}$ to ensure that the test has the correct size $\alpha$? Let's examine the rejection probabilities under $H_0$:
+$$
+\begin{aligned}
+& P(\text{test rejects}|H_0) \\
+& = P(\max\lbrace |{t}_1|, |{t}_2| \rbrace \geq c_{\alpha}|H_0) \\
+& = P\left( \lbrace |{t}_1| \geq c_{\alpha}\rbrace \cup \lbrace |{t}_2| \geq c_{\alpha}\rbrace |H_0 \right) \\
+& = P\left( \lbrace |{t}_1| \geq c_{\alpha}\rbrace   |H_0 \right) + P\left(   \lbrace |{t}_2| \geq c_{\alpha}\rbrace |H_0 \right)  \\
+& \quad - P\left( \lbrace |{t}_1| \geq c_{\alpha}\rbrace \cap \lbrace |{t}_2| \geq c_{\alpha}\rbrace |H_0 \right),
+\end{aligned}
+$$
+
+
+::: {.footer}
+
+See [this xckd](https://xkcd.com/882/) on multiple comparisons
+
+::: 
+
 ### Choosing a Basic Scenario {background="#43464B"}
 
-
-### Background: Joint and Multiple Test {background="#43464B"}
-
-
-
-#### Formalizing The Question
-
-#### 1
-
-
-
-#### Multiple Test Approach
-
-## Simulating Hypothesis Test Performance {background="#00100F"}
+#### Recap
  
+Now know the most important metrics:
 
+ 
+::: {.left-color}
+
+Should compare joint vs. multiple approach to testing in terms of <span class="highlight">power</span>
+
+::: 
+
+<br>
+
+But now key open questions:
+
+- Which tests exactly to use? 
+- In which scenario? 
+
+ 
 #### Technique: Reference Scenario
 
 Today: trying to understand something 
@@ -473,13 +508,19 @@ Try to include a "reference" nice scenario
 
 and vary something 
 
+Very often: the nicest scenario is a simple linear model where everything in normal
 
+::: {.footer}
+
+There are theoretical reasons for importance of normality as a "base" case, see chapters 6-7 in @VanderVaart1998AsymptoticStatistics
+
+:::
 
 #### Reference Scenario: Simple Linear Model
 
 Simple linear model:
 $$
-Y_i = \theta_0 + \theta_1 X_i^{(1)} + \theta_0 X_{i}^{(2)} + U_i
+Y_i = \theta_0 + \theta_1 X_i^{(1)} + \theta_2 X_{i}^{(2)} + U_i
 $$
 
 
@@ -494,6 +535,16 @@ $$
 
 
 #### Effects for DGP
+
+#### 
+
+
+
+## Simulating Hypothesis Test Performance {background="#00100F"}
+ 
+
+
+
 
 
 #### Aside: On Code Structure
