@@ -492,30 +492,66 @@ Two main approaches for testing $H_0$:
 
 #### Joint Tests
 
-A <span class="highlight">joint test</span>
-
-#### Definition
-
-$$
-t_k = \dfrac{\sqrt{n}\hat{\beta_k}}{\widehat{\avar}(\hat{\beta}_k)}
-$$
-A test for our $H_0$ rejects if $\max\lbrace |{t}_1|, |{t}_2| \rbrace$ exceeds some prespecified critical value $c_{\alpha}$.
-
-
-#### Multiple Comparisons Problem
-
  
-Key question: how do you set the critical value $c_{\alpha}$ to ensure that the test has the correct size $\alpha$? Let's examine the rejection probabilities under $H_0$:
+::: {.left-color}
+
+
+A <span class="highlight">joint test</span> uses a single statistic to conduct the text
+
+
+:::
+
+<br>
+
+Example: Wald test based on
+
+$$
+W = N(\hat{\btheta}-\bc)'(\widehat{\avar}(\hat{\btheta}))^{-1}(\hat{\btheta}-\bc),
+$$
+Test based on comparing $W$ with $(1-\alpha)$th quantile of $\chi^2_p$
+
+#### Multiple Test
+
+::: {.left-color}
+
+
+A <span class="highlight">multiple test</span> aggregates the decisions of many separate tests
+
+
+:::
+
+For example, let 
+$$ \small 
+t_k = \dfrac{\sqrt{N}(\hat{\btheta}_k-c_k)}{\widehat{\avar}(\hat{\btheta}_k)}
+$$
+ 
+A  <span class="highlight">multiple $t$-test</span> for $H_0$ rejects if $\max_{k=1, \dots, p}\lbrace \abs{t_k}\rbrace$ exceeds some prespecified critical value $c_{\alpha}$
+
+
+#### Critical Values and Multiple Comparisons Problem
+
+
+::: {.left-color}
+
+
+Critical values of multiple tests have to be set to ensure overall correct size
+
+:::
+
+Have to be careful: e.g. with $p=2$ have
 $$
 \begin{aligned}
 & P(\text{test rejects}|H_0) \\
-& = P(\max\lbrace |{t}_1|, |{t}_2| \rbrace \geq c_{\alpha}|H_0) \\
-& = P\left( \lbrace |{t}_1| \geq c_{\alpha}\rbrace \cup \lbrace |{t}_2| \geq c_{\alpha}\rbrace |H_0 \right) \\
 & = P\left( \lbrace |{t}_1| \geq c_{\alpha}\rbrace   |H_0 \right) + P\left(   \lbrace |{t}_2| \geq c_{\alpha}\rbrace |H_0 \right)  \\
 & \quad - P\left( \lbrace |{t}_1| \geq c_{\alpha}\rbrace \cap \lbrace |{t}_2| \geq c_{\alpha}\rbrace |H_0 \right),
 \end{aligned}
 $$
 
+Hence if each $t$-test is a size $\alpha$-test, resulting multiple test has
+
+$$
+P(\text{test rejects}|H_0) \in [\alpha, 2\alpha]
+$$
 
 ::: {.footer}
 
