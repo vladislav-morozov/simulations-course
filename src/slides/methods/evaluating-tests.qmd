@@ -85,7 +85,7 @@ Often want to test <span class="highlight">joint hypotheses</span>: hypotheses t
 $$
 \begin{aligned}
 & H_0: \text{for all $k$ the statement $A_k$ is true} \quad \text{vs.} \\
-&  H_1: \text{for at least some $k$ the statement $A_k$ is not true}
+&  H_1: \text{for at least some $k$, the statement $A_k$ is not true}
 \end{aligned}
 $$
 
@@ -93,7 +93,7 @@ $$
 
 <br>
 
-Example: null that some coefficients are zero
+Example: null that coefficients are zero ($A_k=\curl{\theta_k=0}$)
 $$
 \begin{aligned}
 H_0: \theta_k = 0, \quad k=1, \dots, p
@@ -143,6 +143,8 @@ Today talk about
 
 Suppose that we have a model with some parameters $\theta$ (of whatever nature)
 
+<br>
+
 <div class="left-color">
 
 Two competing *hypotheses* (statements about parameters $\theta$)
@@ -169,7 +171,7 @@ $$
 
 #### Definition of a Test
 
-A test is a *decision rule*: you see the sample and then you decide in favor of $H_0$ or $H_1$
+A test is a <span class="highlight">decision rule</span>: you see the sample and then you decide in favor of $H_0$ or $H_1$
 
 
 . . . 
@@ -188,6 +190,11 @@ A test $T$ is a function of the sample $(X_1, \dots, X_N)$ to the space $\{ \tex
 
 </div>
 
+::: {.footer}
+
+Technically, @def-vector-inference-test is about <span class="highlight">deterministic</span> tests, there are also randomized tests
+
+:::
 
 
 
@@ -340,6 +347,7 @@ Suppose that have estimator $\hat{\theta}_k$ such that
 $$ \small
 \sqrt{N}(\hat{\theta}_k-\theta_k)\xrightarrow{d} N(0, \avar(\hat{\theta}_k))
 $$
+where $N$ is sample size
 
 
 Will base the test on the <span class="highlight">$t$-statistic</span>:
@@ -350,10 +358,10 @@ $$
 
 #### Example I: Definition of $t$-Test  
 
+<br>
+
 
 We call the following the <span class="highlight">asymptotic size $\alpha$ $t$-test</span>:
-
-<br>
 
 <div class="rounded-box">
 
@@ -369,7 +377,7 @@ Let $z_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)$. Then
 
 #### Example II: Wald Test for $H_0: \bR\btheta =\bc$ vs. $H_1: \bR\btheta \neq \bc$
  
-Let $\btheta= (\theta_0, \theta_1, \dots, \theta_p$, $\bR$ some matrix, $\bc$ some vector.
+Let $\btheta= (\theta_0, \theta_1, \dots, \theta_p$, $\bR$ some matrix, $\bc$ some vector
 
 Suppose that have estimator $\hat{\btheta}$ such that
 $$ \small
@@ -447,8 +455,44 @@ plt.show()
  
 ## Preparing Simulation: Joint vs. Multiple Tests {background="#00100F"}
 
+#### Plan For This Part
+
+Now turn to answering our motivating question: joint vs. mulitple tests for joint nulls
+
+<br>
+
+Plan:
+
+- A reminder on joint vs. multiple tests
+- Choosing simulation design: DGP, tests to compare 
+
+After: implementation
+
 ### Background: Joint and Multiple Tests {background="#43464B"}
 
+#### Example Setting
+
+Suppose that have coefficients $\theta_k$ and want to test the joint null
+$$
+H_0: \theta_k = c_k, \quad k=1, \dots, p
+$$
+Have estimator $\hat{\btheta}$ such that $\sqrt{N}(\hat{\btheta}-\btheta)\xrightarrow{d} N(0, \avar(\hat{\btheta}))$
+
+. . . 
+
+::: {.left-color}
+
+Two main approaches for testing $H_0$:
+
+- Single joint test
+- Multiple tests
+
+
+:::
+
+#### Joint Tests
+
+A <span class="highlight">joint test</span>
 
 #### Definition
 
