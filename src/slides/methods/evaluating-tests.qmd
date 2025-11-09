@@ -73,6 +73,11 @@ By the end, you should be able to
  
 - [My slides from undergraduate econometrics](https://vladislav-morozov.github.io/econometrics-2/slides/vector/ols-inference.html) for some more theory and examples on linear hypothesis tests
 
+
+- @Hansen2022Econometrics
+
+- Chapter 9 in @Lehmann2022TestingStatisticalHypotheses on multiple comparison problems
+
 :::
 
 ### Motivating Example Question {background="#43464B"}
@@ -555,7 +560,7 @@ $$
 
 ::: {.footer}
 
-See [this xckd](https://xkcd.com/882/) on multiple comparisons
+See [this xckd](https://xkcd.com/882/) on multiple comparisons. Or see chapter 9 of @Lehmann2022TestingStatisticalHypotheses for theory
 
 ::: 
 
@@ -582,13 +587,36 @@ But now key open questions:
  
 #### Technique: Reference Scenario
 
-Today: trying to understand something 
+Today: 
 
-Try to include a "reference" nice scenario
+- Trying to understand joint vs. multiple choice 
+- <span class="highlight">Without any constraints on setting</span>
+ 
+::: {.rounded-box}
 
-and vary something 
+When no constraint on setting is present, start with
 
-Very often: the nicest scenario is a simple linear model where everything in normal
+- Simplest DGPs
+- Simplest methods (here tests)
+
+::: 
+Ideally: simplest = some kind of "textbook" reference setting
+ 
+#### Nice Reference Scenarios for Testing
+
+Very often in testing:
+
+- The nicest scenario is a simple linear model w
+- Everything is normally distribution
+
+. . .
+
+<br>
+
+Key reason: 
+
+- Many practical tests are based on asymptotic normality
+- Hence exact normality = close to idealized asymptotic setting
 
 ::: {.footer}
 
@@ -613,41 +641,209 @@ $$
 H_0: \theta_1 = \theta_2 = 0
 $$
 
+#### Reference DGPs: Distributions for $U_i$ and $(X_i^{(1)}, X_i^{(2)})$
  
+$$
+\begin{aligned}
+U_{i} & \sim N(0, 1), \\
+\begin{pmatrix}
+X_i^{(1)} \\
+X_i^{(2)}
+\end{pmatrix} & \sim N\left(\begin{pmatrix}
+1 \\
+1
+\end{pmatrix}, \begin{pmatrix}
+1 & \rho \\
+\rho & 1
+\end{pmatrix} \right)
+\end{aligned},
+$$
+where the correlation $\rho$ runs between $-1$ and $1$
+
+. . . 
+
+::: {.left-color}
+
+Varying $\rho$ — key axis controlling geometry of many asymptotic joint tests — they depend on $\avar(\hat{\bbeta})$
+
+::: 
+
+#### DGPs: Coefficient Values
+
+Power function is function of $\btheta=(\theta_0, \theta_1, \theta_2)$ 
+
+$$ \small
+\text{Power}_T(\btheta) = P(T(X_1, \dots, X_N)=\text{Reject }H_0|\btheta)
+$$  
+
+::: {.left-color}
+
+Always need to look at DGPs that vary at least in coefficients in that enter in $H_0$ 
+
+::: 
+
+- Here: consider $\theta_1=\theta_2=c$ and vary $c$
+- Under each $c$ test $H_0:\theta_1=\theta_2=0$ 
+
+. . . 
+
+
+$\Rightarrow$ DGPs vary in $c$ and $\rho$
+
+::: {.footer}
+
+Not that restrictive to have $\theta_1=\theta_2$: can suitably rotate $(X_{i}^{(1)}, X_{i}^{(2)})$ to make any $(\theta_1, \theta_2)$ to  $\theta_1=\theta_2$.
+
+::: 
+
+
+
 ### Choosing Tests {background="#43464B"}
 
 
 #### Which Tests to Use?
 
-In our case: think about what everyone uses
+In our case: think about which tests are the most popular
 
-- Wald/$F$ test
-- $t$ tests
+<br>
+
+- For joint: Wald test is easiest theoretically and practically
+- For multiple: individual $t$ tests for $H_0: \theta_1=0$ and $H_0: \theta_2=0$
 
 
-do that
+
+
+Will compare those based on OLS estimator, just need to choose <span class="highlight">adjusted critical values for multiple $t$-test</span>
+
 
 #### Bonferroni Correction
 
+Recall: if each $t$-test is done at size $\alpha$, then multiple $t$-test based on two has
+$$
+P(\text{test rejects}|H_0) \leq 2\alpha
+$$
+
+::: {.left-color}
+
+If want overall multiple test to have size $\leq \alpha$, need to do each component test with size $\alpha/2$ 
+:::
+
+- Example: 2.5% individual tests for 5% overall
+- This is called the <span class="highlight">Bonferroni correction</span>
+
+#### Role of $\rho$
+
+$\rho$ controls correlation between $\hat{\theta}_1$ and $\hat{\theta}_2$ with $\mathrm{corr}(\hat{\theta}_1, \hat{\theta}_2) \approx -\rho$
+```{python}
+from matplotlib.patches import Rectangle
+from scipy.stats.distributions import chi2, norm
+
+# Define contour value c
+c = chi2.ppf(0.95, df=2)  # Change this to the desired value of c
+t_bound = norm.ppf(0.025 / 2)
+
+# Create a grid of x1 and x2 values
+x1 = np.linspace(-5, 5, 400)
+x2 = np.linspace(-5, 5, 400)
+X1, X2 = np.meshgrid(x1, x2)
+
+rhos = [-0.99, 0, 0.99]
+
+# Plot the contour for the specified value c
+fig, axs = plt.subplots(1, 3, figsize=(16, 4))
+fig.patch.set_facecolor(BG_COLOR)
+fig.patch.set_edgecolor(THEME_COLOR)
+fig.patch.set_linewidth(5)
+
+
+for ax, rho in zip(axs, rhos): 
+    # Define the matrix A
+    A = np.array([[1, rho], [rho, 1]])  # Example symmetric positive-definite matrix
+    A = np.linalg.inv(A)
+
+    # Compute the quadratic form x'Ax
+    Z = A[0, 0] * X1**2 + A[1, 1] * X2**2 + 2 * A[0, 1] * X1 * X2
+
+
+    ax.contourf(X1, X2, Z, levels=[c, Z.max()], hatches=["."], colors=["gold"], alpha=0) 
+    ax.set_xlabel("$\\hat{\\beta}_1$", color="white")
+    ax.set_ylabel("$\\hat{\\beta}_2$", color="white")
+
+ 
+    ax.set_xbound(-3, 3)
+    ax.set_ylim(-4.3, 4.3)
+
+    ax.add_patch(
+        Rectangle(
+            (t_bound, t_bound),
+            -2 * t_bound,
+            -2 * t_bound,
+            facecolor="none",
+            ec=THEME_COLOR,
+            lw=2,
+            linestyle="--",
+        )
+    )
+ 
+
+    # Mask the region inside the rectangle
+    Z_masked = np.ma.masked_where(
+        (X1 >= t_bound) & (X1 <= -1 * t_bound) & (X2 >= t_bound) & (X2 <= -1 * t_bound), Z
+    )
+ 
+    ax.contour(X1, X2, Z, levels=[c], colors="gold")
+
+    ax.text(-5, 4.7, "Correlation($\\hat{\\theta}_1$, $\\hat{\\theta}_2$) = " + str(rho),     fontsize=16,  color="black")
+
+axs[0].set_title(
+    "Rejection regions: Wald (dotted) vs. adjusted multiple $t$-test (shaded)\n\n",
+    color="black",
+    loc="left",
+    fontsize=16, 
+    weight="bold",
+);
+plt.show()
+
+```
 
 ## Simulating Hypothesis Test Performance {background="#00100F"}
  
 
+### Implementing Individual Components {background="#43464B"}
 
 
 
 
-#### Aside: On Code Structure
+#### Overall Code Structure
 
 Will keep using the code structure developed in 
 
 actually many DGPs from one class. Creation of multiple things — handled by `scenarios.py`
+
+
+#### Simulation Runner
+
+#### Handling Results
+
+
+::: {.footer}
+
+Averages of bounded random variables converge exponentially quickly by [Hoeffding's inequality](https://en.wikipedia.org/wiki/Hoeffding%27s_inequality) 
+
+:::
+
+#### Our `main.py`
+
 
 ## Simulation Results {background="#00100F"}
  
 #### 
 
 Now have a larger array of simulation results. 
+
+#### 
+
+Creating graphs — unfortunately very idiosyncratic and lots of trial and error specific to each graph
 
 ## Recap and Conclusions {background="#00100F"}
  
