@@ -47,6 +47,7 @@ website:
       - section: "Evaluating Methods"
         contents: 
         - slides/methods/evaluating-tests.qmd
+        - slides/methods/evaluating-cis.qmd
 
 execute:
   freeze: auto  # re-render only when source changes
