@@ -35,13 +35,13 @@ class SimulationScenario:
     test: type[TestProtocol]
     test_params: dict  # E.g. reg_params go here
     sample_size: int
-    n_simulations: int = 200
+    n_simulations: int = 500
     first_seed: int = 1
 
 
 # Create DGP combinations indexed by correlation and coefficient values
-common_coef_vals = np.linspace(-3, 3, 201)
-covar_corr_vals = np.linspace(-0.99, 0.99, 50)
+common_coef_vals = np.linspace(-1.75, 1.75, 231)
+covar_corr_vals = np.linspace(-0.99, 0.99, 51)
 dgp_list = [
     (
         BivariateLinearModel,
