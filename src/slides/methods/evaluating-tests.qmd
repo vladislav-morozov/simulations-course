@@ -1,12 +1,12 @@
 ---
 title: "Evaluating Hypothesis Tests"
-subtitle: "SUBTITLE"
+subtitle: "Simulating Test Power and Size for Comparing Tests"
 author: Vladislav Morozov  
 format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content=" (lecture note slides)"/> 
+        <meta name="description" content="Learn how to evaluate hypothesis tests in data science using Monte Carlo simulations; with worked power evaluation example (lecture note slides)"/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: "  (lecture note slides)" 
+    description: "Learn how to evaluate hypothesis tests in data science using Monte Carlo simulations; with worked power evaluation example (lecture note slides)" 
 ---
 
 
@@ -61,24 +61,42 @@ This lecture is about evaluating hypothesis tests
 By the end, you should be able to
 
  
-- Capture 
+- Describe key properties of hypothesis tests 
+- Add parallel execution and result handling to our simulation code 
+- Use simulations to evaluate test power
+ 
 
 
-#### References
-
+#### References on Hypothesis Testing
+ 
 <br>
 
 ::: {.nonincremental}
 
  
 - [My slides from undergraduate econometrics](https://vladislav-morozov.github.io/econometrics-2/slides/vector/ols-inference.html) for some more theory and examples on linear hypothesis tests
+- Ch. 9 of @Hansen2022Econometrics
+- Ch. 9 in @Lehmann2022TestingStatisticalHypotheses on multiple comparison problems
 
 
-- @Hansen2022Econometrics
-
-- Chapter 9 in @Lehmann2022TestingStatisticalHypotheses on multiple comparison problems
 
 :::
+
+
+#### References on Relevant Code Aspects
+ 
+<br>
+
+::: {.nonincremental}
+
+- Ch. 6 of @Lau2023LearningDataScience on pandas basics
+- Ch. 11 of @Lau2023LearningDataScience on plotting
+- Ch. 1-3 of @Antao2023FastPythonHigh regarding performance (but note that Python since [has added support for free threading](https://docs.python.org/3/howto/free-threading-python.html))
+
+
+:::
+
+
 
 ### Motivating Example Question {background="#43464B"}
 
@@ -274,7 +292,7 @@ Power function — key metric in comparing tests
 
  
 
-Give preference to tests that
+You should prefer tests that
 
 - Control size correctly 
 - Reject alternative more often (=use data more efficiently)
@@ -808,7 +826,7 @@ plt.show()
 ```
  
 
-## Simulating Hypothesis Test Performance {background="#00100F"}
+## Implementing Our Simulation {background="#00100F"}
  
 
 ### Simulation Runner and Tests {background="#43464B"}
@@ -849,7 +867,7 @@ Some differences:
     ├── joint.py
     └── multiple.py
 ```
-"Infrastructure" classes organized in separate folder so that `main.py` is the only high-level `.py` file
+"Infrastructure" classes organized in separate folder so that `main.py` is the only   `.py` file in root
 
 
 #### Simulation Runner: Design
@@ -865,15 +883,15 @@ What does execution look like for a single dataset?
 
 For many datasets:
 
-- Repeat above
-- Estimate power with frequency of rejections
+- Repeat above many times
+- Key: estimate power as frequency of rejections
 
 
 #### `SimulationRunner` Implementation
 
 
 
-```{.python filename="sim_infrastructure/runner.py"} 
+```{.python filename="sim_infrastructure/runner.py" code-line-numbers="73"} 
 """
 Module for executing a given Monte Carlo scenario.
 
@@ -952,7 +970,7 @@ class SimulationRunner:
 
 ::: {.footer}
 
-Notice how the `SimulationRunner` summarizes its result
+Notice how the `SimulationRunner` summarizes its result: that's the power function computation!
 
 :::
 
@@ -1091,6 +1109,12 @@ Again: power function depends on $c$ (from $\theta_1=\theta_2=c$)
 
 Here: evaluate for 231 points evenly spaced between $-1.75$ and $+1.75$  — sufficient to capture everything
 
+::: {.footer}
+
+No special meaning for 231 — just a reasonable large number
+
+:::
+
 #### Scenarios: Grid for $\rho$
 
 ::: {.left-color}
@@ -1099,7 +1123,10 @@ Want to also see the power function for <span class="highlight">different values
 
 :::
 
-Will analyze for 51 values equally spaced between $-0.99$ and $+0.99$
+Will analyze for
+
+- 51 values of $\rho$
+- Equally spaced between $-0.99$ and $+0.99$
 
 
 <br>
@@ -1151,8 +1178,7 @@ class BivariateLinearModel:
         covar_corr (float): Correlation coefficient between covariates
     """
 
-    def __init__(self, common_coef_val: float, covar_corr: float) -> None: 
-        """
+    def __init__(self, common_coef_val: float, covar_corr: float) -> None:  
         self.common_coef_val: float = common_coef_val
         self.covar_corr: float = covar_corr
 
@@ -1357,31 +1383,133 @@ class SimulationOrchestratorParallel:
 ## Simulation Results {background="#00100F"}
  
 
+#### Handling Simulation Results
+ 
+- Now have a large collection of results in the results field of the orchestrator: estimated power function for each combination of $c$, $\rho$ and test
+- Can convert to pandas DataFrame and export as a CSV
 
-### `main.py` {background="#43464B"}
+. . .
+
+Here: create a custom `ResultsProcessor` that processes results and export plots
+
+::: {.left-color}
+
+Sadly, <span class="highlight">no general approaches</span> for making graphs — always a lot of customization and tight coupling to setting
+
+::: 
+
+
+#### Resulting `main.py`
+
+```{.python filename="main.py"}
+from pathlib import Path
+
+import pandas as pd
+
+from sim_infrastructure.orchestrators import SimulationOrchestratorParallel
+from sim_infrastructure.results_processor import ResultsProcessor
+from sim_infrastructure.scenarios import scenarios
+
+SIM_RESULTS_PATH = Path() / "results" / "sim_results.csv"
+PLOT_FOLDER = Path() / "results" / "plots"
+
+
+if __name__ == "__main__":
+    # Create and execute simulations
+    orchestrator = SimulationOrchestratorParallel(scenarios)
+    orchestrator.run_all()
+
+    # Export results
+    pd.DataFrame(orchestrator.summary_results).to_csv(SIM_RESULTS_PATH)
+
+    # Export plots
+    results_processor = ResultsProcessor(SIM_RESULTS_PATH, PLOT_FOLDER)
+    results_processor.export_all_plots()
+```
+  
+ 
+ 
+#### Power Surfaces
+
+![](../../../example-codes/2-joint-vs-multiple-tests/results/plots/power_surfaces.svg)
+
+
+#### Plotting Difference in Powers
 
 
 
-#### Handling Results
 
+:::: {.columns}
 
-#### Our `main.py`
+::: {.column width="46%"}
 
+ 
+![](../../../example-codes/2-joint-vs-multiple-tests/results/plots/power_diff.svg)
 
-#### 
-
-Now have a larger array of simulation results. 
-
-#### 
-
-Creating graphs — unfortunately very idiosyncratic and lots of trial and error specific to each graph 
-
-::: {.footer}
-
-Wobbliness — likely
 
 :::
 
+   
+::: {.column width="54%"} 
+
+::: {.nonincremental}
+
+- Hard to see differences directly from power surfaces
+- Can plot differences in power functions: power of Wald $-$ power of multiple $t$-test 
+- Positive values: Wald more powerful
+
+
+:::
+
+:::
+
+::::
+
+
+#### Interpreting Power Differences
+
+
+
+:::: {.columns}
+
+::: {.column width="46%"}
+
+ 
+![](../../../example-codes/2-joint-vs-multiple-tests/results/plots/power_diff.svg)
+
+
+:::
+
+   
+::: {.column width="54%"} 
+
+::: {.nonincremental}
+
+- Both control size correctly (see values at $c=0$)
+- Neither test dominates each other (both positive and negative values)
+- Wald has huge advantage with $\mathrm{corr}(\hat{\theta}_1, \hat{\theta}_2) \approx -1$
+- Multiple slightly better for $\mathrm{corr}(\hat{\theta}_1, \hat{\theta}_2) \approx 1$
+
+:::
+
+:::
+
+::::
+
+#### Overall Statistical Conclusions
+
+Can we justify always using Wald tests based on this? 
+
+<br>
+
+::: {.left-color}
+
+Yes. Wald test is <span class="highlight">safe</span>
+
+- Never loses by much
+- Sometimes has huge power advantage
+
+:::
 
 
 ## Recap and Conclusions {background="#00100F"}
@@ -1392,8 +1520,9 @@ Wobbliness — likely
 
 In this lecture we 
 
-- Discussed  
-
+- Discussed key characteristics of hypothesis tests
+- Considered a worked example of comparing tests
+- Added parallel execution and result handling to our simulation code 
 
 
 
