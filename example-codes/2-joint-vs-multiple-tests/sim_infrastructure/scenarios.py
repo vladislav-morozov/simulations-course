@@ -1,13 +1,13 @@
 """
 Module for defining simulation scenarios.
 
-This module contains scenarios for simulations on the simple model:
-    y = b0 + b1 * x + u
-The scenarios evaluate several OLS-like estimators under static and dynamic DGPs
-with two different sample sizes.
+This module contains scenarios for comparing power functions of tests under model:
+    Y = theta0  + theta1*x1 + theta2*x2 + u
+The null being tested is
+    H0: theta1=theta2=0
 
 Classes:
-    SimpleOLS: ordinary least squares estimator.
+    SimulationScenario: data class for scenarios
 
 Variables:
     scenarios (list): list of scenarios to un.

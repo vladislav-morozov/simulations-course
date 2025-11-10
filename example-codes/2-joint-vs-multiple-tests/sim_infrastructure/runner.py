@@ -55,7 +55,7 @@ class SimulationRunner:
             x, y = self.dgp.sample(
                 n_obs, seed=first_seed + sim_id if first_seed else None
             )
-            # Fit model
+            # Test null of zero coefficients
             self.test.test(x, y)
             # Store error
             self.test_decisions[sim_id] = self.test.decision
