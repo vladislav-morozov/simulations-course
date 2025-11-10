@@ -47,7 +47,7 @@ class SimulationRunner:
                 Defaults to None.
         """
         # Preallocate array to hold estimation errors
-        self.errors = np.empty(n_sim)
+        self.test_decisions = np.empty(n_sim)
 
         # Run simulation
         for sim_id in range(n_sim):
