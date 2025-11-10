@@ -811,7 +811,7 @@ plt.show()
 ## Simulating Hypothesis Test Performance {background="#00100F"}
  
 
-### Implementing Individual Components {background="#43464B"}
+### Simulation Runner and Tests {background="#43464B"}
 
 
 
@@ -840,9 +840,8 @@ Some differences:
 ├── results/ 
 ├── sim_infrastructure
 │   ├── __init__.py 
-│   ├── orchestrator.py
-│   ├── protocols.py
-│   ├── requirements.txt
+│   ├── orchestrators.py
+│   ├── protocols.py 
 │   ├── runner.py
 │   └── scenarios.py
 └── tests
@@ -861,6 +860,8 @@ What does execution look like for a single dataset?
 - Apply test
 
 . . . 
+
+<br>
 
 For many datasets:
 
@@ -930,7 +931,7 @@ class SimulationRunner:
             x, y = self.dgp.sample(
                 n_obs, seed=first_seed + sim_id if first_seed else None
             )
-            # Fit model
+            # Test null of zero coefficients
             self.test.test(x, y)
             # Store error
             self.test_decisions[sim_id] = self.test.decision
@@ -949,19 +950,182 @@ class SimulationRunner:
         }
 ```
 
+::: {.footer}
 
-#### `tests/joints.py` Module: Wald Test
+Notice how the `SimulationRunner` summarizes its result
+
+:::
 
 
-#### `tests/.py` Module: Wald Test
+#### `tests/joint.py` Module: Wald Test
+
+```{.python filename="tests/joint.py"}
+"""
+Module for joint tests for joint hypothesis.
+
+Classes:
+    WaldWithOLS: OLS-based Wald test that all non-intercept coefficients are zero.
+"""
+
+import numpy as np
+import pandas as pd
+from statsmodels.regression.linear_model import OLS
 
 
+class WaldWithOLS:
+    """Class for applying Wald test to test null of zero coefficients.
+
+    Tailored to linear model
+        Y_i = theta0 + theta1 X_{i1} + ... + thetap X_{ip} + U_i
+    Tests the null:
+        H0: theta1 = ... = thetap = 0
+
+    Attributes:
+        name (str): test name, "Wald"
+        decision (np.bool): whether null is rejected
+    """
+
+    def __init__(self) -> None:
+        self.name: str = "Wald"
+        self.decision: np.bool
+
+    def test(self, x: pd.DataFrame, y: pd.DataFrame) -> None:
+        """Carry out the Wald test with given data.
+
+        Args:
+            x (pd.DataFrame): covariates, including a leading constant column.
+            y (pd.DataFrame): outcomes.
+        """
+        # Fit models
+        lin_reg = OLS(y, x)
+        lin_reg_fit = lin_reg.fit()
+
+        # Perform Wald test
+        num_covars = x.shape[1]
+        wald_restriction_matrix = np.concatenate(
+            (np.zeros((num_covars - 1, 1)), np.eye(num_covars - 1)), axis=1
+        )
+
+        wald_test = lin_reg_fit.wald_test(
+            wald_restriction_matrix,
+            use_f=False,
+            scalar=True,
+        )
+
+        self.decision = wald_test.pvalue <= 0.05
+```
+
+::: {.footer}
+
+`TestProtocol`: asks tests to have a `test()` method and a `decision` field
+
+:::
+
+#### `tests/multiple.py` Module: Multiple $t$-Test
+
+```{.python filename="tests/multiple.py"}
+"""
+Module for multiple tests for joint hypothesis.
+
+Classes:
+    BonferronigMultipleTWithOLS: OLS-based multiple t-test that all non-intercept
+        coefficients are zero. Uses Bonferroni correction.
+"""
+
+import numpy as np
+import pandas as pd
+from statsmodels.regression.linear_model import OLS
+from statsmodels.stats.multitest import multipletests
+
+
+class BonferronigMultipleTWithOLS:
+    """Class for applying multiple t-test to test null of zero coefficients.
+
+    Tailored to linear model
+        Y_i = theta0 + theta1 X_{i1} + ... + thetap X_{ip} + U_i
+    Tests the null:
+        H0: theta1 = ... = thetap = 0
+
+    Attributes:
+        name (str): test name, "Bonferroni t"
+        decision (np.bool): whether null is rejected
+    """
+
+    def __init__(self) -> None:
+        self.name: str = "Bonferroni t"
+        self.decision: np.bool
+
+    def test(self, x: pd.DataFrame, y: pd.DataFrame) -> None:
+        """Carry out the multiple t-test with given data.
+
+        Args:
+            x (pd.DataFrame): covariates, including a leading constant column.
+            y (pd.DataFrame): outcomes.
+        """
+        # Fit models
+        lin_reg = OLS(y, x)
+        lin_reg_fit = lin_reg.fit()
+
+        # Perform multiple t-tests
+        p_vals_t = lin_reg_fit.pvalues.iloc[1:]
+        t_test_corrected_bonf = multipletests(
+            p_vals_t,
+            method="bonferroni",  # Bonferroni
+        )
+        self.decision = t_test_corrected_bonf[0].sum() > 0
+
+```
 
 ### Scenarios and Orchestrator {background="#43464B"}
 
-#### Scenarios
+#### Scenarios: Grid for $c$
 
-evaluate on a grid
+Again: power function depends on $c$ (from $\theta_1=\theta_2=c$)
+
+- In practice: can't compute function for infinite number of values of $c$
+- Instead compute for a <span class="highlight">grid</span> of values of $c$
+
+<br>
+
+. . . 
+
+Here: evaluate for 231 points evenly spaced between $-1.75$ and $+1.75$  — sufficient to capture everything
+
+#### Scenarios: Grid for $\rho$
+
+::: {.left-color}
+
+Want to also see the power function for <span class="highlight">different values of covariate correlation $\rho$</span>
+
+:::
+
+Will analyze for 51 values equally spaced between $-0.99$ and $+0.99$
+
+
+<br>
+
+That is, for every $\rho$, compute power function on the $c$-grid
+
+::: {.footer}
+
+Using uneven number of grid points ensures that 0 is included in the grid
+
+:::
+
+#### Creating Grid of Scenarios
+
+- Different values of $c$ — different DGPs
+- $\Rightarrow$ DGPs vary in both $c$ and $\rho$
+
+. . . 
+
+<br>
+
+Will create as follows:
+
+- Write a prototype DGP with $c$ and $\rho$ as parameters
+- Use `scenarios.py` to create a DGP with every combination of $c$ and $\rho$ from the grid
+- Overall: $51\times 231 = 11781$ combinations 
 
 #### Prototype DGP
 
@@ -987,12 +1151,7 @@ class BivariateLinearModel:
         covar_corr (float): Correlation coefficient between covariates
     """
 
-    def __init__(self, common_coef_val: float, covar_corr: float) -> None:
-        """Initializes the DGP with intercept and slope.
-
-        Args:
-            beta0 (float): Intercept term. Defaults to 0.0.
-            beta1 (float): Slope coefficient. Defaults to 1.0.
+    def __init__(self, common_coef_val: float, covar_corr: float) -> None: 
         """
         self.common_coef_val: float = common_coef_val
         self.covar_corr: float = covar_corr
@@ -1042,27 +1201,169 @@ class BivariateLinearModel:
 
 
 
-#### `scenario.py`
+#### `scenarios.py`
+
+```{.python filename="sim_infrastructure/scenarios.py"}
+"""
+Module for defining simulation scenarios.
+
+This module contains scenarios for comparing power functions of tests under model:
+    Y = theta0  + theta1*x1 + theta2*x2 + u
+The null being tested is
+    H0: theta1=theta2=0
+
+Classes:
+    SimulationScenario: data class for scenarios
+
+Variables:
+    scenarios (list): list of scenarios to un.
+"""
+
+import numpy as np
+
+from dataclasses import dataclass
+from itertools import product
 
 
-#### 
+from dgps.linear import BivariateLinearModel
+from sim_infrastructure.protocols import DGPProtocol, TestProtocol
+from tests.joint import WaldWithOLS
+from tests.multiple import BonferronigMultipleTWithOLS
 
+
+@dataclass(frozen=True)
+class SimulationScenario:
+    """A single simulation scenario: DGP, test, and sample size."""
+
+    name: str  # For readability
+    dgp: type[DGPProtocol]
+    dgp_params: dict  # E.g. betas go here
+    test: type[TestProtocol]
+    test_params: dict  # E.g. reg_params go here
+    sample_size: int
+    n_simulations: int = 500
+    first_seed: int = 1
+
+
+# Create DGP combinations indexed by correlation and coefficient values
+common_coef_vals = np.linspace(-1.75, 1.75, 231)
+covar_corr_vals = np.linspace(-0.99, 0.99, 51)
+dgps = [
+    (
+        BivariateLinearModel,
+        {"common_coef_val": common_coef_val, "covar_corr": covar_corr},
+    )
+    for common_coef_val, covar_corr in product(common_coef_vals, covar_corr_vals)
+]
+
+# Create list of tests
+tests = [
+    (WaldWithOLS, {}),
+    (BonferronigMultipleTWithOLS, {}),
+]
+
+sample_sizes = [200]
+
+# Generate all combinations
+scenarios = [
+    SimulationScenario(
+        name="", # will identify results through info from SimulationRunner
+        dgp=dgp_class,
+        dgp_params=dgp_params,
+        test=test_class,
+        test_params=test_params,
+        sample_size=size,
+    )
+    for (dgp_class, dgp_params), (
+        test_class,
+        test_params,
+    ), size in product(dgps, tests, sample_sizes)
+]
+```
+
+
+ 
+
+#### Working With Many DGPs
+
+We end up many DGPs
+
+- But each scenario is "separate"
+- Scope for running simulations in <span class="highlight">parallel</span>
+ 
+::: {.left-color} 
+
+
+Will implement `SimulationOrchestrator` that can
+
+- Execute scenarios in parallel (with `ThreadPoolExecutor` under free-threaded Python 3.14+)
+- Collect the results
+- Track progress (with `tqdm`)
+
+:::
+
+::: {.footer}
+
+Parallel computation is a deep topic. See @Antao2023FastPythonHigh on Python, but be aware of the removal of GIL in CPython starting from 3.14
+
+:::
+
+#### A Parallel `SimulationOrchestratorParallel`
+
+```{.python filename="sim_infrastructure/orchestrators.py"}
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from tqdm import tqdm
+
+from sim_infrastructure.runner import SimulationRunner
+from sim_infrastructure.scenarios import SimulationScenario
+
+
+class SimulationOrchestratorParallel:
+    """Parallelized simulation orchestrator class."""
+
+    def __init__(self, scenarios: list[SimulationScenario]) -> None:
+        self.scenarios = scenarios
+        self.summary_results = []
+
+    def run_single_scenario(self, scenario):
+        """Run a single scenario and return the result dictionary."""
+        dgp = scenario.dgp(**scenario.dgp_params)
+        estimator = scenario.test(**scenario.test_params)
+        runner = SimulationRunner(dgp, estimator)
+        runner.simulate(
+            n_sim=scenario.n_simulations,
+            n_obs=scenario.sample_size,
+            first_seed=scenario.first_seed,
+        )
+        return runner.summarize_results()
+
+    def run_all(self, max_workers=None):
+        """Run all scenarios in parallel using ThreadPoolExecutor."""
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all scenarios to the executor
+            futures = {
+                executor.submit(self.run_single_scenario, scenario): scenario
+                for scenario in self.scenarios
+            }
+            # Collect results as they complete, with a progress bar
+            for future in tqdm(
+                as_completed(futures), total=len(futures), desc="Running simulations"
+            ):
+                self.summary_results.append(future.result())
+```
 
 
 ## Simulation Results {background="#00100F"}
  
 
 
+### `main.py` {background="#43464B"}
+
 
 
 #### Handling Results
 
-
-::: {.footer}
-
-Averages of bounded random variables converge exponentially quickly by [Hoeffding's inequality](https://en.wikipedia.org/wiki/Hoeffding%27s_inequality) 
-
-:::
 
 #### Our `main.py`
 
