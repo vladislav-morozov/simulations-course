@@ -15,6 +15,7 @@ Protocols:
 from typing import Protocol
 
 import numpy as np
+import pandas as pd
 
 
 class TestProtocol(Protocol):
@@ -30,10 +31,10 @@ class TestProtocol(Protocol):
 class DGPProtocol(Protocol):
     def sample(
         self, n_obs: int, seed: int | None = None
-    ) -> tuple[np.ndarray, np.ndarray]: ...
+    ) -> tuple[pd.DataFrame, pd.DataFrame]: ...
 
     @property
-    def beta1(self) -> float: ...
+    def covar_corr(self) -> str: ... 
 
     @property
-    def name(self) -> str: ... 
+    def common_coef_val(self) -> str: ... 
