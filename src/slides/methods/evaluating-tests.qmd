@@ -382,7 +382,7 @@ Let $z_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)$. Then
 
 #### Example II: Wald Test for $H_0: \bR\btheta =\bc$ vs. $H_1: \bR\btheta \neq \bc$
  
-Let $\btheta= (\theta_0, \theta_1, \dots, \theta_p$, $\bR$ some matrix, $\bc$ some vector
+Let $\btheta= (\theta_0, \theta_1, \dots, \theta_p)$, $\bR$ some matrix, $\bc$ some vector
 
 Suppose that have estimator $\hat{\btheta}$ such that
 $$ \small
@@ -606,8 +606,8 @@ Ideally: simplest = some kind of "textbook" reference setting
 
 Very often in testing:
 
-- The nicest scenario is a simple linear model w
-- Everything is normally distribution
+- The nicest scenario is a simple linear model
+- Everything is normally distributed
 
 . . .
 
@@ -628,7 +628,7 @@ There are theoretical reasons for importance of normality as a "base" case, see 
 
 Simple linear model:
 $$
-Y_i = \theta_0 + \theta_1 X_i^{(1)} + \theta_2 X_{i}^{(2)} + U_i
+Y_i = 1 + \theta_1 X_i^{(1)} + \theta_2 X_{i}^{(2)} + U_i
 $$
 
 
@@ -670,7 +670,7 @@ Varying $\rho$ — key axis controlling geometry of many asymptotic joint tests 
 
 #### DGPs: Coefficient Values
 
-Power function is function of $\btheta=(\theta_0, \theta_1, \theta_2)$ 
+Power function is function of $\btheta=(\theta_1, \theta_2)$ 
 
 $$ \small
 \text{Power}_T(\btheta) = P(T(X_1, \dots, X_N)=\text{Reject }H_0|\btheta)
@@ -783,8 +783,7 @@ for ax, rho in zip(axs, rhos):
             lw=2,
             linestyle="--",
         )
-    )
- 
+    ) 
 
     # Mask the region inside the rectangle
     Z_masked = np.ma.masked_where(
@@ -794,7 +793,9 @@ for ax, rho in zip(axs, rhos):
     ax.contour(X1, X2, Z, levels=[c], colors="gold")
 
     ax.text(-5, 4.7, "Correlation($\\hat{\\theta}_1$, $\\hat{\\theta}_2$) = " + str(rho),     fontsize=16,  color="black")
+    ax.set_xlabel("$\\hat{\\theta}_1$", color="black")
 
+axs[0].set_ylabel("$\\hat{\\theta}_2$", color="black")
 axs[0].set_title(
     "Rejection regions: Wald (dotted) vs. adjusted multiple $t$-test (shaded)\n\n",
     color="black",
@@ -805,6 +806,7 @@ axs[0].set_title(
 plt.show()
 
 ```
+ 
 
 ## Simulating Hypothesis Test Performance {background="#00100F"}
  
@@ -816,12 +818,242 @@ plt.show()
 
 #### Overall Code Structure
 
-Will keep using the code structure developed in 
+Mostly use same code structure developed in first block
 
-actually many DGPs from one class. Creation of multiple things — handled by `scenarios.py`
+<br>
+
+Some differences: 
+
+- `tests` instead of `estimators`
+- Will add parallel execution
+- More results handling
+- Special approach to specifying DGPs
+
+#### File Structure
+
+```
+├── README.md
+├── dgps
+│   ├── __init__.py 
+│   └── linear.py 
+├── main.py
+├── results/ 
+├── sim_infrastructure
+│   ├── __init__.py 
+│   ├── orchestrator.py
+│   ├── protocols.py
+│   ├── requirements.txt
+│   ├── runner.py
+│   └── scenarios.py
+└── tests
+    ├── __init__.py 
+    ├── joint.py
+    └── multiple.py
+```
+"Infrastructure" classes organized in separate folder so that `main.py` is the only high-level `.py` file
 
 
-#### Simulation Runner
+#### Simulation Runner: Design
+
+What does execution look like for a single dataset?
+
+- Draw data
+- Apply test
+
+. . . 
+
+For many datasets:
+
+- Repeat above
+- Estimate power with frequency of rejections
+
+
+#### `SimulationRunner` Implementation
+
+
+
+```{.python filename="sim_infrastructure/runner.py"} 
+"""
+Module for executing a given Monte Carlo scenario.
+
+This module contains the SimulationRunner class, which executes a scenario
+by combining a DGP and a test. It handles data generation, estimation, testing,
+and result collection.
+
+Classes:
+    SimulationRunner: Runs simulations and summarizes results.
+"""
+
+import numpy as np
+from sim_infrastructure.protocols import DGPProtocol, TestProtocol
+
+
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and estimator.
+
+    Attributes:
+        dgp: data-generating process with a sample() method and beta1 attribute.
+        estimator: estimator with a fit() method and beta1_hat attribute.
+        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+    """
+
+    def __init__(
+        self,
+        dgp: DGPProtocol,
+        test: TestProtocol,
+    ) -> None:
+        """Initializes the simulation runner.
+
+        Args:
+            dgp: An instance of a DGP class (must implement `sample`).
+            estimator: An instance of an estimator class (must implement `fit`).
+        """
+        self.dgp: DGPProtocol = dgp
+        self.test: TestProtocol = test
+        self.test_decisions: np.ndarray = np.empty(0)
+
+    def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
+        """Runs simulations and stores estimation errors.
+
+        Args:
+            n_sim (int): number of simulations to run.
+            n_obs (int): Number of observations per simulation.
+            first_seed (int | None): Starting random seed for reproducibility.
+                Defaults to None.
+        """
+        # Preallocate array to hold estimation errors
+        self.test_decisions = np.empty(n_sim)
+
+        # Run simulation
+        for sim_id in range(n_sim):
+            # Draw data
+            x, y = self.dgp.sample(
+                n_obs, seed=first_seed + sim_id if first_seed else None
+            )
+            # Fit model
+            self.test.test(x, y)
+            # Store error
+            self.test_decisions[sim_id] = self.test.decision
+
+    def summarize_results(self) -> dict:
+        """Return a summary of results
+
+        Returns:
+            dict: power of current test at current DGP
+        """
+        return {
+            "test": self.test.name,
+            "covar_corr": self.dgp.covar_corr,
+            "common_coef_val": self.dgp.common_coef_val,
+            "power": self.test_decisions.mean(),
+        }
+```
+
+
+#### `tests/joints.py` Module: Wald Test
+
+
+#### `tests/.py` Module: Wald Test
+
+
+
+### Scenarios and Orchestrator {background="#43464B"}
+
+#### Scenarios
+
+evaluate on a grid
+
+#### Prototype DGP
+
+```{.python filename="dgps/linear.py"} 
+"""
+Module for linear data-generating processes (DGPs).
+
+This module contains classes for generating data from simple linear models.
+
+Classes:
+    BivariateLinearModel: A DGP for static linear models with normal variables,
+        adjustable correlation between covariates, and two variables + constant.
+"""
+
+import numpy as np
+import pandas as pd
+
+class BivariateLinearModel:
+    """A data-generating process (DGP) for a static linear model
+
+    Attributes:
+        common_coef_val (float): Common values for theta1 and theta2
+        covar_corr (float): Correlation coefficient between covariates
+    """
+
+    def __init__(self, common_coef_val: float, covar_corr: float) -> None:
+        """Initializes the DGP with intercept and slope.
+
+        Args:
+            beta0 (float): Intercept term. Defaults to 0.0.
+            beta1 (float): Slope coefficient. Defaults to 1.0.
+        """
+        self.common_coef_val: float = common_coef_val
+        self.covar_corr: float = covar_corr
+
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """Samples data from the static DGP.
+
+        Args:
+            n_obs (int): Number of observations to sample.
+            seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+        Returns:
+            tuple: (x, y) DataFrames, each of length n_obs.
+        """
+        # Initialize RNG
+        rng = np.random.default_rng(seed)
+
+        # Construct mean and covariance for coefficients
+        x_mean = np.array([1, 0, 0])
+        x_covar = np.array([[0, 0, 0], [0, 1, self.covar_corr], [0, self.covar_corr, 1]])
+
+        # Construct vector of coefficients
+        thetas = np.array([1, self.common_coef_val, self.common_coef_val]
+                          )
+        # Draw covariates and residuals, combine into output 
+        covariates = rng.multivariate_normal(
+            x_mean,
+            x_covar,
+            size=n_obs,
+        )
+        resids = rng.normal(0, np.sqrt(1), size=n_obs)
+        y = (covariates @ thetas) + resids
+
+        # Convert output into pandas dataframes with dynamic variable names for X
+        covariates_df = pd.DataFrame(
+            covariates,
+            columns=[f"X{i}" for i in range(covariates.shape[1])],
+        )
+        y_df = pd.DataFrame(
+            y,
+            columns=["y"],
+        )
+        return covariates_df, y_df
+```
+
+
+
+#### `scenario.py`
+
+
+#### 
+
+
+
+## Simulation Results {background="#00100F"}
+ 
+
+
+
 
 #### Handling Results
 
@@ -835,15 +1067,21 @@ Averages of bounded random variables converge exponentially quickly by [Hoeffdin
 #### Our `main.py`
 
 
-## Simulation Results {background="#00100F"}
- 
 #### 
 
 Now have a larger array of simulation results. 
 
 #### 
 
-Creating graphs — unfortunately very idiosyncratic and lots of trial and error specific to each graph
+Creating graphs — unfortunately very idiosyncratic and lots of trial and error specific to each graph 
+
+::: {.footer}
+
+Wobbliness — likely
+
+:::
+
+
 
 ## Recap and Conclusions {background="#00100F"}
  
