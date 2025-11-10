@@ -1,16 +1,21 @@
 """
-Entry point for running simulations for comparing linear
+Entry point for running simulations for comparing power of a joint Wald test
+vs. a multiple t-test. 
 
-Overall goal of simulation: evaluate bias of OLS-like estimators in simple model
-    y = b0 + b1 * x + u
-Scenarios consider: several estimators, static vs. dynamic DGPs, various sample
-sizes.
+This module contains scenarios for comparing power functions of tests under model:
+    Y = theta0  + theta1*x1 + theta2*x2 + u
+The null being tested is
+    H0: theta1=theta2=0
+
+Scenarios considered: normal DGP with varying values of coefficients and varying
+values of correlation between x1 and x2.
+    
 
 Usage:
-    python main.py
+    python -X gil=0 main.py
 
 Output:
-    A pandas Series of bias results for each scenario, printed to the console.
+    Power surface comparison plots saved under PLOT_FOLDER
 """
 
 from pathlib import Path
@@ -18,7 +23,7 @@ from pathlib import Path
 import pandas as pd
 
 from sim_infrastructure.orchestrators import SimulationOrchestratorParallel
-from sim_infrastructure.results_processor import ResultProcessor
+from sim_infrastructure.results_processor import ResultsProcessor
 from sim_infrastructure.scenarios import scenarios
 
 SIM_RESULTS_PATH = Path() / "results" / "sim_results.csv"
@@ -31,8 +36,8 @@ if __name__ == "__main__":
     orchestrator.run_all()
 
     # Export results
-    pd.DataFrame(orchestrator.summary_results).to_csv("results/sim_results.csv")
+    pd.DataFrame(orchestrator.summary_results).to_csv(SIM_RESULTS_PATH)
 
-    # Eexport plots
-    results_processor = ResultProcessor(SIM_RESULTS_PATH, PLOT_FOLDER)
+    # Export plots
+    results_processor = ResultsProcessor(SIM_RESULTS_PATH, PLOT_FOLDER)
     results_processor.export_all_plots()

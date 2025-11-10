@@ -42,7 +42,7 @@ class SimulationScenario:
 # Create DGP combinations indexed by correlation and coefficient values
 common_coef_vals = np.linspace(-1.75, 1.75, 231)
 covar_corr_vals = np.linspace(-0.99, 0.99, 51)
-dgp_list = [
+dgps = [
     (
         BivariateLinearModel,
         {"common_coef_val": common_coef_val, "covar_corr": covar_corr},
@@ -50,7 +50,7 @@ dgp_list = [
     for common_coef_val, covar_corr in product(common_coef_vals, covar_corr_vals)
 ]
 
-# Create test
+# Create list of tests
 tests = [
     (WaldWithOLS, {}),
     (BonferronigMultipleTWithOLS, {}),
@@ -71,5 +71,5 @@ scenarios = [
     for (dgp_class, dgp_params), (
         test_class,
         test_params,
-    ), size in product(dgp_list, tests, sample_sizes)
+    ), size in product(dgps, tests, sample_sizes)
 ]

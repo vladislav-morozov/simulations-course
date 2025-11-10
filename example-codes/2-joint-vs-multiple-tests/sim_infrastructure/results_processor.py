@@ -2,7 +2,7 @@
 Module for processing and visualizing simulation results.
 
 Classes:
-    ResultsProcessor: exports figures that appear in the 
+    ResultsProcessor: exports figures that appear in the slides.
 """
 
 from pathlib import Path
@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 
-class ResultProcessor:
+class ResultsProcessor:
     """Visualizes simulation results for comparing Wald vs. Bonferroni t test.
 
     Attributes:

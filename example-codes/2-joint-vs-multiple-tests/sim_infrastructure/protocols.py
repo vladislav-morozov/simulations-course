@@ -2,13 +2,11 @@
 Module for defining simulation protocols.
 
 This module contains Protocol classes that define the interfaces for
-data-generating processes (DGPs) and estimators. These protocols ensure
-compatibility between components in the simulation framework for analyzing
-simple linear-like estimators with one covariate.
+data-generating processes (DGPs) and tests. 
 
 Protocols:
     DGPProtocol: Interface for data-generating processes.
-    EstimatorProtocol: Interface for estimators.
+    TestProtocol: Interface for test.
 """
 
 
