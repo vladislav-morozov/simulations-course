@@ -16,7 +16,7 @@ from sim_infrastructure.runner import SimulationRunner
 from sim_infrastructure.scenarios import SimulationScenario
 
 
-class SimulationOrchestrator:
+class SimulationOrchestratorSequential:
     """Sequential simulation orchestrator class."""
 
     def __init__(self, scenarios: list[SimulationScenario]) -> None:
