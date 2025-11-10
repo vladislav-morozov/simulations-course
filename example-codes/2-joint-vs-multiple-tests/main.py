@@ -15,14 +15,17 @@ Output:
 
 import pandas as pd
 
-from sim_infrastructure.orchestrator import SimulationOrchestrator 
-from sim_infrastructure.scenarios import scenarios               
+from sim_infrastructure.orchestrator import (
+    SimulationOrchestratorParallel,
+    SimulationOrchestratorSequential,
+)
+from sim_infrastructure.scenarios import scenarios
 
 if __name__ == "__main__": 
 
     # Create and execute simulations 
-    orchestrator = SimulationOrchestrator(scenarios)                         
+    orchestrator = SimulationOrchestratorParallel(scenarios)                         
     orchestrator.run_all()
 
-    # Handling results
+    # Export results
     pd.DataFrame(orchestrator.summary_results).to_csv("results/sim_results.csv")
