@@ -7,7 +7,7 @@ The scenarios evaluate several OLS-like estimators under static and dynamic DGPs
 with two different sample sizes.
 
 Classes:
-    SimpleOLS: ordinary least squares estimator.
+    SimulationScenario: data class for holding scenario data.
 
 Variables:
     scenarios (list): list of scenarios to un.
