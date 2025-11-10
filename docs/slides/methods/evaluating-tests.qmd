@@ -1,0 +1,1534 @@
+---
+title: "Evaluating Hypothesis Tests"
+subtitle: "Simulating Test Power and Size for Comparing Tests"
+author: Vladislav Morozov  
+format:
+  revealjs:
+    include-in-header: 
+      text: |
+        <meta name="description" content="Learn how to evaluate hypothesis tests in data science using Monte Carlo simulations; with worked power evaluation example (lecture note slides)"/> 
+    width: 1150
+    slide-number: true
+    sc-sb-title: true
+    incremental: true   
+    logo: ../../themes/favicon.ico
+    footer: "Evaluating Hypothesis Tests"
+    footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
+    theme: ../../themes/slides_theme.scss
+    toc: TRUE
+    toc-depth: 2
+    toc-title: Contents
+    transition: convex
+    transition-speed: fast
+slide-level: 4
+title-slide-attributes:
+    data-background-color: "#3c165cff"
+    data-footer: " "
+filters:
+  - reveal-header 
+embed-resources: true
+include-in-header: ../../themes/mathjax.html 
+highlight-style: tango
+open-graph:
+    description: "Learn how to evaluate hypothesis tests in data science using Monte Carlo simulations; with worked power evaluation example (lecture note slides)" 
+---
+
+
+
+
+
+
+## Introduction {background="#00100F"}
+ 
+  
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+
+from scipy.stats import chi2
+BG_COLOR = "whitesmoke"
+THEME_COLOR = "#3c165c"
+```
+
+### Lecture Info {background="#43464B"}
+
+#### Learning Outcomes
+
+This lecture is about evaluating hypothesis tests
+
+<br>
+
+By the end, you should be able to
+
+ 
+- Describe key properties of hypothesis tests 
+- Add parallel execution and result handling to our simulation code 
+- Use simulations to evaluate test power
+ 
+
+
+#### References on Hypothesis Testing
+ 
+<br>
+
+::: {.nonincremental}
+
+ 
+- [My slides from undergraduate econometrics](https://vladislav-morozov.github.io/econometrics-2/slides/vector/ols-inference.html) for some more theory and examples on linear hypothesis tests
+- Ch. 9 of @Hansen2022Econometrics
+- Ch. 9 in @Lehmann2022TestingStatisticalHypotheses on multiple comparison problems
+
+
+
+:::
+
+
+#### References on Relevant Code Aspects
+ 
+<br>
+
+::: {.nonincremental}
+
+- Ch. 6 of @Lau2023LearningDataScience on pandas basics
+- Ch. 11 of @Lau2023LearningDataScience on plotting
+- Ch. 1-3 of @Antao2023FastPythonHigh regarding performance (but note that Python since [has added support for free threading](https://docs.python.org/3/howto/free-threading-python.html))
+
+
+:::
+
+
+
+### Motivating Example Question {background="#43464B"}
+
+#### Setting: Joint Hypotheses
+ 
+Often want to test <span class="highlight">joint hypotheses</span>: hypotheses that involve several statements about parameters at the same time:
+
+<div class="left-color">
+$$
+\begin{aligned}
+& H_0: \text{for all $k$ the statement $A_k$ is true} \quad \text{vs.} \\
+&  H_1: \text{for at least some $k$, the statement $A_k$ is not true}
+\end{aligned}
+$$
+
+</div>
+
+<br>
+
+Example: null that coefficients are zero ($A_k=\curl{\theta_k=0}$)
+$$
+\begin{aligned}
+H_0: \theta_k = 0, \quad k=1, \dots, p
+\end{aligned}
+$$
+
+#### Motivating Question for Simulation
+
+Two example approaches:
+
+- With a simultaneous (joint) test (e.g. Wald/$F$, LM, LR)
+- Testing each component separately (e.g. with a $t$-test) and combining the results (with adjusted $p$-values)
+
+. . . 
+
+
+<br>
+
+Question of today:
+
+<div class="left-color">
+
+When do we generally use the first approach? 
+
+</div>
+ 
+#### Goals for Today:
+
+How to answer this question? 
+
+<br>
+
+Today talk about
+
+- What matters for comparing hypothesis tests
+- How to simulate tests
+- How to interpret results
+
+## Theory Essentials for Hypothesis Testings {background="#00100F"}
+ 
+
+### Definitions {background="#43464B"}
+
+
+
+#### Basic Setup: Hypotheses
+
+Suppose that we have a model with some parameters $\theta$ (of whatever nature)
+
+<br>
+
+<div class="left-color">
+
+Two competing *hypotheses* (statements about parameters $\theta$)
+$$
+H_0: \theta\in \Theta_0 \text{  vs.  } H_1: \theta \in \Theta_1 
+$$
+for some non-intersecting $\Theta_0$ and $\Theta_1$
+
+</div>
+
+#### Examples of Hypotheses
+
+Example: linear model of the form:
+
+$$\small
+Y_i  = \sum_{k=0}^{p} \beta_k X_i^{(k)}
+$$
+
+- Hypothesis on one parameter: $H_0: \beta_k \leq 0$ vs. $H_1: \beta_k >0$
+- Hypothesis about many parameters: 
+$$ \small
+H_0: \beta_0= \dots = \beta_p =0 \quad \text{ vs. } H_1: \beta_k\neq 0 \text{ for some }k
+$$
+
+#### Definition of a Test
+
+A test is a <span class="highlight">decision rule</span>: you see the sample and then you decide in favor of $H_0$ or $H_1$
+
+
+. . . 
+
+<br>
+
+Formally:
+
+<div class="rounded-box">
+
+::: {#def-vector-inference-test}
+
+A test $T$ is a function of the sample $(X_1, \dots, X_N)$ to the space $\{ \text{Reject } H_0$,  $\text{Do not reject }H_0 \}$
+
+:::
+
+</div>
+
+::: {.footer}
+
+Technically, @def-vector-inference-test is about <span class="highlight">deterministic</span> tests, there are also randomized tests
+
+:::
+
+
+
+#### Power
+
+<br>
+
+Key property of a hypothesis test: 
+<div class="rounded-box">
+
+::: {#def-vector-inference-power}
+
+The power function $\text{Power}_T(\theta)$ of the test $T$ is the probability that $T$ rejects if $\theta$ is the true parameter value:
+$$
+\text{Power}_T(\theta) = P(T(X_1, \dots, X_N)=\text{Reject }H_0|\theta)
+$$
+
+:::
+
+</div>
+
+ 
+
+#### Test Size
+
+Maximal power under the null has a special name 
+<div class="rounded-box">
+
+::: {#def-vector-inference-size}
+
+The <span class="highlight"> size </span> $\alpha$ of the test $T$ is 
+$$
+\alpha = \max_{\theta\in\Theta_0} \text{Power}_T(\theta)
+$$
+
+:::
+
+</div>
+
+In other words, the probability of falsely rejecting the null — <span class="highlight">type I error</span>
+
+
+#### What Defines a Good Test? 
+
+The best possible test has perfect detection:
+
+- Never rejects under $H_0$
+- Always reject under $H_1$
+
+. . . 
+
+<br>
+
+Usually impossible in practice. Instead, we ask
+
+- Not too much false rejection under $H_0$ (e.g. $\leq 5\%$ of the time)
+- As much rejection as possible under $H_1$ 
+ 
+
+#### Role of Size and Power
+
+
+<div class="rounded-box">
+
+Power function — key metric in comparing tests
+
+</div>
+
+<br>
+
+::: {.nonincremental}
+
+ 
+
+You should prefer tests that
+
+- Control size correctly 
+- Reject alternative more often (=use data more efficiently)
+
+:::
+
+### Tests and Test Statistics {background="#43464B"}
+
+ 
+ 
+ 
+
+
+#### How Testing Works in General
+
+<div class="left-color"> 
+
+How do we construct a test/decision rule?
+
+</div>
+
+<br>
+
+. . .
+
+Basic approach:
+
+1. Pick a "statistic" (=some known function of the data) that behaves "<span class="highlight">differently</span>" under $H_0$ and $H_1$
+2. Is the observed value of the statistic <span class="highlight">compatible</span> with $H_0$? 
+   - No $\Rightarrow$ reject $H_0$ in favor or $H_1$
+   - Yes $\Rightarrow$ do not reject $H_0$
+
+
+
+
+
+
+#### Measuring Compatibility with $H_0$
+
+<div class="left-color">
+
+Recall: compare with <span class="highlight">critical values</span> to measure compatibility with $H_0$
+
+</div>
+
+<br>
+
+Critical values chosen to guarantee
+
+- Exact size (when possible)
+- Asymptotic size (otherwise) 
+
+At least in the limit, the test should not falsely reject $H_0$ "too much"
+
+::: {.footer}
+
+The asymptotic size $\alpha$ of the test $T$ is $\alpha = \lim_{N\to\infty} \max_{\theta\in\Theta_0}  P(T(X_1, \dots, X_N)=\text{Reject }H_0|\theta)$
+
+:::
+ 
+
+#### Reminder: Main Classes of Statistics
+
+- In principle, can pick any statistic. Some are more "standard"
+- For testing hypotheses about coefficients, there are three main classes:
+  - Wald statistics: need only *unrestricted* estimates 
+  - Lagrange multiplier (LM): need *restricted* estimates 
+  - Likelihood ratio (LR): need both
+ 
+
+#### Example I: $t$-Test for $H_0: \theta_k=0$ vs. $H_1: \theta_k\neq 0$
+ 
+
+Suppose that have estimator $\hat{\theta}_k$ such that
+$$ \small
+\sqrt{N}(\hat{\theta}_k-\theta_k)\xrightarrow{d} N(0, \avar(\hat{\theta}_k))
+$$
+where $N$ is sample size
+
+
+Will base the test on the <span class="highlight">$t$-statistic</span>:
+$$ \small
+t = \dfrac{\hat{\theta}_k}{\sqrt{ \widehat{\avar}(\hat{\theta}_k)/N }  }
+$$
+
+
+#### Example I: Definition of $t$-Test  
+
+<br>
+
+
+We call the following the <span class="highlight">asymptotic size $\alpha$ $t$-test</span>:
+
+<div class="rounded-box">
+
+Let $z_{1-\alpha/2} = \Phi^{-1}(1-\alpha/2)$. Then
+
+- Reject $H_0$ is $\abs{t}>z_{1-\alpha/2}$
+- Do not reject $H_0$ is $\abs{t}\leq z_{1-\alpha/2}$
+
+
+</div>
+
+ 
+
+#### Example II: Wald Test for $H_0: \bR\btheta =\bc$ vs. $H_1: \bR\btheta \neq \bc$
+ 
+Let $\btheta= (\theta_0, \theta_1, \dots, \theta_p)$, $\bR$ some matrix, $\bc$ some vector
+
+Suppose that have estimator $\hat{\btheta}$ such that
+$$ \small
+\sqrt{N}(\hat{\btheta}-\btheta)\xrightarrow{d} N(0, \avar(\hat{\btheta}))
+$$
+
+
+Will base the test on the <span class="highlight">Wald statistic</span>:
+$$ \small
+W = N\left(  \bR\hat{\bbeta}-\bq   \right)'\left(\bR\widehat{\avar}(\bbeta)\bR'\right)^{-1}\left(  \bR\hat{\bbeta}-\bq   \right)
+$$ 
+
+#### Example II: Definition of Wald Test
+
+We call the following the <span class="highlight">asymptotic size $\alpha$ Wald-test</span>:
+
+
+<br>
+
+<div class="rounded-box">
+
+Let $c_{1-\alpha}$ solve $P(\chi^2_k\leq c_{1-\alpha})=1-\alpha$ where $k$ is the number of rows and rank of $\bR$. Then
+
+- Reject $H_0$ if $W>c_{1-\alpha}$
+- Do not reject $H_0$ if $W\leq c_{1-\alpha}$
+
+
+</div>
+
+#### Plot: PDF of $\chi^2_k$ and Rejection Region (Shaded)
+
+```{python}
+
+
+# Parameters for the chi-squared distribution
+df = 5
+
+# Generate the x values for the PDF
+x_vals = np.linspace(0, 20, 1000)
+
+# Compute the PDF values
+pdf_vals = chi2.pdf(x_vals, df)
+
+# Compute the 95th quantile
+quantile_95 = chi2.ppf(0.95, df)
+
+# Set up the figure and the axes
+fig, ax = plt.subplots(figsize=(15, 6))
+fig.patch.set_facecolor(BG_COLOR)
+fig.patch.set_edgecolor(THEME_COLOR)
+fig.patch.set_linewidth(5)
+
+# Plot the PDF
+ax.plot(x_vals, pdf_vals, label=f'PDF of $\\chi^2_k$ distribution', color=THEME_COLOR)
+
+# Fill the area under the PDF to the right of the 95th quantile
+ax.fill_between(x_vals, pdf_vals, where=(x_vals >= quantile_95), color='darkorange', alpha=0.3)
+
+# Mark the 95th quantile
+ax.axvline(quantile_95, color='red', linestyle='--', label="$c_{1-\\alpha}$")
+
+# Set the labels and title 
+ax.set_ylabel('Density') 
+ax.legend(loc='upper right')
+ax.set_ylim(0, 0.17)
+ax.set_xlim(0, 20)
+ax.set_xticklabels([])
+ax.set_yticklabels([])
+ax.set_facecolor(BG_COLOR)
+
+# Show the plot
+plt.show()
+
+```
+ 
+## Preparing Simulation: Joint vs. Multiple Tests {background="#00100F"}
+
+#### Plan For This Part
+
+Now turn to answering our motivating question: joint vs. mulitple tests for joint nulls
+
+<br>
+
+Plan:
+
+- A reminder on joint vs. multiple tests
+- Choosing simulation design: DGP, tests to compare 
+
+After: implementation
+
+### Background: Joint and Multiple Tests {background="#43464B"}
+
+#### Example Setting
+
+Suppose that have coefficients $\theta_k$ and want to test the joint null
+$$
+H_0: \theta_k = c_k, \quad k=1, \dots, p
+$$
+Have estimator $\hat{\btheta}$ such that $\sqrt{N}(\hat{\btheta}-\btheta)\xrightarrow{d} N(0, \avar(\hat{\btheta}))$
+
+. . . 
+
+::: {.left-color}
+
+Two main approaches for testing $H_0$:
+
+- Single joint test
+- Multiple tests
+
+
+:::
+
+#### Joint Tests
+
+ 
+::: {.left-color}
+
+
+A <span class="highlight">joint test</span> uses a single statistic to conduct the text
+
+
+:::
+
+<br>
+
+Example: Wald test based on
+
+$$
+W = N(\hat{\btheta}-\bc)'(\widehat{\avar}(\hat{\btheta}))^{-1}(\hat{\btheta}-\bc),
+$$
+Test based on comparing $W$ with $(1-\alpha)$th quantile of $\chi^2_p$
+
+#### Multiple Test
+
+::: {.left-color}
+
+
+A <span class="highlight">multiple test</span> aggregates the decisions of many separate tests
+
+
+:::
+
+For example, let 
+$$ \small 
+t_k = \dfrac{\sqrt{N}(\hat{\btheta}_k-c_k)}{\widehat{\avar}(\hat{\btheta}_k)}
+$$
+ 
+A  <span class="highlight">multiple $t$-test</span> for $H_0$ rejects if $\max_{k=1, \dots, p}\lbrace \abs{t_k}\rbrace$ exceeds some prespecified critical value $c_{\alpha}$
+
+
+#### Critical Values and Multiple Comparisons Problem
+
+
+::: {.left-color}
+
+
+Critical values of multiple tests have to be set to ensure overall correct size
+
+:::
+
+Have to be careful: e.g. with $p=2$ have
+$$
+\begin{aligned}
+& P(\text{test rejects}|H_0) \\
+& = P\left( \lbrace |{t}_1| \geq c_{\alpha}\rbrace   |H_0 \right) + P\left(   \lbrace |{t}_2| \geq c_{\alpha}\rbrace |H_0 \right)  \\
+& \quad - P\left( \lbrace |{t}_1| \geq c_{\alpha}\rbrace \cap \lbrace |{t}_2| \geq c_{\alpha}\rbrace |H_0 \right),
+\end{aligned}
+$$
+
+Hence if each $t$-test is a size $\alpha$-test, resulting multiple test has
+
+$$
+P(\text{test rejects}|H_0) \in [\alpha, 2\alpha]
+$$
+
+::: {.footer}
+
+See [this xckd](https://xkcd.com/882/) on multiple comparisons. Or see chapter 9 of @Lehmann2022TestingStatisticalHypotheses for theory
+
+::: 
+
+### Choosing a Basic DGP {background="#43464B"}
+
+#### Recap
+ 
+Now know the most important metrics:
+
+ 
+::: {.left-color}
+
+Should compare joint vs. multiple approach to testing in terms of <span class="highlight">power</span>
+
+::: 
+
+<br>
+
+But now key open questions:
+
+- Which tests exactly to use? 
+- In which scenario? 
+
+ 
+#### Technique: Reference Scenario
+
+Today: 
+
+- Trying to understand joint vs. multiple choice 
+- <span class="highlight">Without any constraints on setting</span>
+ 
+::: {.rounded-box}
+
+When no constraint on setting is present, start with
+
+- Simplest DGPs
+- Simplest methods (here tests)
+
+::: 
+Ideally: simplest = some kind of "textbook" reference setting
+ 
+#### Nice Reference Scenarios for Testing
+
+Very often in testing:
+
+- The nicest scenario is a simple linear model
+- Everything is normally distributed
+
+. . .
+
+<br>
+
+Key reason: 
+
+- Many practical tests are based on asymptotic normality
+- Hence exact normality = close to idealized asymptotic setting
+
+::: {.footer}
+
+There are theoretical reasons for importance of normality as a "base" case, see chapters 6-7 in @VanderVaart1998AsymptoticStatistics
+
+:::
+
+#### Reference Scenario: Simple Linear Model
+
+Simple linear model:
+$$
+Y_i = 1 + \theta_1 X_i^{(1)} + \theta_2 X_{i}^{(2)} + U_i
+$$
+
+
+. . . 
+
+<br>
+
+Very simple kind of joint hypothesis:
+$$
+H_0: \theta_1 = \theta_2 = 0
+$$
+
+#### Reference DGPs: Distributions for $U_i$ and $(X_i^{(1)}, X_i^{(2)})$
+ 
+$$
+\begin{aligned}
+U_{i} & \sim N(0, 1), \\
+\begin{pmatrix}
+X_i^{(1)} \\
+X_i^{(2)}
+\end{pmatrix} & \sim N\left(\begin{pmatrix}
+1 \\
+1
+\end{pmatrix}, \begin{pmatrix}
+1 & \rho \\
+\rho & 1
+\end{pmatrix} \right)
+\end{aligned},
+$$
+where the correlation $\rho$ runs between $-1$ and $1$
+
+. . . 
+
+::: {.left-color}
+
+Varying $\rho$ — key axis controlling geometry of many asymptotic joint tests — they depend on $\avar(\hat{\bbeta})$
+
+::: 
+
+#### DGPs: Coefficient Values
+
+Power function is function of $\btheta=(\theta_1, \theta_2)$ 
+
+$$ \small
+\text{Power}_T(\btheta) = P(T(X_1, \dots, X_N)=\text{Reject }H_0|\btheta)
+$$  
+
+::: {.left-color}
+
+Always need to look at DGPs that vary at least in coefficients in that enter in $H_0$ 
+
+::: 
+
+- Here: consider $\theta_1=\theta_2=c$ and vary $c$
+- Under each $c$ test $H_0:\theta_1=\theta_2=0$ 
+
+. . . 
+
+
+$\Rightarrow$ DGPs vary in $c$ and $\rho$
+
+::: {.footer}
+
+Not that restrictive to have $\theta_1=\theta_2$: can suitably rotate $(X_{i}^{(1)}, X_{i}^{(2)})$ to make any $(\theta_1, \theta_2)$ to  $\theta_1=\theta_2$.
+
+::: 
+
+
+
+### Choosing Tests {background="#43464B"}
+
+
+#### Which Tests to Use?
+
+In our case: think about which tests are the most popular
+
+<br>
+
+- For joint: Wald test is easiest theoretically and practically
+- For multiple: individual $t$ tests for $H_0: \theta_1=0$ and $H_0: \theta_2=0$
+
+
+
+
+Will compare those based on OLS estimator, just need to choose <span class="highlight">adjusted critical values for multiple $t$-test</span>
+
+
+#### Bonferroni Correction
+
+Recall: if each $t$-test is done at size $\alpha$, then multiple $t$-test based on two has
+$$
+P(\text{test rejects}|H_0) \leq 2\alpha
+$$
+
+::: {.left-color}
+
+If want overall multiple test to have size $\leq \alpha$, need to do each component test with size $\alpha/2$ 
+:::
+
+- Example: 2.5% individual tests for 5% overall
+- This is called the <span class="highlight">Bonferroni correction</span>
+
+#### Role of $\rho$
+
+$\rho$ controls correlation between $\hat{\theta}_1$ and $\hat{\theta}_2$ with $\mathrm{corr}(\hat{\theta}_1, \hat{\theta}_2) \approx -\rho$
+```{python}
+from matplotlib.patches import Rectangle
+from scipy.stats.distributions import chi2, norm
+
+# Define contour value c
+c = chi2.ppf(0.95, df=2)  # Change this to the desired value of c
+t_bound = norm.ppf(0.025 / 2)
+
+# Create a grid of x1 and x2 values
+x1 = np.linspace(-5, 5, 400)
+x2 = np.linspace(-5, 5, 400)
+X1, X2 = np.meshgrid(x1, x2)
+
+rhos = [-0.99, 0, 0.99]
+
+# Plot the contour for the specified value c
+fig, axs = plt.subplots(1, 3, figsize=(16, 4))
+fig.patch.set_facecolor(BG_COLOR)
+fig.patch.set_edgecolor(THEME_COLOR)
+fig.patch.set_linewidth(5)
+
+
+for ax, rho in zip(axs, rhos): 
+    # Define the matrix A
+    A = np.array([[1, rho], [rho, 1]])  # Example symmetric positive-definite matrix
+    A = np.linalg.inv(A)
+
+    # Compute the quadratic form x'Ax
+    Z = A[0, 0] * X1**2 + A[1, 1] * X2**2 + 2 * A[0, 1] * X1 * X2
+
+
+    ax.contourf(X1, X2, Z, levels=[c, Z.max()], hatches=["."], colors=["gold"], alpha=0) 
+    ax.set_xlabel("$\\hat{\\beta}_1$", color="white")
+    ax.set_ylabel("$\\hat{\\beta}_2$", color="white")
+
+ 
+    ax.set_xbound(-3, 3)
+    ax.set_ylim(-4.3, 4.3)
+
+    ax.add_patch(
+        Rectangle(
+            (t_bound, t_bound),
+            -2 * t_bound,
+            -2 * t_bound,
+            facecolor="none",
+            ec=THEME_COLOR,
+            lw=2,
+            linestyle="--",
+        )
+    ) 
+
+    # Mask the region inside the rectangle
+    Z_masked = np.ma.masked_where(
+        (X1 >= t_bound) & (X1 <= -1 * t_bound) & (X2 >= t_bound) & (X2 <= -1 * t_bound), Z
+    )
+ 
+    ax.contour(X1, X2, Z, levels=[c], colors="gold")
+
+    ax.text(-5, 4.7, "Correlation($\\hat{\\theta}_1$, $\\hat{\\theta}_2$) = " + str(rho),     fontsize=16,  color="black")
+    ax.set_xlabel("$\\hat{\\theta}_1$", color="black")
+
+axs[0].set_ylabel("$\\hat{\\theta}_2$", color="black")
+axs[0].set_title(
+    "Rejection regions: Wald (dotted) vs. adjusted multiple $t$-test (shaded)\n\n",
+    color="black",
+    loc="left",
+    fontsize=16, 
+    weight="bold",
+);
+plt.show()
+
+```
+ 
+
+## Implementing Our Simulation {background="#00100F"}
+ 
+
+### Simulation Runner and Tests {background="#43464B"}
+
+
+
+
+#### Overall Code Structure
+
+Mostly use same code structure developed in first block
+
+<br>
+
+Some differences: 
+
+- `tests` instead of `estimators`
+- Will add parallel execution
+- More results handling
+- Special approach to specifying DGPs
+
+#### File Structure
+
+```
+├── README.md
+├── requirements.txt
+├── dgps
+│   ├── __init__.py 
+│   └── linear.py 
+├── main.py
+├── results
+│   ├── ...
+├── sim_infrastructure
+│   ├── __init__.py 
+│   ├── orchestrators.py
+│   ├── protocols.py 
+│   ├── runner.py
+│   └── scenarios.py
+└── tests
+    ├── __init__.py 
+    ├── joint.py
+    └── multiple.py
+```
+"Infrastructure" classes organized in separate folder so that `main.py` is the only   `.py` file in root
+
+
+#### Simulation Runner: Design
+
+What does execution look like for a single dataset?
+
+- Draw data
+- Apply test
+
+. . . 
+
+<br>
+
+For many datasets:
+
+- Repeat above many times
+- Key: estimate power as frequency of rejections
+
+
+#### `SimulationRunner` Implementation
+
+
+
+```{.python filename="sim_infrastructure/runner.py" code-line-numbers="73"} 
+"""
+Module for executing a given Monte Carlo scenario.
+
+This module contains the SimulationRunner class, which executes a scenario
+by combining a DGP and a test. It handles data generation, estimation, testing,
+and result collection.
+
+Classes:
+    SimulationRunner: Runs simulations and summarizes results.
+"""
+
+import numpy as np
+from sim_infrastructure.protocols import DGPProtocol, TestProtocol
+
+
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and estimator.
+
+    Attributes:
+        dgp: data-generating process with a sample() method and beta1 attribute.
+        estimator: estimator with a fit() method and beta1_hat attribute.
+        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+    """
+
+    def __init__(
+        self,
+        dgp: DGPProtocol,
+        test: TestProtocol,
+    ) -> None:
+        """Initializes the simulation runner.
+
+        Args:
+            dgp: An instance of a DGP class (must implement `sample`).
+            estimator: An instance of an estimator class (must implement `fit`).
+        """
+        self.dgp: DGPProtocol = dgp
+        self.test: TestProtocol = test
+        self.test_decisions: np.ndarray = np.empty(0)
+
+    def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
+        """Runs simulations and stores estimation errors.
+
+        Args:
+            n_sim (int): number of simulations to run.
+            n_obs (int): Number of observations per simulation.
+            first_seed (int | None): Starting random seed for reproducibility.
+                Defaults to None.
+        """
+        # Preallocate array to hold estimation errors
+        self.test_decisions = np.empty(n_sim)
+
+        # Run simulation
+        for sim_id in range(n_sim):
+            # Draw data
+            x, y = self.dgp.sample(
+                n_obs, seed=first_seed + sim_id if first_seed else None
+            )
+            # Test null of zero coefficients
+            self.test.test(x, y)
+            # Store error
+            self.test_decisions[sim_id] = self.test.decision
+
+    def summarize_results(self) -> dict:
+        """Return a summary of results
+
+        Returns:
+            dict: power of current test at current DGP
+        """
+        return {
+            "test": self.test.name,
+            "covar_corr": self.dgp.covar_corr,
+            "common_coef_val": self.dgp.common_coef_val,
+            "power": self.test_decisions.mean(),
+        }
+```
+
+::: {.footer}
+
+Notice how the `SimulationRunner` summarizes its result: that's the power function computation!
+
+:::
+
+
+#### `tests/joint.py` Module: Wald Test
+
+```{.python filename="tests/joint.py"}
+"""
+Module for joint tests for joint hypothesis.
+
+Classes:
+    WaldWithOLS: OLS-based Wald test that all non-intercept coefficients are zero.
+"""
+
+import numpy as np
+import pandas as pd
+from statsmodels.regression.linear_model import OLS
+
+
+class WaldWithOLS:
+    """Class for applying Wald test to test null of zero coefficients.
+
+    Tailored to linear model
+        Y_i = theta0 + theta1 X_{i1} + ... + thetap X_{ip} + U_i
+    Tests the null:
+        H0: theta1 = ... = thetap = 0
+
+    Attributes:
+        name (str): test name, "Wald"
+        decision (np.bool): whether null is rejected
+    """
+
+    def __init__(self) -> None:
+        self.name: str = "Wald"
+        self.decision: np.bool
+
+    def test(self, x: pd.DataFrame, y: pd.DataFrame) -> None:
+        """Carry out the Wald test with given data.
+
+        Args:
+            x (pd.DataFrame): covariates, including a leading constant column.
+            y (pd.DataFrame): outcomes.
+        """
+        # Fit models
+        lin_reg = OLS(y, x)
+        lin_reg_fit = lin_reg.fit()
+
+        # Perform Wald test
+        num_covars = x.shape[1]
+        wald_restriction_matrix = np.concatenate(
+            (np.zeros((num_covars - 1, 1)), np.eye(num_covars - 1)), axis=1
+        )
+
+        wald_test = lin_reg_fit.wald_test(
+            wald_restriction_matrix,
+            use_f=False,
+            scalar=True,
+        )
+
+        self.decision = wald_test.pvalue <= 0.05
+```
+
+::: {.footer}
+
+`TestProtocol`: asks tests to have a `test()` method and a `decision` field
+
+:::
+
+#### `tests/multiple.py` Module: Multiple $t$-Test
+
+```{.python filename="tests/multiple.py"}
+"""
+Module for multiple tests for joint hypothesis.
+
+Classes:
+    BonferronigMultipleTWithOLS: OLS-based multiple t-test that all non-intercept
+        coefficients are zero. Uses Bonferroni correction.
+"""
+
+import numpy as np
+import pandas as pd
+from statsmodels.regression.linear_model import OLS
+from statsmodels.stats.multitest import multipletests
+
+
+class BonferronigMultipleTWithOLS:
+    """Class for applying multiple t-test to test null of zero coefficients.
+
+    Tailored to linear model
+        Y_i = theta0 + theta1 X_{i1} + ... + thetap X_{ip} + U_i
+    Tests the null:
+        H0: theta1 = ... = thetap = 0
+
+    Attributes:
+        name (str): test name, "Bonferroni t"
+        decision (np.bool): whether null is rejected
+    """
+
+    def __init__(self) -> None:
+        self.name: str = "Bonferroni t"
+        self.decision: np.bool
+
+    def test(self, x: pd.DataFrame, y: pd.DataFrame) -> None:
+        """Carry out the multiple t-test with given data.
+
+        Args:
+            x (pd.DataFrame): covariates, including a leading constant column.
+            y (pd.DataFrame): outcomes.
+        """
+        # Fit models
+        lin_reg = OLS(y, x)
+        lin_reg_fit = lin_reg.fit()
+
+        # Perform multiple t-tests
+        p_vals_t = lin_reg_fit.pvalues.iloc[1:]
+        t_test_corrected_bonf = multipletests(
+            p_vals_t,
+            method="bonferroni",  # Bonferroni
+        )
+        self.decision = t_test_corrected_bonf[0].sum() > 0
+
+```
+
+### Scenarios and Orchestrator {background="#43464B"}
+
+#### Scenarios: Grid for $c$
+
+Again: power function depends on $c$ (from $\theta_1=\theta_2=c$)
+
+- In practice: can't compute function for infinite number of values of $c$
+- Instead compute for a <span class="highlight">grid</span> of values of $c$
+
+<br>
+
+. . . 
+
+Here: evaluate for 231 points evenly spaced between $-1.75$ and $+1.75$  — sufficient to capture everything
+
+::: {.footer}
+
+No special meaning for 231 — just a reasonable large number
+
+:::
+
+#### Scenarios: Grid for $\rho$
+
+::: {.left-color}
+
+Want to also see the power function for <span class="highlight">different values of covariate correlation $\rho$</span>
+
+:::
+
+Will analyze for
+
+- 51 values of $\rho$
+- Equally spaced between $-0.99$ and $+0.99$
+
+
+<br>
+
+That is, for every $\rho$, compute power function on the $c$-grid
+
+::: {.footer}
+
+Using uneven number of grid points ensures that 0 is included in the grid
+
+:::
+
+#### Creating Grid of Scenarios
+
+- Different values of $c$ — different DGPs
+- $\Rightarrow$ DGPs vary in both $c$ and $\rho$
+
+. . . 
+
+<br>
+
+Will create as follows:
+
+- Write a prototype DGP with $c$ and $\rho$ as parameters
+- Use `scenarios.py` to create a DGP with every combination of $c$ and $\rho$ from the grid
+- Overall: $51\times 231 = 11781$ combinations 
+
+#### Prototype DGP
+
+```{.python filename="dgps/linear.py"} 
+"""
+Module for linear data-generating processes (DGPs).
+
+This module contains classes for generating data from simple linear models.
+
+Classes:
+    BivariateLinearModel: A DGP for static linear models with normal variables,
+        adjustable correlation between covariates, and two variables + constant.
+"""
+
+import numpy as np
+import pandas as pd
+
+class BivariateLinearModel:
+    """A data-generating process (DGP) for a static linear model
+
+    Attributes:
+        common_coef_val (float): Common values for theta1 and theta2
+        covar_corr (float): Correlation coefficient between covariates
+    """
+
+    def __init__(self, common_coef_val: float, covar_corr: float) -> None:  
+        self.common_coef_val: float = common_coef_val
+        self.covar_corr: float = covar_corr
+
+    def sample(
+        self, n_obs: int, seed: int | None = None
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """Samples data from the static DGP.
+
+        Args:
+            n_obs (int): Number of observations to sample.
+            seed (int, optional): Random seed for reproducibility. Defaults to None.
+
+        Returns:
+            tuple: (x, y) DataFrames, each of length n_obs.
+        """
+        # Initialize RNG
+        rng = np.random.default_rng(seed)
+
+        # Construct mean and covariance for coefficients
+        x_mean = np.array([1, 0, 0])
+        x_covar = np.array([[0, 0, 0], [0, 1, self.covar_corr], [0, self.covar_corr, 1]])
+
+        # Construct vector of coefficients
+        thetas = np.array([1, self.common_coef_val, self.common_coef_val]
+                          )
+        # Draw covariates and residuals, combine into output 
+        covariates = rng.multivariate_normal(
+            x_mean,
+            x_covar,
+            size=n_obs,
+        )
+        resids = rng.normal(0, np.sqrt(1), size=n_obs)
+        y = (covariates @ thetas) + resids
+
+        # Convert output into pandas dataframes with dynamic variable names for X
+        covariates_df = pd.DataFrame(
+            covariates,
+            columns=[f"X{i}" for i in range(covariates.shape[1])],
+        )
+        y_df = pd.DataFrame(
+            y,
+            columns=["y"],
+        )
+        return covariates_df, y_df
+```
+
+
+
+#### `scenarios.py`
+
+```{.python filename="sim_infrastructure/scenarios.py"}
+"""
+Module for defining simulation scenarios.
+
+This module contains scenarios for comparing power functions of tests under model:
+    Y = theta0  + theta1*x1 + theta2*x2 + u
+The null being tested is
+    H0: theta1=theta2=0
+
+Classes:
+    SimulationScenario: data class for scenarios
+
+Variables:
+    scenarios (list): list of scenarios to un.
+"""
+
+import numpy as np
+
+from dataclasses import dataclass
+from itertools import product
+
+
+from dgps.linear import BivariateLinearModel
+from sim_infrastructure.protocols import DGPProtocol, TestProtocol
+from tests.joint import WaldWithOLS
+from tests.multiple import BonferronigMultipleTWithOLS
+
+
+@dataclass(frozen=True)
+class SimulationScenario:
+    """A single simulation scenario: DGP, test, and sample size."""
+
+    name: str  # For readability
+    dgp: type[DGPProtocol]
+    dgp_params: dict  # E.g. betas go here
+    test: type[TestProtocol]
+    test_params: dict  # E.g. reg_params go here
+    sample_size: int
+    n_simulations: int = 500
+    first_seed: int = 1
+
+
+# Create DGP combinations indexed by correlation and coefficient values
+common_coef_vals = np.linspace(-1.75, 1.75, 231)
+covar_corr_vals = np.linspace(-0.99, 0.99, 51)
+dgps = [
+    (
+        BivariateLinearModel,
+        {"common_coef_val": common_coef_val, "covar_corr": covar_corr},
+    )
+    for common_coef_val, covar_corr in product(common_coef_vals, covar_corr_vals)
+]
+
+# Create list of tests
+tests = [
+    (WaldWithOLS, {}),
+    (BonferronigMultipleTWithOLS, {}),
+]
+
+sample_sizes = [200]
+
+# Generate all combinations
+scenarios = [
+    SimulationScenario(
+        name="", # will identify results through info from SimulationRunner
+        dgp=dgp_class,
+        dgp_params=dgp_params,
+        test=test_class,
+        test_params=test_params,
+        sample_size=size,
+    )
+    for (dgp_class, dgp_params), (
+        test_class,
+        test_params,
+    ), size in product(dgps, tests, sample_sizes)
+]
+```
+
+
+ 
+
+#### Working With Many DGPs
+
+We end up many DGPs
+
+- But each scenario is "separate"
+- Scope for running simulations in <span class="highlight">parallel</span>
+ 
+::: {.left-color} 
+
+
+Will implement `SimulationOrchestrator` that can
+
+- Execute scenarios in parallel (with `ThreadPoolExecutor` under free-threaded Python 3.14+)
+- Collect the results
+- Track progress (with `tqdm`)
+
+:::
+
+::: {.footer}
+
+Parallel computation is a deep topic. See @Antao2023FastPythonHigh on Python, but be aware of the removal of GIL in CPython starting from 3.14
+
+:::
+
+#### A Parallel `SimulationOrchestratorParallel`
+
+```{.python filename="sim_infrastructure/orchestrators.py"}
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from tqdm import tqdm
+
+from sim_infrastructure.runner import SimulationRunner
+from sim_infrastructure.scenarios import SimulationScenario
+
+
+class SimulationOrchestratorParallel:
+    """Parallelized simulation orchestrator class."""
+
+    def __init__(self, scenarios: list[SimulationScenario]) -> None:
+        self.scenarios = scenarios
+        self.summary_results = []
+
+    def run_single_scenario(self, scenario):
+        """Run a single scenario and return the result dictionary."""
+        dgp = scenario.dgp(**scenario.dgp_params)
+        estimator = scenario.test(**scenario.test_params)
+        runner = SimulationRunner(dgp, estimator)
+        runner.simulate(
+            n_sim=scenario.n_simulations,
+            n_obs=scenario.sample_size,
+            first_seed=scenario.first_seed,
+        )
+        return runner.summarize_results()
+
+    def run_all(self, max_workers=None):
+        """Run all scenarios in parallel using ThreadPoolExecutor."""
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all scenarios to the executor
+            futures = {
+                executor.submit(self.run_single_scenario, scenario): scenario
+                for scenario in self.scenarios
+            }
+            # Collect results as they complete, with a progress bar
+            for future in tqdm(
+                as_completed(futures), total=len(futures), desc="Running simulations"
+            ):
+                self.summary_results.append(future.result())
+```
+
+
+## Simulation Results {background="#00100F"}
+ 
+
+#### Handling Simulation Results
+ 
+- Now have a large collection of results in the results field of the orchestrator: estimated power function for each combination of $c$, $\rho$ and test
+- Can convert to pandas DataFrame and export as a CSV
+
+. . .
+
+Here: create a custom `ResultsProcessor` that processes results and export plots
+
+::: {.left-color}
+
+Sadly, <span class="highlight">no general approaches</span> for making graphs — always a lot of customization and tight coupling to setting
+
+::: 
+
+
+#### Resulting `main.py`
+
+```{.python filename="main.py"}
+from pathlib import Path
+
+import pandas as pd
+
+from sim_infrastructure.orchestrators import SimulationOrchestratorParallel
+from sim_infrastructure.results_processor import ResultsProcessor
+from sim_infrastructure.scenarios import scenarios
+
+SIM_RESULTS_PATH = Path() / "results" / "sim_results.csv"
+PLOT_FOLDER = Path() / "results" / "plots"
+
+
+if __name__ == "__main__":
+    # Create and execute simulations
+    orchestrator = SimulationOrchestratorParallel(scenarios)
+    orchestrator.run_all()
+
+    # Export results
+    pd.DataFrame(orchestrator.summary_results).to_csv(SIM_RESULTS_PATH)
+
+    # Export plots
+    results_processor = ResultsProcessor(SIM_RESULTS_PATH, PLOT_FOLDER)
+    results_processor.export_all_plots()
+```
+  
+ 
+ 
+#### Power Surfaces
+
+![](../../../example-codes/2-joint-vs-multiple-tests/results/plots/power_surfaces.svg)
+
+
+#### Plotting Difference in Powers
+
+
+
+
+:::: {.columns}
+
+::: {.column width="46%"}
+
+ 
+![](../../../example-codes/2-joint-vs-multiple-tests/results/plots/power_diff.svg)
+
+
+:::
+
+   
+::: {.column width="54%"} 
+
+::: {.nonincremental}
+
+- Hard to see differences directly from power surfaces
+- Can plot differences in power functions: power of Wald $-$ power of multiple $t$-test 
+- Positive values: Wald more powerful
+
+
+:::
+
+:::
+
+::::
+
+
+#### Interpreting Power Differences
+
+
+
+:::: {.columns}
+
+::: {.column width="46%"}
+
+ 
+![](../../../example-codes/2-joint-vs-multiple-tests/results/plots/power_diff.svg)
+
+
+:::
+
+   
+::: {.column width="54%"} 
+
+::: {.nonincremental}
+
+- Both control size correctly (see values at $c=0$)
+- Neither test dominates each other (both positive and negative values)
+- Wald has huge advantage with $\mathrm{corr}(\hat{\theta}_1, \hat{\theta}_2) \approx -1$
+- Multiple slightly better for $\mathrm{corr}(\hat{\theta}_1, \hat{\theta}_2) \approx 1$
+
+:::
+
+:::
+
+::::
+
+#### Overall Statistical Conclusions
+
+Can we justify always using Wald tests based on this? 
+
+<br>
+
+::: {.left-color}
+
+Yes. Wald test is <span class="highlight">safe</span>
+
+- Never loses by much
+- Sometimes has huge power advantage
+
+:::
+
+
+## Recap and Conclusions {background="#00100F"}
+ 
+#### Recap
+
+<br>
+
+In this lecture we 
+
+- Discussed key characteristics of hypothesis tests
+- Considered a worked example of comparing tests
+- Added parallel execution and result handling to our simulation code 
+
+
+
+#### References {.allowframebreaks visibility="uncounted"}
+
+::: {#refs}
+:::

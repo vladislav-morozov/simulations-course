@@ -231,6 +231,72 @@
     ]
   },
   {
+    "objectID": "slides/methods/evaluating-tests.html#introduction",
+    "href": "slides/methods/evaluating-tests.html#introduction",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Introduction",
+    "text": "Introduction",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#theory-essentials-for-hypothesis-testings",
+    "href": "slides/methods/evaluating-tests.html#theory-essentials-for-hypothesis-testings",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Theory Essentials for Hypothesis Testings",
+    "text": "Theory Essentials for Hypothesis Testings",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#preparing-simulation-joint-vs.-multiple-tests",
+    "href": "slides/methods/evaluating-tests.html#preparing-simulation-joint-vs.-multiple-tests",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Preparing Simulation: Joint vs. Multiple Tests",
+    "text": "Preparing Simulation: Joint vs. Multiple Tests",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#implementing-our-simulation",
+    "href": "slides/methods/evaluating-tests.html#implementing-our-simulation",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Implementing Our Simulation",
+    "text": "Implementing Our Simulation",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#simulation-results",
+    "href": "slides/methods/evaluating-tests.html#simulation-results",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Simulation Results",
+    "text": "Simulation Results",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#recap-and-conclusions",
+    "href": "slides/methods/evaluating-tests.html#recap-and-conclusions",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
     "objectID": "slides/general-principles/code-organization.html#introduction",
     "href": "slides/general-principles/code-organization.html#introduction",
     "title": "Good Simulation Code III: Organization",
