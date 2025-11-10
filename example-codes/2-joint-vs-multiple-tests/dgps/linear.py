@@ -1,5 +1,5 @@
 """
-Module for static data-generating processes (DGPs).
+Module for linear data-generating processes (DGPs).
 
 This module contains classes for generating data from simple linear models.
 
@@ -20,12 +20,6 @@ class BivariateLinearModel:
     """
 
     def __init__(self, common_coef_val: float, covar_corr: float) -> None:
-        """Initializes the DGP with intercept and slope.
-
-        Args:
-            beta0 (float): Intercept term. Defaults to 0.0.
-            beta1 (float): Slope coefficient. Defaults to 1.0.
-        """
         self.common_coef_val: float = common_coef_val
         self.covar_corr: float = covar_corr
 
