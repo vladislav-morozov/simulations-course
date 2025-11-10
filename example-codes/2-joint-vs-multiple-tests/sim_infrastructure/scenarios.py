@@ -13,55 +13,63 @@ Variables:
     scenarios (list): list of scenarios to un.
 """
 
+import numpy as np
+
 from dataclasses import dataclass
 from itertools import product
 
-from dgps.static import StaticNormalDGP
-from dgps.dynamic import DynamicNormalDGP 
-from estimators.ols_like import LassoWrapper, SimpleOLS, SimpleRidge
-from sim_infrastructure.protocols import DGPProtocol, EstimatorProtocol
+
+from dgps.linear import BivariateLinearModel
+from sim_infrastructure.protocols import DGPProtocol, TestProtocol
+from tests.joint import WaldWithOLS
+from tests.multiple import BonferronigMultipleTWithOLS
 
 
 @dataclass(frozen=True)
 class SimulationScenario:
-    """A single simulation scenario: DGP, estimator, and sample size."""
+    """A single simulation scenario: DGP, test, and sample size."""
 
     name: str  # For readability
     dgp: type[DGPProtocol]
     dgp_params: dict  # E.g. betas go here
-    estimator: type[EstimatorProtocol]
-    estimator_params: dict  # E.g. reg_params go here
+    test: type[TestProtocol]
+    test_params: dict  # E.g. reg_params go here
     sample_size: int
-    n_simulations: int = 1000
+    n_simulations: int = 200
     first_seed: int = 1
 
 
-# Define lists of components
-dgps = [
-    (StaticNormalDGP, {"beta0": 0.0, "beta1": 1.0}, "static"),
-    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.0}, "low_pers"),
-    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.5}, "mid_pers"),
-    (DynamicNormalDGP, {"beta0": 0.0, "beta1": 0.95}, "high_pers"),
+# Create DGP combinations indexed by correlation and coefficient values
+common_coef_vals = np.linspace(-3, 3, 201)
+covar_corr_vals = np.linspace(-0.99, 0.99, 50)
+dgp_list = [
+    (
+        BivariateLinearModel,
+        {"common_coef_val": common_coef_val, "covar_corr": covar_corr},
+    )
+    for common_coef_val, covar_corr in product(common_coef_vals, covar_corr_vals)
 ]
-estimators = [
-    (SimpleOLS, {}),
-    (LassoWrapper, {"reg_param": 0.1}),
-    (SimpleRidge, {"reg_param": 0.1}),
+
+# Create test
+tests = [
+    (WaldWithOLS, {}),
+    (BonferronigMultipleTWithOLS, {}),
 ]
-sample_sizes = [50, 200]
+
+sample_sizes = [200]
 
 # Generate all combinations
 scenarios = [
     SimulationScenario(
-        name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_T{size}",
+        name="",
         dgp=dgp_class,
         dgp_params=dgp_params,
-        estimator=estimator_class,
-        estimator_params=estimator_params,
+        test=test_class,
+        test_params=test_params,
         sample_size=size,
     )
-    for (dgp_class, dgp_params, dgp_descr), (
-        estimator_class,
-        estimator_params,
-    ), size in product(dgps, estimators, sample_sizes)
+    for (dgp_class, dgp_params), (
+        test_class,
+        test_params,
+    ), size in product(dgp_list, tests, sample_sizes)
 ]

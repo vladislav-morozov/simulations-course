@@ -14,15 +14,15 @@ from sim_infrastructure.runner import SimulationRunner
 class SimulationOrchestrator:
     """Simulation orchestrator that stores results in a dictionary
     """
-    def __init__(self, scenarios: list[SimulationScenario]):
+    def __init__(self, scenarios: list[SimulationScenario]) -> None:
         self.scenarios = scenarios
-        self.summary_results = {}
+        self.summary_results = []
 
     def run_all(self):
         for scenario in self.scenarios: 
             # Create DGP and estimator
             dgp = scenario.dgp(**scenario.dgp_params)
-            estimator = scenario.estimator(**scenario.estimator_params)
+            estimator = scenario.test(**scenario.test_params)
 
             # Run the simulation
             runner = SimulationRunner(dgp, estimator)
@@ -32,4 +32,4 @@ class SimulationOrchestrator:
                 first_seed=scenario.first_seed,
             )
             # Save results
-            self.summary_results[scenario.name] = runner.errors.mean()
+            self.summary_results.append(runner.summarize_results())
