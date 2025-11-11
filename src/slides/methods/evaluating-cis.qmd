@@ -73,7 +73,7 @@ By the end, you should be able to
 ::: {.nonincremental}
 
  
-- - [My slides from undergraduate econometrics](https://vladislav-morozov.github.io/econometrics-2/slides/vector/ols-inference.html) for some basic theory on univariate confidence intervals
+- [My slides from undergraduate econometrics](https://vladislav-morozov.github.io/econometrics-2/slides/vector/ols-inference.html) for some basic theory on univariate confidence intervals
 
 :::
 
@@ -334,12 +334,40 @@ Still need to choose remaining DGP parameters: mean $\mu$ and sample size $N$
 
 #### Choosing the Remaining Parameters
 
+Can set
+$$
+\mu = 0
+$$
+
+For sample sizes:
+
+- Consider two: $N=20$ and $N=100$
+- If asymptotic approximation problems exist, they should be less present with larger sample sizes
+
+
+### Implementing The Simulation {background="#43464B"}
+
+#### Approach to Code: Functions
+
+Our simulation 
+
+- Quite small
+- Unlikely to need many more DGPs and different estimators
+
+::: {.left-color}
+
+Today will organize as a small collection of functions
+
+:::
+
+Contrast with the modular approach of the previous two examples
+
 #### Code Organization
 
-Our simulation is quite small
 
-### Implementing Results {background="#43464B"}
+####
 
+1
 
 
 ## Simulation Results {background="#00100F"}
