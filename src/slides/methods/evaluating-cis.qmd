@@ -83,7 +83,72 @@ By the end, you should be able to
 
 ### Motivating Example {background="#43464B"}
 
-#### Setting 
+#### Setting and Estimators
+
+Suppose that observe an IID sample $X_1, \dots, X_N$ where
+$$
+X_i \sim N(\mu, \sigma^2)
+$$
+We estimate $\mu$ and $\sigma^2$ with their maximum likelihood estimators
+
+$$
+\hat{\mu} = \dfrac{1}{N}\sum_{i=1}^N X_i, \quad \hat{\sigma}^2 = \dfrac{1}{N}\sum_{i=1}^{N}(X_i -\bar{X})^2
+$$
+
+#### Towards Confidence Intervals
+
+::: {.left-color}
+
+In practice usually want to quantify uncertainty using confidence intervals
+
+:::
+
+- Can construct based on exact sampling distribution of $\hat{\mu}$ and $\hat{\sigma}^2$
+- More often and generally, use asymptotic normality approximations, e.g. that if $\mu=0$, then under any distribution of data
+
+$$
+\sqrt{N}(\hat{\sigma}^2 - \sigma^2) \xrightarrow{d} N(0, \E[X_i^4]-\sigma^4)
+$$
+
+::: {.footer}
+
+Can prove the above asymptotic result using the [delta method](https://vladislav-morozov.github.io/econometrics-2/slides/vector/ols-delta-method.html)
+
+:::
+
+#### Motivating Issue: Errors in Mean vs. in Variance
+
+- Suppose that true values are $\mu=0$ and $\sigma^2 = 0.1$
+- For the mean: you can make the same mistake in both directions: e.g. you can underestimate or overestimate the mean by $0.5$
+- You can also overestimate $\sigma^2$ by 0.5
+ 
+::: {.left-color}
+
+But you cannot underestimate $\sigma^2$ by $0.5$ (which would mean an estimate of $-0.4$)
+
+$\Rightarrow$ Distribution of estimation errors $(\sigma^2-\sigma^2)$ cannot be symmetric
+:::
+
+#### Simulation Question of Today
+
+- Asymmetry of error distribution $\Rightarrow$ maybe asymptotic normal (symmetric) approximation is not good?
+- This effect may be more pronounced when $\sigma$ is small (less space for underestimation)
+- Does it affect he "quality" of asymptotic confidence intervals for $\sigma^2$?
+
+
+. . . 
+
+::: {.left-color}
+
+Today: check numerically whether confidence intervals properties change as $\sigma^2\to 0$
+
+:::
+
+::: {.footer}
+
+There is a lot of theory work about things going wrong when parameters may be on the boundary. See [@Andrews1999EstimationWhenParameter; @Andrews2000InconsistencyBootstrapWhen; @Andrews2001TestingWhenParameter]
+
+:::
 
 ## Theory Essentials for Confidence Intervals {background="#00100F"}
 
@@ -247,16 +312,45 @@ For multivariate sets the metric is usually called *volume*
 ::: 
  
 
-## Implementation {background="#00100F"}
+## Simulation Implementation {background="#00100F"}
+
+### Completing Simulation Design {background="#43464B"}
+
+
+#### Recap: Simulation Setting
+
+Let's come back to our example of today. Already have
+
+- DGP of variables (normal with different variances)
+- Estimators: maximum likelihood
+- Confidence interval to evaluate: based on asympotic normality of $\hat{\sigma}^2$
+
+::: {.left-color}
+
+Still need to choose remaining DGP parameters: mean $\mu$ and sample size $N$
+
+::: 
+
+
+#### Choosing the Remaining Parameters
 
 #### Code Organization
+
+Our simulation is quite small
+
+### Implementing Results {background="#43464B"}
 
 
 
 ## Simulation Results {background="#00100F"}
 
-####
+#### Results Handling
 
+Since our simulation is small, can just rerun any time
+
+Then don't save the results
+
+and just pass them directly to plottiing functions
 
 
 ## Recap and Conclusions {background="#00100F"}
