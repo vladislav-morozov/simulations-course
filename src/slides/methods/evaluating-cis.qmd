@@ -1,6 +1,6 @@
 ---
 title: "Evaluating Confidence Intervals"
-subtitle: "Simulating"
+subtitle: "Understanding Actual Coverage and Length Properties"
 author: Vladislav Morozov  
 format:
   revealjs:
@@ -63,6 +63,7 @@ By the end, you should be able to
  
 - Describe  
  
+ 
 
 
 #### References 
@@ -72,7 +73,7 @@ By the end, you should be able to
 ::: {.nonincremental}
 
  
-- Referemce
+- - [My slides from undergraduate econometrics](https://vladislav-morozov.github.io/econometrics-2/slides/vector/ols-inference.html) for some basic theory on univariate confidence intervals
 
 :::
 
@@ -80,13 +81,183 @@ By the end, you should be able to
   
 
 
-### Motivating Example Question {background="#43464B"}
+### Motivating Example {background="#43464B"}
 
 #### Setting 
 
 ## Theory Essentials for Confidence Intervals {background="#00100F"}
 
-#### 
+### Definitions and Examples {background="#43464B"}
+
+
+#### Confidence Sets: Definition
+
+
+<div class="rounded-box">
+
+::: {#def-vector-inference-conf-set}
+
+1. A <span class="highlight"> $(1-\alpha)\times 100\%$ confidence set for $\theta$ </span> ($\theta\in\R^p$) is a random set $S(X_1, \dots, X_N)\subseteq \R^p$  
+$$ \scriptsize
+P(\theta \in S(X_1, \dots, X_N)) = 1-\alpha
+$$
+
+1. $S(\cdot, \cdots)$ is an <span class="highlight">asymptotic $(1-\alpha)\times 100\%$ confidence set for $\theta$ </span>  if $\lim_{N\to\infty} P(\theta \in S(X_1, \dots, X_N)) = 1-\alpha$
+
+2. $P(\theta \in S(X_1, \dots, X_N))$ is the <span class="highlight">coverage</span> of $S$
+
+:::
+
+
+</div>
+
+
+::: footer
+
+:::
+
+#### Confidence Sets as Set Estimators
+
+Suppose that we are interested in some $\btheta\in \R^p$
+
+::: {.left-color}
+
+Confidence sets can be viewed as <span class="highlight">set estimators</span> —  return a whole set of values in $\R^p$ as a collection of guesses for $\btheta$
+
+
+:::
+  
+<br>
+
+- Confidence sets — intervals estimators with coverage guarantees
+- Should contrast with <span class="highlight">point estimators</span> (e.g. OLS, IV, etc.) — give only one point
+
+#### Familiar Example: CI Based on Asymptotic Normality
+  
+<div class="rounded-box">
+
+::: {#prp-vector-inference-ci}
+
+Suppose that $\sqrt{N}(\hat{\theta} - \theta) \xrightarrow{d} N(0, \avar(\hat{\theta}))$. Let $\widehat{\avar}(\hat{\theta})\xrightarrow{p} \avar(\hat{\theta})$.
+
+
+The confidence interval
+$$ \small \hspace{-1.6cm}
+S = \left[  \hat{\theta} -  z_{1-\alpha/2} \sqrt{ \frac{\widehat{\avar}(\hat{\theta})}{N} }, \hat{\theta}+  z_{1-\alpha/2} \sqrt{ \frac{\widehat{\avar}(\hat{\theta})}{N} }  \right]
+$$ {#eq-vector-inference-basic-ci}
+has asymptotic coverage $(1-\alpha)\times 100\%$
+
+:::
+
+</div>
+
+
+#### Connection to Tests: Test Inversion
+
+There is an equivalent way to construct the confidence interval ([-@eq-vector-inference-basic-ci])
+
+- Recall $t$-statistic for $H_0: \theta = c$
+- $S$ is the set of all $c$ for which the $t$-test does not reject
+
+. . . 
+
+<br>
+
+::: {.left-color}
+
+
+An example of <span class="highlight">test inversion</span> and equivalence between testing and confidence intervals
+
+:::
+
+ 
+
+#### Interpetation of Confidence Interval
+
+Recall interpretation of $95\%$ coverage:
+
+::: {.left-color}
+
+- Suppose we draw many samples of the same size 
+- In ~95% of the samples the CI will fall "on top" of the true parameter value
+
+
+
+:::
+
+<br>
+
+Notice: interpretation aligns with what we actually do in Monte Carlo
+ 
+### Motivating Example {background="#43464B"}
+
+#### Metrics for Evaluating Confidence Intervals
+
+<br>
+
+There are two key metrics for looking at confidence intervals in simulations
+
+1. Coverage: what the actual coverage is 
+2. (Average) length
+
+::: {.left-color}
+
+Generally prefer shorter intervals with coverage that is close to the nominal level
+
+:::
+
+#### Metric: Actual Coverage
+
+How do you evaluate coverage? 
+
+<br>
+
+::: {.left-color}
+
+Draw many datasets and in each sample $s$
+
+- Compute CI = $[\hat{a}_s, \hat{b}_s]$
+- Record $\text{Length}_s = \hat{b}_s - \hat{a}_s$
+
+Report estimated average of $\text{Length}_s$ over $s$
+:::
+
+
+#### Metric: Average Length
+
+
+Similar story for length:
+
+::: {.left-color}
+
+Draw many datasets and in each sample $s$
+
+- Compute CI
+- Check if CI include the true parameter and record inclusion as variable $D_s = 0, 1$ (1 for included)
+
+Report estimated coverage as average of $D_s$ over $s$
+:::
+
+Can also report other characteristics of length distribution (e.g. quantiles)
+
+::: {.footer}
+
+For multivariate sets the metric is usually called *volume*
+
+::: 
+ 
+
+## Implementation {background="#00100F"}
+
+#### Code Organization
+
+
+
+## Simulation Results {background="#00100F"}
+
+####
+
+
 
 ## Recap and Conclusions {background="#00100F"}
  
