@@ -1,26 +1,27 @@
 ---
-description: "Information about the projects for the course on fundamentals of simulation in data science"
+description: "Information about course projects, evaluation, and project organization for the Research Module (Fundamentals of Monte Carlo Simulation in Data Science)"
+title: "Course Project Information"
 open-graph:
-    description: "Information about the projects for the course on fundamentals of simulation in data science" 
+    description: "Information about course projects, evaluation, and project organization for the Research Module (Fundamentals of Monte Carlo Simulation in Data Science)" 
 format:
     html:
         toc: true
 ---
 
-
-# Course Project Information
+ 
  
 
 ## About the Project  
 
-The course project is the cornerstone of your learning experience in this module. Its key objective is to evaluate a statistical method (or a set of related methods) through Monte Carlo simulations. Students are required to design, execute, and analyze simulations to assess the method's performance in a given context.
+The course project is the cornerstone of your learning experience in this module. Its key objective is to evaluate a statistical method (or a set of related methods) through Monte Carlo simulations. You are required to design, execute, and analyze simulations to assess the method's performance in a given context. 
 
-The project is designed to help you develop three key skills:
+The project is designed to help you develop four key skills:
 
 
 1. Designing and interpreting simulations to evaluate statistical methods.
 2. Organizing and sharing technical work in a reproducible and professional manner.
 3. Communicating findings effectively through writing and presentations.
+4. Staying resilient and adapting to changes in open-ended technical projects. 
 
 Your grade for the course will be based entirely on this project. For deadlines, group sign-ups, and submission details, please refer to eCampus.
 
@@ -92,10 +93,44 @@ Bias in Cross-Validation for Model Selection
 
 
 ## Format
-
+ 
 ### Group Work
-- You will work in groups of three students. Form your groups independently, but notify the instructor if you need help finding teammates.
 
+Group formation:
+
+- You will work in groups of three students. 
+- Form your groups independently, but notify the instructor if you need help finding teammates.
+
+The key component of the project phase is group meetings. These meetings will by default take place during lecture hours. Every group should meet with the instructor at least once every two weeks. The sign-up details will be provided on eCampus.
+
+These meetings are your opportunity to:
+
+- Discuss progress and challenges.
+- Get feedback on your project direction. 
+- Figure our directions for improvement.
+
+The general idea is to rapidly iterate on the project based on the feedback and discussions in the meetings. 
+
+Open-ended technical projects often evolve as you work on them. Be prepared for a continuous learning process, including:
+
+- Refining your code and simulation design (e.g. implementation, refactoring).
+- Deepening your understanding of statistical methods and their real-world context.
+- Learning more technical tools as challenges arise.
+- Adjusting your evaluation approach as needed.
+- Shifting scope if earlier approaches prove ineffective.
+  
+Collaboration within your group is key.
+
+
+You can think of this stage as an agile (learning) experience:
+
+- Regular check-ins to assess progress.
+- Rapid adjustments based on feedback.
+- Learning just what you need for the next step.
+- Collaborating on both technical work and knowledge sharing.
+
+The aim is to produce a final project that reflects your learning and iteration throughout the course.
+ 
 ### Term Paper
 - Length: Maximum 20 pages (excluding bibliography and appendix).
   - *Note:* 20 pages is an upper limit, not a target. Focus on clarity and conciseness.
