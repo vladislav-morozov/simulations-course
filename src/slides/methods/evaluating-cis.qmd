@@ -362,13 +362,14 @@ Today will organize as a small collection of functions
 
 Contrast with the modular approach of the previous two examples
 
-#### Code Organization
+#### Code Structure
 
 
-####
+#### Key Simulation Function
 
-1
 
+
+#### `main.py`
 
 ## Simulation Results {background="#00100F"}
 
