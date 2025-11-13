@@ -1,10 +1,10 @@
 """
 Core simulation logic for evaluating confidence intervals for variance.
 
-This module contains the core functions for:
-- Maximum likelihood estimation of variance.
-- Construction of asymptotic confidence intervals.
-- Running Monte Carlo simulations for coverage and interval length.
+This module contains the core functions:
+- mle_variance: maximum likelihood estimation of variance.
+- asymptotic_ci_variance: construction of asymptotic confidence intervals.
+- run_simulations: running Monte Carlo simulations for coverage and interval length.
 """
 
 import numpy as np
@@ -30,37 +30,44 @@ def run_simulations(
     n_simulations: int = 1000,
     n_obs_list: list[int] = [20, 100],
     alpha: float = 0.05,
-    seed: int = 42,
+    seed: int = 1,
 ) -> dict[int, dict[float, dict]]:
     """
     Run Monte Carlo simulations for each true variance and sample size.
 
     Args:
-        true_vars: List of true variance values to simulate.
-        n_simulations: Number of Monte Carlo simulations per true variance.
-        n_obs_list: List of sample sizes to simulate.
-        alpha: Significance level for confidence intervals.
-        seed: Random seed for reproducibility.
+        true_vars (np.ndarray): true variance values to simulate.
+        n_simulations (int): number of Monte Carlo simulations per true variance.
+        n_obs_list (list[int]): list of sample sizes to simulate.
+        alpha (float): significance level for confidence intervals.
+        seed (int): Random seed for reproducibility.
 
     Returns:
         Nested dictionary: {n_obs: {true_var: {'coverage': ..., 'errors': ..., 'lengths': ...}}}
     """
-    np.random.seed(seed)
+    rng = np.random.default_rng(seed)
     results = {n_obs: {} for n_obs in n_obs_list}
 
+    # Loop over sample sizes
     for n_obs in n_obs_list:
+        # Loop over true variables
         for true_var in true_vars:
             errors = []
             lengths = []
             coverage = []
             for _ in range(n_simulations):
-                data = np.random.normal(0, np.sqrt(true_var), n_obs)
+                # Draw data and run estimation
+                data = rng.normal(0, np.sqrt(true_var), n_obs)
                 var_hat = mle_variance(data)
-                ci_lower, ci_upper = asymptotic_ci_variance(data, alpha)
-                errors.append(var_hat - true_var)
-                lengths.append((ci_upper - ci_lower) / true_var)  # Normalized length
-                coverage.append(ci_lower <= true_var <= ci_upper)
 
+                # Record estimation error in variance
+                errors.append(var_hat - true_var)
+
+                # Construct CI and check if variance belongs to it
+                ci_lower, ci_upper = asymptotic_ci_variance(data, alpha)
+                lengths.append((ci_upper - ci_lower) / true_var) 
+                coverage.append(ci_lower <= true_var <= ci_upper)
+ 
             results[n_obs][true_var] = {
                 'coverage': np.mean(coverage),
                 'errors': np.array(errors),
