@@ -6,7 +6,7 @@ format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content="Learn (lecture note slides)"/> 
+        <meta name="description" content="Learn how to evaluate confidence intervals in data science using Monte Carlo simulations; with worked maximum likelihood example(lecture note slides)"/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: "Learn  (lecture note slides)" 
+    description: "Learn how to evaluate confidence intervals in data science using Monte Carlo simulations; with worked maximum likelihood example(lecture note slides)" 
 ---
 
 
@@ -61,7 +61,9 @@ This lecture is about evaluating confidence intervals
 By the end, you should be able to
 
  
-- Describe  
+- Describe key properties of confidence intervals 
+- Write a small simulation organized in several functions
+- Use simulations to evaluate confidence interval coverage and length
  
  
 
@@ -74,6 +76,7 @@ By the end, you should be able to
 
  
 - [My slides from undergraduate econometrics](https://vladislav-morozov.github.io/econometrics-2/slides/vector/ols-inference.html) for some basic theory on univariate confidence intervals
+- Chapters 7 and 9 in @Hansen2022Econometrics
 
 :::
 
@@ -327,7 +330,7 @@ Let's come back to our example of today. Already have
 
 ::: {.left-color}
 
-Still need to choose remaining DGP parameters: mean $\mu$ and sample size $N$
+Still need to choose remaining DGP parameters: mean $\mu$, sample size $N$, and values of $\sigma$
 
 ::: 
 
@@ -343,6 +346,12 @@ For sample sizes:
 
 - Consider two: $N=20$ and $N=100$
 - If asymptotic approximation problems exist, they should be less present with larger sample sizes
+
+::: {.left-color}
+
+For $\sigma$: logarithmic grid between $10^{-3}$ and $10$
+
+:::
 
 
 ### Implementing The Simulation {background="#43464B"}
@@ -520,37 +529,92 @@ if __name__ == "__main__":
 
 
 
-#### Results Handling
+#### Visualizing Core Results
+ 
+- Our simulation produces coverage and length for each each value of $\sigma$
+- How to look at these results?
 
-Since our simulation is small, can just rerun any time
+<br>
 
-Then don't save the results
+. . .
 
-and just pass them directly to plottiing functions
+::: {.left-color}
+
+Can visually graphically with coverage and length plots
+
+:::
+
+For length: scale by magnitude to target value to get a "normalized" view
 
 #### Coverage Plot
 
+![](../../../example-codes/3-confidence-intervals-close-to-boundary/results/coverage_plot.svg)
 
 #### Length Plot
 
-#### Simulation Results
+
+![](../../../example-codes/3-confidence-intervals-close-to-boundary/results/length_plot.svg)
+
+#### Interpretation of Simulation Results
+
+For the core question:
+
+::: {.left-color}
+
+- Remarkably stable coverage and length properties
+- No dependence on $\sigma$ 
+
+$\Rightarrow$ no issue with $\sigma\approx 0$
+
+:::
+
+<br>
+
+But do see coverage issues for $N=20$ despite much longer intervals (around 87% real coverage with 95% nominal level). <span class="highlight">Why?</span>
+
 
 ### Why Coverage Issues for Smaller Samples? {background="#43464B"}
 
 #### Potential Explanations of Bad Coverage for $N=20$
 
+Why the coverage issues for $N=20$?
+
+- Normal approximation might be poor (incorrect shape of interval around its center)
+- MLE estimator is biased downward (incorrect center of the interval)
 
 ::: {.left-color}
+
+Can look at distribution of estimation errors and how it compares to the normal distribution with same variance
 
 :::
 
 #### Example Distribution Plot for $N=20$
 
+![](../../../example-codes/3-confidence-intervals-close-to-boundary/results/errors_n20_var_0.0518.svg)
 
 #### Example Distribution Plot for $N=100$
 
+![](../../../example-codes/3-confidence-intervals-close-to-boundary/results/errors_n100_var_0.0518.svg)
 
 #### Discussions of Distributional Approximation
+
+From looking at the two plots:
+
+- The shape is not perfect for $N=20$: longer right tail, some asymmetry
+- Bias is present: noticeable shift to the left
+
+. . .
+
+But much better approximation for $N=100$
+
+<br>
+
+
+::: {.left-color}
+
+$\Rightarrow$ Coverage issues are due to small sample effects
+
+:::
 
 ## Recap and Conclusions {background="#00100F"}
  
@@ -560,7 +624,9 @@ and just pass them directly to plottiing functions
 
 In this lecture we 
 
-- Discussed  
+- Reviewed key concepts for confidence intervals  
+- Identified key metrics: coverage and length
+- Saw a practical small simulation organized around tightly couple functions
 
 #### References {.allowframebreaks visibility="uncounted"}
 
