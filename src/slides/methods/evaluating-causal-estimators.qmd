@@ -74,6 +74,45 @@ On fixed effect estimation:
 :::
  
 
+
+## Motivation: Fixed Effects and Simulations as Counterexamples {background="#00100F"}
+ 
+
+
+### Background on Fixed Effect Estimation {background="#43464B"}
+
+#### Reminder
+
+####
+
+
+### Fixed Effects and  {background="#43464B"}
+
+####
+
+## Theory Essentials for Evaluating Causal Estimators {background="#00100F"}
+ 
+####
+
+
+## Specifying the Simulations {background="#00100F"}
+ 
+#### 
+
+Causal process
+
+
+## Simulation Implementation {background="#00100F"}
+
+#### 
+
+a
+
+
+## Results {background="#00100F"}
+ 
+####
+
 ## Recap and Conclusions {background="#00100F"}
  
 #### Recap
