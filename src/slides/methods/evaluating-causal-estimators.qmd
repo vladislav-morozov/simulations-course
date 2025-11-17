@@ -291,6 +291,47 @@ There are three metrics you typically see when evaluating causal estimators:
 
 Causal process
 
+Again: try to be as simple as possible
+
+#### Model
+
+#### Estimators Compared
+
+- OLS: not doing anything at all about unobserved heterogeneity
+- One-way random intercept/FE estimator
+
+#### Goal
+
+#### How Do You Find
+
+start: it's something about $X_{it}$ and $\beta_i$ interacting, not about $U_{it}$, so don't need to pay much attention to $U_{it}$
+
+
+####
+
+Moent condition:
+$$ 
+\begin{aligned} \mathbb{E}[x_{it}(\alpha_i + \alpha_i x_{it}+ u_{it})] & = 0, \quad t=1, 2, \\ \mathbb{E}[(x_{i2}- x_{i1})(\alpha_i (x_{i2}- x_{i1})+ u_{it})] & \neq 0 . \end{aligned} 
+$$
+
+
+#### Covariate Distribution
+
+- Can try simple normal distributions again
+- Different distributions given different $\alpha_i$ --- some sort of implicit (self-)selection mechanism
+$$  \small
+\begin{aligned}
+\begin{pmatrix} X_{i1} \\ X_{i2} \end{pmatrix}\Bigg| \alpha_i = + 1  & \sim N\left( \begin{pmatrix} \mu_{1+} \\ \mu_{2+} \end{pmatrix}, \begin{pmatrix} \sigma_{1+}^2 & \rho_+ \sigma_{1+} \sigma_{2+} \\ \rho_+ \sigma_{1+} \sigma_{2+} & \sigma_{2+}^2 \end{pmatrix} \right)  \\
+\begin{pmatrix} X_{i1} \\ X_{i2} \end{pmatrix}\Bigg| \curl{\alpha_i = - 1}  & \sim N\left( \begin{pmatrix} \mu_{1-} \\ \mu_{2-} \end{pmatrix}, \begin{pmatrix} \sigma_{1-}^2 & \rho_- \sigma_{1-} \sigma_{2-} \\ \rho_- \sigma_{1-} \sigma
+_{2-} & \sigma_{2-}^2 \end{pmatrix} \right)
+\end{aligned}
+$$
+
+::: {.footer}
+
+In some settings import to explicitly model selection into treatment
+
+:::
 
 ## Simulation Implementation {background="#00100F"}
 
