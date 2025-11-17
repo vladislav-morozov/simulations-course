@@ -26,10 +26,7 @@ from tqdm import tqdm
 
 from dgp.constants import (
     BETA_MEAN,
-    N_REPLICATIONS,
     N_VALUES,
-    OUTPUT_DIR,
-    SEEDS,
 )
 
 # from utils.combine_results import combine_results
@@ -40,6 +37,12 @@ from dgp.moment_info import (
     sim_moment_conditions,
 )
 from gmm.solver import GMMSolver
+from simulation_infrastructure.constants import (
+    N_REPLICATIONS,
+    OUTPUT_DIR,
+    SEEDS,
+)
+from simulation_infrastructure.plotting import plot_kdes
 from simulation_infrastructure.runner_functions import run_simulation_for_seed
 
 # Ensure output directory exists
@@ -82,8 +85,9 @@ def main() -> None:
             result = future.result()
             all_results.append(result)
 
-    # Combine results
-    pd.concat(all_results).to_csv("results/combo_results.csv")
+    # Combine results and export plots
+    sim_results = pd.concat(all_results)
+    plot_kdes(sim_results, OUTPUT_DIR)
 
 
 if __name__ == "__main__":
