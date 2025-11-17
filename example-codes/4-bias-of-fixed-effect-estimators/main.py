@@ -6,10 +6,10 @@ Causal model:
 
 
 Goal of simulation: construct an example of distribution under which:
-    1. The OLS estimator in regression of $Y_{it}$ on $X_{it}$ is unbiased for
+    1. The OLS estimator in regression of Y_{it} on X_{it} is unbiased for
         average coefficient value E[beta_i]
     2. The one-way random intercept/fixed effects estimator has the wrong sign
-       relative to $E[beta_i]$ with high probability
+       relative to E[beta_i] with high probability
 
 Usage:
     python main.py
@@ -61,11 +61,10 @@ def main() -> None:
     )
     solver_dgp_params.minimize()
     mu_sigma_params = solver_dgp_params.process_solution()
-
-    #
-    all_results = []
+ 
 
     # Run simulations in parallel
+    all_results = []
     with ProcessPoolExecutor() as executor:
         futures = {
             executor.submit(

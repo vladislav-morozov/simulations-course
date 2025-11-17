@@ -52,7 +52,12 @@ This lecture is about evaluating causal estimators
 By the end, you should be able to
 
  
-- Describe k 
+ 
+
+- Reviewed potential outcomes framework
+- Discussed core metrics for evaluating causal estimators
+- Saw another variation on structure code files
+
 - Use simulations as a tool for constructing (counter)examples
  
 
@@ -553,9 +558,19 @@ Again have a small targeted simulation $\Rightarrow$ will structure using functi
     └── runner_functions.py
 ```
 
-#### Structuring
+::: {.footer}
 
-Will structure some things differently this time to give difference
+Again have code with tighter coupling but less infrastructure to manage
+
+:::
+
+#### New Things This Time
+
+Will structure some things differently this time to give broader perspective
+
+- Different simulation run structure: both estimators applied on the same dataset (not separately like before)
+- Parameters of DGP found by optimization before starting Monte Carlo
+- Different approach to parallelism (process-based)
 
 #### Our `main.py`
 
@@ -568,7 +583,7 @@ Causal model:
 
 
 Goal of simulation: construct an example of distribution under which:
-    1. The OLS estimator in regression of $Y_{it}$ on $X_{it}$ is unbiased for
+    1. The OLS estimator in regression of Y_{it} on X_{it} is unbiased for
         average coefficient value E[beta_i]
     2. The one-way random intercept/fixed effects estimator has the wrong sign
        relative to $E[beta_i]$ with high probability
@@ -655,26 +670,111 @@ if __name__ == "__main__":
     main()
 ```
 
+#### Finding DGP Parameters
+  
+Construct parameters $(\mu_{\cdot}, \sigma_{\cdot}, \rho_{\cdot})$ by GMM
 
-#### Creating DGPs
+- Program conditions ([-@eq-moment-ols])-([-@eq-moment-fe])!
+- Set left hand side of condition ([-@eq-moment-fe]) to be equal to 1000 (which is not 0)
+- Apply a custom `GMMSolver` to find some valid parameter values
 
-On import `scenarios.py` will find 
 
+
+Then  just collect found parameter and pass to data generator function
 
 ::: {.footer}
 
-Try adding more target values and comparing distributions
+Try varying target values of moment and comparing  resulting estimator distributions
 
 :::
 
+#### Different Approach to Parallelism
 
+- Key package in using FE estimators well --- `pyfixest`
+- But: only available up to Python 3.12 (for now)
+
+. . .
+
+Still want to use parallelism to use multiple cores
+
+- But 3.12 has GIL (see @Antao2023FastPythonHigh), can't use thread-based approach like before
+
+. . .
+
+::: {.left-color}
+
+Here: use *process*-based approach: spawn a fully separate Python process that does part of the work, then combine results
+
+:::
+
+#### Different Approach to Scenarios
+
+Another difference: 
+
+::: {.left-color}
+
+Both FE and OLS estimators applied to same dataset in each step
+
+:::
+Remember: before had a scenario per estimator
+
+
+. . .
+
+- In general: difference is small if data generation is cheap
+- Trade-off: more cumbersome runners if want to apply array of estimators on each dataset (internal iteration over estimators)
 
 ### Results {background="#43464B"}
 
+#### How to Visualize Results
+
+Our simulation
+
+- Computes values of estimators in each dataset
+- Stores them all 
+
+. . . 
+
+<br>
+
+::: {.left-color}
+
+In line with our goal, most appropriate summary --- visualize distributions of estimators vs. $\E[\beta_i]$
+
+:::
+
+Allows us to see how often they sign $\neq$ sign of $\E[\beta-i]$
 
 #### Visualizing Simulation Results
 
+Recall: $\E[\beta_i] = -0.25$ (dotted vertical line)
 ![](../../../example-codes/4-bias-of-fixed-effect-estimators/results/kde_results.svg)
+
+#### Simulation Results: Discussion
+
+Results exactly as wanted:
+
+::: {.left-color}
+
+Accounting for the (correctly specified!) random intercept $\alpha_i$ leads to much worse performance than not accounting for any coefficient heterogeneity
+
+:::
+
+- With $N\geq 200$ FE estimator always has sign $\neq$ sign of $\E[\beta_i]$
+- OLS estimator -- fairly reasonable
+
+#### Broader Practical Conclusion
+
+<br>
+
+Two: 
+
+::: {.rounded-box}
+
+1. Adding more fixed effects can produce unpredictable changes in point estimates (fragility of "robustness checks")
+2. Better to use methods that can handle coefficient heterogeneity (e.g. mean group estimator) if want $\E[\beta_i]$
+
+:::
 
 ## Recap and Conclusions {background="#00100F"}
  
@@ -684,7 +784,11 @@ Try adding more target values and comparing distributions
 
 In this lecture we 
 
-- Reviewed  
+- Reviewed potential outcomes framework
+- Discussed core metrics for evaluating causal estimators
+- Saw another variation on structure code files
+- Used simulations as a tool for constructing  a (counter)example
+ 
 
 
 #### References {.allowframebreaks visibility="uncounted"}
