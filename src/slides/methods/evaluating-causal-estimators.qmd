@@ -228,7 +228,7 @@ What is $\hat{\bbeta}^{FE}$ actually estimating?
 Can show that
 $$ \small
 \hat{\bbeta}^{FE} \xrightarrow \E\left[ \left( \E\left[ \tilde{\bX}_i'\tilde{\bX}_i \right]\right)^{-1} \tilde{\bX}'_i\bbeta_i \right]
-$$
+$$ {#eq-fe-limit-hetero}
 where $\tilde{\bX}_i'$ --- matrix with $\tilde{\bX}_{it}'$ as rows
 
 - FE estimator  $\xrightarrow{p}$ weighted average of individual effects
@@ -371,35 +371,116 @@ Can FE estimator be somehow worse than not eliminating $\alpha_i$ at all?
 - Need to finish specifying DGP (coefficients process, treatments, $U_{it}$)
 - What "worse" means
 - What "not eliminating $\alpha_i$" means
+- Causal parameter of interest
 
-#### 
+#### Simplifying Setting
 
-Causal process
+::: {.left-color}
 
-Again: try to be as simple as possible
+Again: want simplest possible example
 
-#### Model
+:::
+
+<br>
+
+Specify model in form
+$$
+\begin{aligned}
+Y_{it} & = \alpha_i + (\beta + \alpha_i) X_{it} + Y_{it}, \quad i=1, \dots, N, \quad t=1, 2
+\end{aligned}
+$$ 
+
+- Shortest genuine panel with $T=2$
+- Coefficients controlled by $\alpha_i$
+
+#### Specifying Coefficient Distribution
+ 
+Now just need to specify $\beta$ and distribution of $\alpha_i$ 
+
+<br> 
+
+- Set $\alpha_i \pm 1$ with equal probability
+- Set $\beta=-0.25$ ($\Rightarrow \E[\beta_i]=-0.25$)
+
+. . .
+
+$\Rightarrow$ two types of units: 
+
+- 50% with $\beta_i = -1.25$ 
+- 50% with $\beta_i=0.75$
+
 
 #### Estimators Compared
 
-- OLS: not doing anything at all about unobserved heterogeneity
-- One-way random intercept/FE estimator
+Obvious that we need to include one-way random intercept/FE estimator
 
-#### Goal
+<br>
 
-#### How Do You Find
+. . .
 
-start: it's something about $X_{it}$ and $\beta_i$ interacting, not about $U_{it}$, so don't need to pay much attention to $U_{it}$
+And
+
+- Need something that does not eliminate $\alpha_i$
+- Simple baseline: OLS 
+- OLS: just regressing $Y_{it}$ on $(1, X_{it})$ without any transformations 
+ 
+#### Causal Parameter of Interest
+
+::: {.left-color}
+
+Remember: causal parameter must be specified based on the causal model, not on the estimator
+
+:::
+
+In our case
+
+- FE estimator often "justified" with the excuse that it still estimates "average effects"
+- "Average effects" often understood in the sense of ATE, not the weighted average ([-@eq-fe-limit-hetero])
+- $\Rightarrow$ <span class="highlight">parameter of interest is $\E[\beta_i]$ </span> --- can be used to compute ATE of any change in $x$
+
+#### Metric and Goal
+
+Good metric: bias of FE and OLS estimators for $\E[\beta_i]$ 
+
+<br>
+
+. . . 
+
+Want a dramatic example for things going wrong the FE vis-à-vis $\E[\beta_i]$
+
+- Want OLS (doing nothing about heterogeneity) to be unbiased for $\E[\beta_i]$
+- Want FE (doing something, but wrong) to have the wrong sign 
+
+#### How To Specify DGPs 
+
+Good place to start looking --- moment conditions that characterize limits of estimators
+
+- OLS consistent if
+$$ \small
+\mathbb{E}[X_{it}(\alpha_i + \alpha_i X_{it}+ U_{it})]  = 0, \quad t=1, 2
+$$ {#eq-moment-ols}
+- FE inconsistent (why?) if
+$$  \small
+ \mathbb{E}[(X_{i2}- X_{i1})(\alpha_i (X_{i2}- X_{i1})+ U_{it})] \neq 0 
+$$ {#eq-moment-fe}
+
+Distribution of $(X_{it}, U_{it})$ must be same for both estimators
+
+#### Distribution for $U_{it}$
+
+Moment conditions tell us
+
+- Both estimators have "~same dependence" on properties of $U_{it}$
+- $\Rightarrow$ differences in bias likely shouldn't depend on $U_{it}$ much
+- $\Rightarrow$ can just make a very simple assumption again
 
 
-####
+::: {.left-color}
 
-Moent condition:
-$$ 
-\begin{aligned} \mathbb{E}[x_{it}(\alpha_i + \alpha_i x_{it}+ u_{it})] & = 0, \quad t=1, 2, \\ \mathbb{E}[(x_{i2}- x_{i1})(\alpha_i (x_{i2}- x_{i1})+ u_{it})] & \neq 0 . \end{aligned} 
-$$
+Assume that $U_{it}$ is standard normal
 
-
+:::
+ 
 #### Covariate Distribution
 
 - Can try simple normal distributions again
@@ -418,12 +499,39 @@ In some settings import to explicitly model selection into treatment
 
 :::
 
+#### Finding Parameters 
+
+- Now have full distribution of $(\alpha_i, X_i, U_i)$
+- $\Rightarrow$ can compute expectations in ([-@eq-moment-ols])-([-@eq-moment-fe])!
+- Can now solve as system of equations for the $\mu$s, $\rho$s, and $\sigma$s
+
+. . . 
+
+::: {.left-color}
+
+Will solve numerically as part of DGP generation
+
+:::
+
 ## Simulation Implementation {background="#00100F"}
 
 #### 
 
 a
 
+
+#### Code Organization
+
+#### Creating DGPs
+
+On import `scenarios.py` will find 
+
+
+::: {.footer}
+
+Try adding more target values and comparing distributions
+
+:::
 
 ## Results {background="#00100F"}
  
