@@ -2,7 +2,7 @@
 Plotting functions for simulation results.
 
 This module contains the following functions:
-    - plot_kdes(): densities of estimators for each value of N
+    - plot_kdes: densities of estimators for each value of N
 
 """
 

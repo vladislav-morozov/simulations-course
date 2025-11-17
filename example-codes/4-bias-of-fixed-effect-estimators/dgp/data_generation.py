@@ -8,7 +8,7 @@ Functions:
             params: dict[str, np.ndarray],
             seed: int = None,
         ) -> pd.DataFrame:
-        Generates a synthetic dataset with specified characteristics.
+        Generates (Y, X) panel data follow DGP in the lecture.
 """
 
 import numpy as np

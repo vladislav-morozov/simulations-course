@@ -1,6 +1,6 @@
 """
 This module contains functions to run Monte Carlo simulations for different
-seeds and save the results to CSV files.
+seeds and return results in a manner compatible with process parallelism.
 
 Functions:
     - run_simulation_for_seed(seed: int,
@@ -9,7 +9,7 @@ Functions:
                             beta_mean: float,
                             mu_sigma_params: dict[str, np.ndarray],
                             output_dir: str):
-        Runs Monte Carlo for a given seed and saves the results
+        Runs Monte Carlo for a given seed and returns the results
 """
 
 import numpy as np
