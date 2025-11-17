@@ -53,7 +53,7 @@ By the end, you should be able to
 
  
 - Describe k 
- 
+- Use simulations as a tool for constructing (counter)examples
  
 
 
@@ -125,7 +125,7 @@ $$
 
 
 
-#### Underlying Causal Models
+#### Causal Model Underlying FE
 
 
 ::: {.left-color}
@@ -139,52 +139,149 @@ Remember: properties of causal estimator only meaningful if one specifies an und
 For one-way FE estimator: typical setting is linear <span class="highlight">potential outcomes</span> model
 
 $$
-Y_{it}^{\bx} = \alpha_i + \beta'\bx + U_{it}
-$$
+Y_{it}^{\bx} = \alpha_i + \bbeta'\bx + U_{it}
+$$ {#eq-fe-causal-model}
 
 - $\alpha_i$ --- the "random intercept"/unit FE
 - $\beta$ --- common treatment effect of $x$ 
  
 #### Properties Under Random Intercept Model
 
-### Fixed Effect Estimators and Heterogeneous Coefficients  {background="#43464B"}
+::: {.rounded-box}
 
-####
+Under
+
+
+- FE causal model ([-@eq-fe-causal-model])
+- Strict exogeneity: $\E[U_{it}|X_{i1}, \dots, X_{iT}]=0$
  
-Can show that
 
-#### 
+the one-way random intercept estimator $\hat{\bbeta}^{FE}$ satisfies
+$$
+\begin{aligned}
+ \E[\hat{\bbeta}^{FE}]  & = \bbeta, \\
+ \sqrt{N}(\hat{\bbeta}^{FE} - \bbeta) & \xrightarrow{d} N(0, \avar(\hat{\bbeta}^{FE}))
+\end{aligned}
+$$
 
-
-::: {.left-color}
-
-- Important to separate estimator from underlying causal model!
-- Can carry out FE estimation even if true model is not random intercept
 
 :::
 
-#### 
 
-Seems possible that attempting to "control for heterogeneity" <span class="highlight">leads to more bias</span> 
+### Fixed Effect Estimators and Heterogeneous Coefficients  {background="#43464B"}
+
+#### Discussion of FE Estimator
+
+- Typical motivation: "controlling unobserved heterogeneity"
+- Unobserved heterogeneity:
+    - Unit-specific effects $\alpha_i$
+    - Can also time effects $\gamma_t$ and other versions
+
+::: {.left-color}
+
+If model correctly specified, suitable FE estimator will recover $\bbeta$
+
+::: 
+
+#### A More Realistic Causal Model
+ 
+But model ([-@eq-fe-causal-model]) not internally consistent:
+
+::: {.nonincremental}
+
+- Why unobserved heterogeneity only in intercepts $\alpha_i$?
+- Why not <span class="highlight">heterogeneous treatment effects</span>?
+
+:::
+
+. . . 
+
+More realistic to assume causal model
+$$
+Y_{it}^{\bx} = \alpha_i + \bbeta_{i}'\bx + U_{it}
+$$ {#eq-causal-hetero}
+Now $\bbeta_i$ --- also unit-specific
+
+::: {.footer}
+
+Can also consider even more general models with $\bbeta_{it}$
+
+:::
+
+#### Question: What Does the FE Estimator Do?
+
+Suppose model ([-@eq-causal-hetero]) is true, but we still apply $\hat{\bbeta}^{FE}$
+
+::: {.left-color}
+
+What is $\hat{\bbeta}^{FE}$ actually estimating?
+
+:::
+
+<br>
+
+- Important to separate estimator from underlying causal model!
+- Can carry out FE estimation even if true model is not random intercept
+ 
+#### Estimand of FE Estimator Under Model  ([-@eq-causal-hetero])
+
+Can show that
+$$ \small
+\hat{\bbeta}^{FE} \xrightarrow \E\left[ \left( \E\left[ \tilde{\bX}_i'\tilde{\bX}_i \right]\right)^{-1} \tilde{\bX}'_i\bbeta_i \right]
+$$
+where $\tilde{\bX}_i'$ --- matrix with $\tilde{\bX}_{it}'$ as rows
+
+- FE estimator  $\xrightarrow{p}$ weighted average of individual effects
+- In general
+$$ \small
+\mathrm{plim}_{N\to\infty} \hat{\bbeta}^{FE} \neq \E[\bbeta_i]
+$$
+
+#### Simulation Question of Today
+ 
+
+::: {.rounded-box}
+
+It is possible that "controlling for heterogeneity"  with FE estimators <span class="highlight">can lead to more bias</span>  than not doing anything about heterogeneity?
+
+::: 
+
+- This matters because FE estimators are used *a lot*
+- Well-suited for simulations:
+    - Theory hard due to $\hat{\bbeta}^{FE}$ depending on transforms and inverses of $\bX_{it}$ 
+    - In simulations: can try to find a single example numerically
 
 
 ## Theory Essentials for Evaluating Causal Estimators {background="#00100F"}
  
-####
+#### Potential Outcomes
 
-#### Metrics of Interest
+Same goes in panel or time series settings
 
-There are three metrics you typically see
+#### Treatment Effects
 
-- Bias
-- Variance
-- Distribution
+#### Types of Causal Estimators
 
-#### Settings
+
+#### Settings for Studying Causal Estimators
 
 Can study in settings where it's supposed to work
 
 
+#### Metrics of Interest
+
+There are three metrics you typically see when evaluating causal estimators:
+
+
+
+- Bias
+- Variance
+- Sampling distribution
+
+#### Metrics: Bias and Variance
+
+
+#### Metrics: Distribution 
 
 
 
