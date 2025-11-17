@@ -6,7 +6,7 @@ Classes:
         of moment conditions to zero
 """
 
-from typing import Any, Callable
+from typing import Callable
 
 import numpy as np
 from scipy.optimize import minimize
@@ -20,13 +20,13 @@ class GMMSolver:
     Attributes:
         moment_conditions (Callable[[np.ndarray], np.ndarray]):
             Function returning moment conditions given parameter values.
-        constraints (list[dict[str, Any]] | None):
+        constraints (list[dict[str, str | Callable]] | None):
             List of constraints for parameter optimization.
         initial_guess (np.ndarray):
             Initial parameter values for the optimization.
         weighting_matrix (np.ndarray):
             Weighting matrix for the GMM objective function. Defaults to identity.
-        process_func (Callable[[np.ndarray], dict[str, Any]] | None):
+        process_func (Callable[[np.ndarray], dict[str, np.array| np.float]] | None):
             Function that processes the optimized parameters into a meaningful format.
         estimated_params (np.ndarray | None):
             The estimated parameters after optimization.
@@ -36,9 +36,10 @@ class GMMSolver:
         self,
         moment_conditions: Callable[[np.ndarray], np.ndarray],
         initial_guess: np.ndarray,
-        constraints: list[dict[str, Any]] | None = None,
+        constraints: list[dict[str, str | Callable]] | None = None,
         weighting_matrix: np.ndarray | None = None,
-        process_func: Callable[[np.ndarray], dict[str, Any]] | None = None,
+        process_func: Callable[[np.ndarray], dict[str, np.ndarray | np.floating]]
+        | None = None,
     ) -> None:
         self.moment_conditions = moment_conditions
         self.initial_guess = np.array(initial_guess)
@@ -65,12 +66,9 @@ class GMMSolver:
         moments = self.moment_conditions(params)
         return float(moments.T @ self.weighting_matrix @ moments)
 
-    def minimize(self) -> np.ndarray:
+    def minimize(self) -> None:
         """
         Runs the GMM estimation by minimizing the GMM objective function.
-
-        Returns:
-            np.ndarray: The estimated parameters.
         """
         result = minimize(
             self._gmm_objective, self.initial_guess, constraints=self.constraints
@@ -80,9 +78,8 @@ class GMMSolver:
             raise ValueError(f"Optimization failed: {result.message}")
 
         self.estimated_params = result.x
-        return self.estimated_params
 
-    def process_solution(self) -> dict[str, Any]:
+    def process_solution(self) -> dict[str, np.ndarray | np.floating]:
         """
         Processes the estimated parameters into a meaningful format.
 
