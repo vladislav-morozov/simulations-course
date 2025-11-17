@@ -254,39 +254,93 @@ It is possible that "controlling for heterogeneity"  with FE estimators <span cl
 
 ## Theory Essentials for Evaluating Causal Estimators {background="#00100F"}
  
-#### Potential Outcomes
+#### Potential Outcomes Framework
 
-Same goes in panel or time series settings
+- Key feature of causal settings: some causal process
+- Typically expressed using <span class="highlight">potential outcomes</spam>
+
+. . . 
+
+::: {.left-color}
+
+$$
+Y_i^x = \phi(x, U_i)
+$$
+= "If unit $i$ with unobserved characteristics $U_i$ receives treatment $x$, their outcome is $Y_i^x$"
+
+:::
+
+$\phi$ may be known of (fully/partially) unknown
+
+::: {.footer}
+
+Same type of approach can be used with panel or time series settings
+
+:::
 
 #### Treatment Effects
 
-#### Types of Causal Estimators
+Potential outcomes allow defining <span class="highlight">causal effects</spam>: 
+
+::: {.left-color}
+
+Causal effect of moving from treatment $\bx_1$ to $\bx_2$ for unit $i$ is defined as
+$$
+\phi(\bx_2, U_i) - \phi(\bx_1, U_i)
+$$
+
+:::
+
+- Typically different between units (because of different values of $U_i$)
+- Intuition: "exogenously/dictatorially" changing $\bx$ of unit $i$ --- difference in outcome attributable only to change in $\bx$
+
+#### Causal Parameters of Interest
+
+Usually interested in some <span class="highlight">distributional features</spam> of causal effects:
+
+- Average effects
+- Variance of effects (or higher-order moments)
+- Distribution of causal effects
+- Differences between distributions of potential outcomes (distributional/quantile treatment effects)
+
+
+Sometimes can learn individual treatment effects themselves
 
 
 #### Settings for Studying Causal Estimators
 
-Can study in settings where it's supposed to work
+<br>
+
+Two scenarios for studying causal estimators:
+
+- How well in performs in setting it was designed for (where it is guaranteed to consistently estimate the parameter of interest)
+- Robustness: how well/badly it performs in settings they are not designed for
+
 
 
 #### Metrics of Interest
+ 
 
-There are three metrics you typically see when evaluating causal estimators:
+Three metrics you typically see when evaluating causal estimators:
 
-
+::: {.left-color}
 
 - Bias
 - Variance
-- Sampling distribution
+- Full sampling distribution
 
-#### Metrics: Bias and Variance
+:::
 
-
-#### Metrics: Distribution 
+. . .
+ 
+Distribution: usually for inference purposes (good normal approximation $\Rightarrow$ good performance of natural asymptotic intervals)
 
 
 
 ## Specifying the Simulations {background="#00100F"}
  
+#### Settings
+
 #### 
 
 Causal process
