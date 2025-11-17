@@ -64,7 +64,7 @@ def run_simulation_for_seed(
                     "seed": seed,
                     "replication": replication,
                     "n_units": n_units,
-                    "model": "no_effects",
+                    "model": "No Fixed Effects",
                     "coef_est": fit_no_effect.coef().iloc[0],
                     "ci_lower": fit_no_effect.confint().iloc[0, 0],
                 }
@@ -74,7 +74,7 @@ def run_simulation_for_seed(
                     "seed": seed,
                     "replication": replication,
                     "n_units": n_units,
-                    "model": "fixed_effects",
+                    "model": "With Fixed Effects",
                     "coef_est": fit_effect.coef().iloc[0],
                     "ci_lower": fit_effect.confint().iloc[0, 0],
                 }

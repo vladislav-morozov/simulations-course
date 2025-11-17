@@ -15,6 +15,7 @@ Usage:
     python main.py
 
 Output:
+    Kernel density plots of distributions of the two estimators
 """
 
 import os
@@ -82,7 +83,7 @@ def main() -> None:
             all_results.append(result)
 
     # Combine results
-    print(pd.concat(all_results))
+    pd.concat(all_results).to_csv("results/combo_results.csv")
 
 
 if __name__ == "__main__":
