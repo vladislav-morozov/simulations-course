@@ -1,12 +1,12 @@
 ---
 title: "Evaluating Causal Estimators"
-subtitle: "SUBTITLE"
+subtitle: "Working with Causal Frameworks and Simulations for Counterexamples"
 author: Vladislav Morozov  
 format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content="Learn how to evaluate  (lecture note slides)"/> 
+        <meta name="description" content="Learn how to evaluate causal estimators using Monte Carlo simulations, with worked examples on the issues of fixed effect estimators (lecture note slides)"/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: "Learn how to evaluate c (lecture note slides)" 
+    description: "Learn how to evaluate causal estimators using Monte Carlo simulations, with worked examples on the issues of fixed effect estimators (lecture note slides)" 
 ---
 
 
@@ -52,14 +52,10 @@ This lecture is about evaluating causal estimators
 By the end, you should be able to
 
  
- 
 
-- Reviewed potential outcomes framework
-- Discussed core metrics for evaluating causal estimators
-- Saw another variation on structure code files
-
+- Understand the core aspects of evaluating causal estimators by simulations 
 - Use simulations as a tool for constructing (counter)examples
- 
+- Use process-based parallelism to accelerate computation
 
 
 #### References 
