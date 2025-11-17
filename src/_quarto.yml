@@ -48,6 +48,7 @@ website:
         contents: 
         - slides/methods/evaluating-tests.qmd
         - slides/methods/evaluating-cis.qmd
+        - slides/methods/evaluating-causal-estimators.qmd
 
 execute:
   freeze: auto  # re-render only when source changes

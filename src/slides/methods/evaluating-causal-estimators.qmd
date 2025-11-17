@@ -81,18 +81,111 @@ On fixed effect estimation:
 
 ### Background on Fixed Effect Estimation {background="#43464B"}
 
-#### Reminder
+#### Setting: Panel Data
+
+Suppose that we have data on
+
+- Some outcome $Y_{it}$
+- Some treatment $\bX_{it}$ (possibly vector)
+
+. . . 
+
+::: {.left-color}
+
+Interested in causal effect of $\bX_{it}$  on $Y_{it}$
+
+:::
+
+<br>
+
+
+Data is <span class="highlight">panel</span>: 
+
+- Two dimensions ($i$ and $t$)
+- E.g. units $i=1, \dots, N$ over time $t=1, \dots, T$
+
+
+
+#### Reminder: Random Intercept/Fixed Effect Estimation
+
+::: {.left-color}
+
+One way to estimate effects of treatment on $Y_{it}$ is using <span class="highlight">random intercept/fixed effect</span> estimators
+
+:::
+
+Simple example: one-way FE estimator:
+
+1. Construct
+$$\small 
+\tilde{Y}_{it} = Y_{it} - \dfrac{1}{T}\sum_{s=1}^T Y_{is}, \quad \tilde{\bX}_{it} = \bX_{it} - \dfrac{1}{T}\sum_{s=1}^T \bX_{is},
+$$
+
+2. The one-way FE estimator is the  OLS estimator in regression of $\tilde{Y}_{it}$ on $\tilde{\bX}_{it}$
+
+
+
+#### Underlying Causal Models
+
+
+::: {.left-color}
+
+Remember: properties of causal estimator only meaningful if one specifies an underlying causal model
+
+:::
+
+. . .  
+
+For one-way FE estimator: typical setting is linear <span class="highlight">potential outcomes</span> model
+
+$$
+Y_{it}^{\bx} = \alpha_i + \beta'\bx + U_{it}
+$$
+
+- $\alpha_i$ --- the "random intercept"/unit FE
+- $\beta$ --- common treatment effect of $x$ 
+ 
+#### Properties Under Random Intercept Model
+
+### Fixed Effect Estimators and Heterogeneous Coefficients  {background="#43464B"}
 
 ####
+ 
+Can show that
+
+#### 
 
 
-### Fixed Effects and  {background="#43464B"}
+::: {.left-color}
 
-####
+- Important to separate estimator from underlying causal model!
+- Can carry out FE estimation even if true model is not random intercept
+
+:::
+
+#### 
+
+Seems possible that attempting to "control for heterogeneity" <span class="highlight">leads to more bias</span> 
+
 
 ## Theory Essentials for Evaluating Causal Estimators {background="#00100F"}
  
 ####
+
+#### Metrics of Interest
+
+There are three metrics you typically see
+
+- Bias
+- Variance
+- Distribution
+
+#### Settings
+
+Can study in settings where it's supposed to work
+
+
+
 
 
 ## Specifying the Simulations {background="#00100F"}
