@@ -522,8 +522,12 @@ Will solve numerically as part of DGP generation
 
 :::
 
-## Simulation Implementation {background="#00100F"}
+## Simulation Implementation and Results{background="#00100F"}
  
+
+
+### Implementation {background="#43464B"}
+
 
 #### Code Organization
 
@@ -551,7 +555,7 @@ Again have a small targeted simulation $\Rightarrow$ will structure using functi
 
 #### Structuring
 
-
+Will structure some things differently this time to give difference
 
 #### Our `main.py`
 
@@ -619,11 +623,10 @@ def main() -> None:
     )
     solver_dgp_params.minimize()
     mu_sigma_params = solver_dgp_params.process_solution()
-
-    #
-    all_results = []
+ 
 
     # Run simulations in parallel
+    all_results = []
     with ProcessPoolExecutor() as executor:
         futures = {
             executor.submit(
@@ -666,9 +669,12 @@ Try adding more target values and comparing distributions
 
 
 
-## Results {background="#00100F"}
- 
-####
+### Results {background="#43464B"}
+
+
+#### Visualizing Simulation Results
+
+![](../../../example-codes/4-bias-of-fixed-effect-estimators/results/kde_results.svg)
 
 ## Recap and Conclusions {background="#00100F"}
  
