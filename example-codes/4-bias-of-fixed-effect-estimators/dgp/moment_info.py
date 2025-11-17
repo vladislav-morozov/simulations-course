@@ -20,8 +20,8 @@ Functions:
     Extracts mu and sigma matrices from the parameter vector.
 
 Variables:
-- constraints (List[Dict[str, Any]]): constraints on the DGP parameters
-- param_initial_guess (List[float]): initial guess for parameters
+- constraints: constraints on the DGP parameters
+- param_initial_guess: initial guess for parameters
 
 """
 
