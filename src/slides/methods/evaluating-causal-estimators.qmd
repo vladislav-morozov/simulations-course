@@ -274,7 +274,7 @@ $\phi$ may be known of (fully/partially) unknown
 
 ::: {.footer}
 
-Same type of approach can be used with panel or time series settings
+Same type of approach can be used with panel or time series settings. Also can consider settings where treatment of others matters
 
 :::
 
@@ -316,6 +316,14 @@ Two scenarios for studying causal estimators:
 - How well in performs in setting it was designed for (where it is guaranteed to consistently estimate the parameter of interest)
 - Robustness: how well/badly it performs in settings they are not designed for
 
+#### Relevance For Simulations
+
+In simulations:
+
+- Always need to fully specify $\phi(\cdot, \cdot)$ 
+- Sample = data you would observe in practice (e.g. $Y_i$ and $\bX_i$, not $U_i$)
+- True target parameters need to be computed from $\phi(\cdot, \cdot)$ and distribution of $U_i$
+
 
 
 #### Metrics of Interest
@@ -339,7 +347,30 @@ Distribution: usually for inference purposes (good normal approximation $\Righta
 
 ## Specifying the Simulations {background="#00100F"}
  
-#### Settings
+#### Recap of Simulation Setting
+
+So far: 
+
+- Causal model of form
+$$
+Y_{it}^{\bx} = \alpha_i + \bbeta_i'\bx + U_{it} 
+$$
+- Estimator to study: one-way FE estimator (the one that eliminates the $\alpha_i$)
+- Question is robustness:
+
+::: {.left-color}
+
+Can FE estimator be somehow worse than not eliminating $\alpha_i$ at all?
+
+:::
+
+#### Things To Specify
+
+<br>
+
+- Need to finish specifying DGP (coefficients process, treatments, $U_{it}$)
+- What "worse" means
+- What "not eliminating $\alpha_i$" means
 
 #### 
 
