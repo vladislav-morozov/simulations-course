@@ -227,7 +227,7 @@ What is $\hat{\bbeta}^{FE}$ actually estimating?
 
 Can show that
 $$ \small
-\hat{\bbeta}^{FE} \xrightarrow \E\left[ \left( \E\left[ \tilde{\bX}_i'\tilde{\bX}_i \right]\right)^{-1} \tilde{\bX}'_i\bbeta_i \right]
+\hat{\bbeta}^{FE} \xrightarrow{p} \E\left[ \left( \E\left[ \tilde{\bX}_i'\tilde{\bX}_i \right]\right)^{-1} \tilde{\bX}'_i\tilde{\bX}_i\bbeta_i \right]
 $$ {#eq-fe-limit-hetero}
 where $\tilde{\bX}_i'$ --- matrix with $\tilde{\bX}_{it}'$ as rows
 
@@ -311,9 +311,9 @@ Sometimes can learn individual treatment effects themselves
 
 <br>
 
-Two scenarios for studying causal estimators:
+Two scenarios for studying a causal estimator:
 
-- How well in performs in setting it was designed for (where it is guaranteed to consistently estimate the parameter of interest)
+- How well it performs in setting it was designed for --- theoretically guaranteed to be consistent for parameter of interest
 - Robustness: how well/badly it performs in settings they are not designed for
 
 #### Relevance For Simulations
@@ -321,7 +321,7 @@ Two scenarios for studying causal estimators:
 In simulations:
 
 - Always need to fully specify $\phi(\cdot, \cdot)$ 
-- Sample = data you would observe in practice (e.g. $Y_i$ and $\bX_i$, not $U_i$)
+- Sample = data you would observe in practice (e.g. $Y_i$ and $\bX_i$, but not $U_i$)
 - True target parameters need to be computed from $\phi(\cdot, \cdot)$ and distribution of $U_i$
 
 
@@ -341,7 +341,7 @@ Three metrics you typically see when evaluating causal estimators:
 
 . . .
  
-Distribution: usually for inference purposes (good normal approximation $\Rightarrow$ good performance of natural asymptotic intervals)
+Distribution: usually for inference purposes (good normal approximation $\Rightarrow$ good performance of usual asymptotic intervals)
 
 
 
@@ -356,7 +356,10 @@ $$
 Y_{it}^{\bx} = \alpha_i + \bbeta_i'\bx + U_{it} 
 $$
 - Estimator to study: one-way FE estimator (the one that eliminates the $\alpha_i$)
-- Question is robustness:
+
+. . .
+
+Question is robustness:
 
 ::: {.left-color}
 
@@ -368,12 +371,12 @@ Can FE estimator be somehow worse than not eliminating $\alpha_i$ at all?
 
 <br>
 
-- Need to finish specifying DGP (coefficients process, treatments, $U_{it}$)
+- DGP: coefficients process, treatments, $U_{it}$
 - What "worse" means
 - What "not eliminating $\alpha_i$" means
 - Causal parameter of interest
 
-#### Simplifying Setting
+#### Choosing a Simple Setting
 
 ::: {.left-color}
 
@@ -386,7 +389,7 @@ Again: want simplest possible example
 Specify model in form
 $$
 \begin{aligned}
-Y_{it} & = \alpha_i + (\beta + \alpha_i) X_{it} + Y_{it}, \quad i=1, \dots, N, \quad t=1, 2
+Y_{it} & = \alpha_i + (\beta + \alpha_i) X_{it} + U_{it}, \quad i=1, \dots, N, \quad t=1, 2
 \end{aligned}
 $$ 
 
@@ -399,7 +402,7 @@ Now just need to specify $\beta$ and distribution of $\alpha_i$
 
 <br> 
 
-- Set $\alpha_i \pm 1$ with equal probability
+- Set $\alpha_i =  \pm 1$ with equal probability
 - Set $\beta=-0.25$ ($\Rightarrow \E[\beta_i]=-0.25$)
 
 . . .
@@ -438,18 +441,24 @@ In our case
 - "Average effects" often understood in the sense of ATE, not the weighted average ([-@eq-fe-limit-hetero])
 - $\Rightarrow$ <span class="highlight">parameter of interest is $\E[\beta_i]$ </span> --- can be used to compute ATE of any change in $x$
 
-#### Metric and Goal
-
-Good metric: bias of FE and OLS estimators for $\E[\beta_i]$ 
-
-<br>
-
-. . . 
-
+#### Goal and Metric
+ 
 Want a dramatic example for things going wrong the FE vis-à-vis $\E[\beta_i]$
 
-- Want OLS (doing nothing about heterogeneity) to be unbiased for $\E[\beta_i]$
+- Want OLS (doing nothing about heterogeneity) to be ~unbiased for $\E[\beta_i]$
 - Want FE (doing something, but wrong) to have the wrong sign 
+
+
+. . .
+
+Potential metric: distributions of estimators and their relation to $\E[\beta_i]$
+
+::: {.footer}
+
+Might be hard to get OLS exactly unbiased, depending on strict exogeneity
+
+:::
+
 
 #### How To Specify DGPs 
 
@@ -487,7 +496,7 @@ Assume that $U_{it}$ is standard normal
 - Different distributions given different $\alpha_i$ --- some sort of implicit (self-)selection mechanism
 $$  \small
 \begin{aligned}
-\begin{pmatrix} X_{i1} \\ X_{i2} \end{pmatrix}\Bigg| \alpha_i = + 1  & \sim N\left( \begin{pmatrix} \mu_{1+} \\ \mu_{2+} \end{pmatrix}, \begin{pmatrix} \sigma_{1+}^2 & \rho_+ \sigma_{1+} \sigma_{2+} \\ \rho_+ \sigma_{1+} \sigma_{2+} & \sigma_{2+}^2 \end{pmatrix} \right)  \\
+\begin{pmatrix} X_{i1} \\ X_{i2} \end{pmatrix}\Bigg| \curl{\alpha_i = + 1}  & \sim N\left( \begin{pmatrix} \mu_{1+} \\ \mu_{2+} \end{pmatrix}, \begin{pmatrix} \sigma_{1+}^2 & \rho_+ \sigma_{1+} \sigma_{2+} \\ \rho_+ \sigma_{1+} \sigma_{2+} & \sigma_{2+}^2 \end{pmatrix} \right)  \\
 \begin{pmatrix} X_{i1} \\ X_{i2} \end{pmatrix}\Bigg| \curl{\alpha_i = - 1}  & \sim N\left( \begin{pmatrix} \mu_{1-} \\ \mu_{2-} \end{pmatrix}, \begin{pmatrix} \sigma_{1-}^2 & \rho_- \sigma_{1-} \sigma_{2-} \\ \rho_- \sigma_{1-} \sigma
 _{2-} & \sigma_{2-}^2 \end{pmatrix} \right)
 \end{aligned}
@@ -514,13 +523,135 @@ Will solve numerically as part of DGP generation
 :::
 
 ## Simulation Implementation {background="#00100F"}
-
-#### 
-
-a
-
+ 
 
 #### Code Organization
+
+Again have a small targeted simulation $\Rightarrow$ will structure using functions
+
+```
+├── dgp
+│   ├── constants.py
+│   ├── data_generation.py
+│   ├── __init__.py
+│   ├── moment_info.py 
+├── exp.ipynb
+├── gmm
+│   ├── __init__.py 
+│   └── solver.py
+├── main.py
+├── README.md 
+│   └── ...
+└── simulation_infrastructure
+    ├── constants.py
+    ├── __init__.py
+    ├── plotting.py 
+    └── runner_functions.py
+```
+
+#### Structuring
+
+
+
+#### Our `main.py`
+
+```{.python filename="main.py"}
+"""
+Entry point for running simulation on bias of FE estimators under heterogeneity.
+
+Causal model:
+    Y_{it}^x = alpha_i + beta_i * x + U_{it}
+
+
+Goal of simulation: construct an example of distribution under which:
+    1. The OLS estimator in regression of $Y_{it}$ on $X_{it}$ is unbiased for
+        average coefficient value E[beta_i]
+    2. The one-way random intercept/fixed effects estimator has the wrong sign
+       relative to $E[beta_i]$ with high probability
+
+Usage:
+    python main.py
+
+Output:
+    Kernel density plots of distributions of the two estimators
+"""
+
+import os
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
+import pandas as pd
+from tqdm import tqdm
+
+from dgp.constants import (
+    BETA_MEAN,
+    N_VALUES,
+)
+
+# from utils.combine_results import combine_results
+from dgp.moment_info import (
+    constraints,
+    param_initial_guess,
+    process_mu_sigma_params,
+    sim_moment_conditions,
+)
+from gmm.solver import GMMSolver
+from simulation_infrastructure.constants import (
+    N_REPLICATIONS,
+    OUTPUT_DIR,
+    SEEDS,
+)
+from simulation_infrastructure.plotting import plot_kdes
+from simulation_infrastructure.runner_functions import run_simulation_for_seed
+
+# Ensure output directory exists
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+
+def main() -> None:
+    """Main function to run simulations in parallel and combine results."""
+
+    # Select parameters of DGP by enforcing desired moment conditions
+    solver_dgp_params = GMMSolver(
+        sim_moment_conditions,
+        param_initial_guess,
+        constraints,
+        process_func=process_mu_sigma_params,
+    )
+    solver_dgp_params.minimize()
+    mu_sigma_params = solver_dgp_params.process_solution()
+
+    #
+    all_results = []
+
+    # Run simulations in parallel
+    with ProcessPoolExecutor() as executor:
+        futures = {
+            executor.submit(
+                run_simulation_for_seed,
+                seed,
+                N_REPLICATIONS,
+                N_VALUES,
+                BETA_MEAN,
+                mu_sigma_params,
+            )
+            for seed in SEEDS
+        }
+        # Collect results as they complete, with a progress bar
+        for future in tqdm(
+            as_completed(futures), total=len(futures), desc="Running simulations"
+        ):
+            result = future.result()
+            all_results.append(result)
+
+    # Combine results and export plots
+    sim_results = pd.concat(all_results)
+    plot_kdes(sim_results, OUTPUT_DIR)
+
+
+if __name__ == "__main__":
+    main()
+```
+
 
 #### Creating DGPs
 
@@ -532,6 +663,8 @@ On import `scenarios.py` will find
 Try adding more target values and comparing distributions
 
 :::
+
+
 
 ## Results {background="#00100F"}
  
