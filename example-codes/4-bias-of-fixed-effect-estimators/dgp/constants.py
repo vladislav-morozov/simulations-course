@@ -15,9 +15,9 @@ import numpy as np
 
 # Simulation parameters
 BETA_MEAN = -0.25
-N_REPLICATIONS = 10
+N_REPLICATIONS = 50
 N_VALUES = np.array([100, 200, 500])
-SEEDS = [1000, 2000, 3000, 40000, 5000, 6000, 7000, 8000]
+SEEDS = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]
 
 
 # Output directory

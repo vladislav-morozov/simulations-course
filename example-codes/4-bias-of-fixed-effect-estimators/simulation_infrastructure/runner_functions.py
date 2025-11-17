@@ -32,14 +32,13 @@ def run_simulation_for_seed(
     Parameters:
     - seed (int): Random seed for reproducibility.
     - n_replications (int): Number of replications per seed.
-    - n_values (list[int]): Different values of `n_units` to simulate.
+    - n_values (np.array): Cross-sectional sample sizes to simulate.
     - beta_mean (float): Average coefficient value for generating data.
     - mu_sigma_params (dict[str, np.ndarray]): Dictionary containing:
             - "mu_plus" (np.ndarray): Mean for covariates when effect is +1.
             - "mu_minus" (np.ndarray): Mean for covariates when effect is -1.
             - "sigma_plus" (np.ndarray): Covariance for X when effect is +1.
             - "sigma_minus" (np.ndarray): Covariance for X when effect is -1.
-    - output_dir (str): Directory to save the CSV file.
     """
     results = []
 

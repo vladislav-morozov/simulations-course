@@ -22,7 +22,7 @@ def generate_data(
     seed: int | None = None,
 ) -> pd.DataFrame:
     """
-    Generates an `num_units × 2` panel dataset with two types of slopes:
+    Generates an `num_units x 2` panel dataset with two types of slopes:
     `beta_mean + 1` and `beta_mean - 1`.
 
     Args:
@@ -62,6 +62,7 @@ def generate_data(
             {
                 "outcome": pd.DataFrame(outcomes).stack(),
                 "covariate": pd.DataFrame(covariates).stack(),
+                "effects": pd.DataFrame(ind_effects).stack()
             }
         )
         data.index = data.index.rename(["Unit", "Period"])
@@ -80,7 +81,7 @@ def generate_data(
         params["mu_minus"],
         params["sigma_minus"],
         1,
-        beta_mean + 1,
+        beta_mean - 1,
     )
 
     # Adjust unit indices for negative effect data
