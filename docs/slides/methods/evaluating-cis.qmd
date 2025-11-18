@@ -257,7 +257,7 @@ Recall interpretation of $95\%$ coverage:
 
 Notice: interpretation aligns with what we actually do in Monte Carlo
  
-### Motivating Example {background="#43464B"}
+### Metrics for Evaluating Confidence Intervals {background="#43464B"}
 
 #### Metrics for Evaluating Confidence Intervals
 
@@ -280,21 +280,6 @@ How do you evaluate coverage?
 
 <br>
 
-::: {.left-color}
-
-Draw many datasets and in each sample $s$
-
-- Compute CI = $[\hat{a}_s, \hat{b}_s]$
-- Record $\text{Length}_s = \hat{b}_s - \hat{a}_s$
-
-Report estimated average of $\text{Length}_s$ over $s$
-:::
-
-
-#### Metric: Average Length
-
-
-Similar story for length:
 
 ::: {.left-color}
 
@@ -306,7 +291,6 @@ Draw many datasets and in each sample $s$
 Report estimated coverage as average of $D_s$ over $s$
 :::
 
-Can also report other characteristics of length distribution (e.g. quantiles)
 
 ::: {.footer}
 
@@ -314,6 +298,26 @@ For multivariate sets the metric is usually called *volume*
 
 ::: 
  
+
+#### Metric: Average Length
+
+
+Similar story for length:
+
+
+::: {.left-color}
+
+Draw many datasets and in each sample $s$
+
+- Compute CI = $[\hat{a}_s, \hat{b}_s]$
+- Record $\text{Length}_s = \hat{b}_s - \hat{a}_s$
+
+Report estimated average of $\text{Length}_s$ over $s$
+:::
+
+
+Can also report other characteristics of length distribution (e.g. quantiles)
+
 
 ## Simulation Implementation {background="#00100F"}
 
