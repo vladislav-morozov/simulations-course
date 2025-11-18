@@ -1,6 +1,6 @@
 ---
 title: "Evaluating Causal Estimators"
-subtitle: "Working with Causal Frameworks and Simulations for Counterexamples"
+subtitle: "Working with Causal Frameworks; Simulations for Counterexamples"
 author: Vladislav Morozov  
 format:
   revealjs:
@@ -55,7 +55,7 @@ By the end, you should be able to
 
 - Understand the core aspects of evaluating causal estimators by simulations 
 - Use simulations as a tool for constructing (counter)examples
-- Use process-based parallelism to accelerate computation
+- Use process-based parallelism
 
 
 #### References 
@@ -144,7 +144,7 @@ Y_{it}^{\bx} = \alpha_i + \bbeta'\bx + U_{it}
 $$ {#eq-fe-causal-model}
 
 - $\alpha_i$ --- the "random intercept"/unit FE
-- $\beta$ --- common treatment effect of $x$ 
+- $\beta$ --- determines <span class="highlight">common</span> treatment effect of $x$ 
  
 #### Properties Under Random Intercept Model
 
@@ -173,8 +173,8 @@ $$
 
 #### Discussion of FE Estimator
 
-- Typical motivation: "controlling unobserved heterogeneity"
-- Unobserved heterogeneity:
+- Typical motivation for using it: "controlling unobserved heterogeneity"
+- Unobserved heterogeneity included:
     - Unit-specific effects $\alpha_i$
     - Can also time effects $\gamma_t$ and other versions
 
@@ -222,7 +222,7 @@ What is $\hat{\bbeta}^{FE}$ actually estimating?
 <br>
 
 - Important to separate estimator from underlying causal model!
-- Can carry out FE estimation even if true model is not random intercept
+- Can carry out FE estimation even if true model is not a random intercept model
  
 #### Estimand of FE Estimator Under Model  ([-@eq-causal-hetero])
 
@@ -250,7 +250,7 @@ It is possible that "controlling for heterogeneity"  with FE estimators <span cl
 - This matters because FE estimators are used *a lot*
 - Well-suited for simulations:
     - Theory hard due to $\hat{\bbeta}^{FE}$ depending on transforms and inverses of $\bX_{it}$ 
-    - In simulations: can try to find a single example numerically
+    - In simulations: can try to numerically find a single example 
 
 
 ## Theory Essentials for Evaluating Causal Estimators {background="#00100F"}
@@ -271,7 +271,7 @@ $$
 
 :::
 
-$\phi$ may be known of (fully/partially) unknown
+$\phi$ may be known or (fully/partially) unknown
 
 ::: {.footer}
 
@@ -487,7 +487,7 @@ Moment conditions tell us
 
 ::: {.left-color}
 
-Assume that $U_{it}$ is standard normal
+Assume that $U_{it}$ is standard normal and independent of everything else
 
 :::
  
@@ -539,7 +539,7 @@ Again have a small targeted simulation $\Rightarrow$ will structure using functi
 │   ├── constants.py
 │   ├── data_generation.py
 │   ├── __init__.py
-│   ├── moment_info.py 
+│   └── moment_info.py 
 ├── exp.ipynb
 ├── gmm
 │   ├── __init__.py 
@@ -564,7 +564,7 @@ Again have code with tighter coupling but less infrastructure to manage
 
 Will structure some things differently this time to give broader perspective
 
-- Different simulation run structure: both estimators applied on the same dataset (not separately like before)
+- Different runner structure: both estimators applied on the same dataset (not separately like before)
 - Parameters of DGP found by optimization before starting Monte Carlo
 - Different approach to parallelism (process-based)
 
@@ -686,7 +686,7 @@ Try varying target values of moment and comparing  resulting estimator distribut
 
 #### Different Approach to Parallelism
 
-- Key package in using FE estimators well --- `pyfixest`
+- Key package in using FE estimators --- `pyfixest`
 - But: only available up to Python 3.12 (for now)
 
 . . .
@@ -703,6 +703,83 @@ Here: use *process*-based approach: spawn a fully separate Python process that d
 
 :::
 
+#### Simulation Runner Function
+
+```{.python filename="simulation_infrastructure.runner_functions"}
+import numpy as np
+import pandas as pd
+import pyfixest as pf
+
+from dgp.data_generation import generate_data
+
+
+def run_simulation_for_seed(
+    seed: int,
+    n_replications: int,
+    n_values: np.ndarray,
+    beta_mean: float,
+    mu_sigma_params: dict[str, np.ndarray | np.floating],
+):
+    """
+    Runs simulations for OLS vs. FE for given seed.
+
+    Args:
+        seed (int): Random seed for reproducibility.
+        n_replications (int): Number of replications per seed.
+        n_values (np.array): Cross-sectional sample sizes to simulate.
+        beta_mean (float): Average coefficient value for generating data.
+        mu_sigma_params (dict[str, np.ndarray]): Dictionary containing:
+            - "mu_plus" (np.ndarray): Mean for covariates when effect is +1.
+            - "mu_minus" (np.ndarray): Mean for covariates when effect is -1.
+            - "sigma_plus" (np.ndarray): Covariance for X when effect is +1.
+            - "sigma_minus" (np.ndarray): Covariance for X when effect is -1.
+
+    Returns:
+        pd.DataFrame: Monte Carlo results for given seed.
+    """
+    results = []
+
+    for n_units in n_values:
+        for replication in range(n_replications):
+            # Generate data
+            data = generate_data(
+                n_units,
+                beta_mean,
+                mu_sigma_params,
+                seed=seed + replication,
+            )
+
+            fit_no_effect = pf.feols(
+                "outcome ~ covariate", data=data, drop_intercept=True
+            )
+            fit_effect = pf.feols("outcome ~ covariate|Unit", data=data)
+
+            # Collect results
+            results.append(
+                {
+                    "seed": seed,
+                    "replication": replication,
+                    "n_units": n_units,
+                    "model": "No Fixed Effects",
+                    "coef_est": fit_no_effect.coef().iloc[0],
+                    "ci_lower": fit_no_effect.confint().iloc[0, 0],
+                }
+            )
+            results.append(
+                {
+                    "seed": seed,
+                    "replication": replication,
+                    "n_units": n_units,
+                    "model": "With Fixed Effects",
+                    "coef_est": fit_effect.coef().iloc[0],
+                    "ci_lower": fit_effect.confint().iloc[0, 0],
+                }
+            )
+
+    # Return results as a dataframe
+    return pd.DataFrame(results)
+```
+
 #### Different Approach to Scenarios
 
 Another difference: 
@@ -712,13 +789,14 @@ Another difference:
 Both FE and OLS estimators applied to same dataset in each step
 
 :::
-Remember: before had a scenario per estimator
+
+Before: separate scenario for each estimator
 
 
 . . .
 
-- In general: difference is small if data generation is cheap
-- Trade-off: more cumbersome runners if want to apply array of estimators on each dataset (internal iteration over estimators)
+- Computational time difference is small if data generation is cheap
+- <span class="highlight">Trade-off</span>: quicker more cumbersome runners if want to apply array of estimators on each dataset (internal iteration over estimators)
 
 ### Results {background="#43464B"}
 
@@ -761,9 +839,11 @@ Accounting for the (correctly specified!) random intercept $\alpha_i$ leads to m
 
 #### Broader Practical Conclusion
 
+Our simulation: example of what <span span="highlight">could</span> go wrong
+
 <br>
 
-Two: 
+Two practical conclusions:
 
 ::: {.rounded-box}
 
