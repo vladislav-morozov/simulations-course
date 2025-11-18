@@ -39,7 +39,16 @@ open-graph:
 
 
 ## Introduction {background="#00100F"}
-  
+
+```{python}
+import matplotlib.pyplot as plt
+
+from itertools import product
+
+from sklearn.datasets import make_classification
+
+BG_COLOR = "whitesmoke"
+```
 
 ### Lecture Info {background="#43464B"}
 
@@ -57,13 +66,80 @@ By the end, you should be able to
 
 ### Lecture Example: Dealing with Class Imbalance {background="#43464B"}
 
-#### Problem of Unbalanced Classificaiton
+#### Problem of Class Imbalance in Classification
 
-#### Examples of Unbalanced Datasets
+Setting of today: classification with class imbalance
 
-#### Solutions
+<br>
 
-#### Goal of Today
+Empirically know that class imbalance may cause bias towards the majority classes, leading to
+
+- Poor generalization
+- Misleading accuracy metrics
+- Potentially incorrect policy recommendations
+
+
+#### Example Datasets With Different Imbalances
+
+::: {.nonincremental}
+
+- Two class example
+- Each row: progressively stronger class imbalance
+
+:::
+
+```{python}
+N_ROWS = 3
+N_COLS = 4
+fig, axs = plt.subplots(nrows=N_ROWS, ncols=N_COLS, figsize=(16,5))
+fig.patch.set_color(BG_COLOR)
+for row_id, col_id in product(range(N_ROWS), range(N_COLS)):
+    X, y = make_classification(
+      n_samples=300,
+      n_features=2,
+      n_redundant=0,
+      weights=[0.95 - 0.4*(N_ROWS - 1 - row_id)/(N_ROWS-1), 0.05 + 0.4*(N_ROWS - 1 - row_id)/(N_ROWS-1)],
+      class_sep=1.7,
+      flip_y=0.05,
+      random_state= 67*row_id + 237*col_id
+    )
+    axs[row_id, col_id].scatter(X[y==1, 0], X[y==1, 1], color='gold', marker='x')
+    axs[row_id, col_id].scatter(X[y==0, 0], X[y==0, 1], color='#3c165c')
+    axs[row_id, col_id].set_xticks([]) 
+    axs[row_id, col_id].set_yticks([]) 
+```
+
+
+#### Solutions to Class Imbalance
+
+There are some solutions:
+
+- Undersampling majority classes (throwing away data)
+- Oversample minority classes (possibly with synthetic examples)
+- Biasing algorithms towards minority classes by modifying training (e.g. weights in objective functions)
+
+::: {.left-color}
+
+Which of these are better?
+
+:::
+
+#### Goal of Today: Evaluating Solutions
+
+<br>
+
+Today:
+
+::: {.left-color}
+
+Compact simulation in low-dimensional setting comparing
+
+- Not doing anything
+- Synthetic oversampling
+- Weights in objective function
+
+:::
+
 
 
 ## Theory Essentials for Evaluating ML Algorithms {background="#00100F"}
