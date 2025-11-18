@@ -209,6 +209,94 @@
     ]
   },
   {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#introduction",
+    "href": "slides/methods/evaluating-causal-estimators.html#introduction",
+    "title": "Evaluating Causal Estimators",
+    "section": "Introduction",
+    "text": "Introduction",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#motivation-fixed-effects-and-simulations-as-counterexamples",
+    "href": "slides/methods/evaluating-causal-estimators.html#motivation-fixed-effects-and-simulations-as-counterexamples",
+    "title": "Evaluating Causal Estimators",
+    "section": "Motivation: Fixed Effects and Simulations as Counterexamples",
+    "text": "Motivation: Fixed Effects and Simulations as Counterexamples",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#theory-essentials-for-evaluating-causal-estimators",
+    "href": "slides/methods/evaluating-causal-estimators.html#theory-essentials-for-evaluating-causal-estimators",
+    "title": "Evaluating Causal Estimators",
+    "section": "Theory Essentials for Evaluating Causal Estimators",
+    "text": "Theory Essentials for Evaluating Causal Estimators",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#specifying-the-simulations",
+    "href": "slides/methods/evaluating-causal-estimators.html#specifying-the-simulations",
+    "title": "Evaluating Causal Estimators",
+    "section": "Specifying the Simulations",
+    "text": "Specifying the Simulations",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#simulation-implementation-and-results",
+    "href": "slides/methods/evaluating-causal-estimators.html#simulation-implementation-and-results",
+    "title": "Evaluating Causal Estimators",
+    "section": "Simulation Implementation and Results",
+    "text": "Simulation Implementation and Results",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#recap-and-conclusions",
+    "href": "slides/methods/evaluating-causal-estimators.html#recap-and-conclusions",
+    "title": "Evaluating Causal Estimators",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/organizational/intro.html#content-and-motivation",
+    "href": "slides/organizational/intro.html#content-and-motivation",
+    "title": "Course Introduction",
+    "section": "Content and Motivation",
+    "text": "Content and Motivation",
+    "crumbs": [
+      "Course Info",
+      "Course Introduction"
+    ]
+  },
+  {
+    "objectID": "slides/organizational/intro.html#course-logistics",
+    "href": "slides/organizational/intro.html#course-logistics",
+    "title": "Course Introduction",
+    "section": "Course Logistics",
+    "text": "Course Logistics",
+    "crumbs": [
+      "Course Info",
+      "Course Introduction"
+    ]
+  },
+  {
     "objectID": "slides/methods/evaluating-cis.html#introduction",
     "href": "slides/methods/evaluating-cis.html#introduction",
     "title": "Evaluating Confidence Intervals",
@@ -261,28 +349,6 @@
     "crumbs": [
       "Evaluating Methods",
       "Evaluating Confidence Intervals"
-    ]
-  },
-  {
-    "objectID": "slides/organizational/intro.html#content-and-motivation",
-    "href": "slides/organizational/intro.html#content-and-motivation",
-    "title": "Course Introduction",
-    "section": "Content and Motivation",
-    "text": "Content and Motivation",
-    "crumbs": [
-      "Course Info",
-      "Course Introduction"
-    ]
-  },
-  {
-    "objectID": "slides/organizational/intro.html#course-logistics",
-    "href": "slides/organizational/intro.html#course-logistics",
-    "title": "Course Introduction",
-    "section": "Course Logistics",
-    "text": "Course Logistics",
-    "crumbs": [
-      "Course Info",
-      "Course Introduction"
     ]
   },
   {
