@@ -55,6 +55,68 @@ By the end, you should be able to
 
 - Understand 
 
+### Lecture Example: Dealing with Class Imbalance {background="#43464B"}
+
+#### Problem of Unbalanced Classificaiton
+
+#### Examples of Unbalanced Datasets
+
+#### Solutions
+
+#### Goal of Today
+
+
+## Theory Essentials for Evaluating ML Algorithms {background="#00100F"}
+  
+### Core Concepts {background="#43464B"}
+
+
+####
+
+#### Further Points
+
+Many other things, e.g. time series
+
+### Evaluation Metrics {background="#43464B"}
+
+
+## Simulation Design {background="#00100F"}
+
+#### DGP
+
+Try a couple of degrees of imbalance
+
+#### Algorithms Considered
+
+#### Approaches for Dealing with Class Imbalance
+
+
+#### Metrics
+
+
+## Simulation Implementation and Solutions {background="#00100F"}
+  
+### Implementation {background="#43464B"}
+
+#### Overall Organization Strategy
+
+Again a more complex setting with possible desire to 
+
+#### Runner Design
+
+Do a bit differently: use the same dataset for all 
+
+Makes
+
+#### Our `SimulationRunner`
+
+#### What `SimulationRunner` Does
+
+
+
+### Results {background="#43464B"}
+
+#### Results
 
 #### References 
   
