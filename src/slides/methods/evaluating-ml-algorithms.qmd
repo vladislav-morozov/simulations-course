@@ -146,14 +146,88 @@ Compact simulation in low-dimensional setting comparing
   
 ### Core Concepts {background="#43464B"}
 
+#### Goal of Statistical/Machine Learning
 
-####
 
-#### Further Points
+<div class="rounded-box">
 
-Many other things, e.g. time series
+Key goal of prediction --- predicting <span class="highlight">well</span>
+
+</div> 
+
+Other goals:
+
+- Computational efficiency: better to have a cheaper and quicker way to produce a new prediction
+- Interpretability: why does the algorithm predict what it does?
+- Scalability: can it handle increasing loads, run in distributed manner, etc
+
+
+#### Loss and Risk
+
+Quality of prediction measured with *risk* function
+
+Let $h(\bX)$ be a prediction of $Y$ given $\bX$  (<span class="highlight">hypothesis</span>) 
+
+
+<div class="rounded-box">
+
+ 
+
+Let the <span class="highlight">loss function </span>$l(y, \hat{y})$ satisfy $l(y, \hat{y})\geq 0$ and $l(y, y)=0$ for all $y, \hat{y}$.
+
+
+The <span class="highlight">risk function</span> of the hypothesis (prediction) $h(\cdot)$ is the expected loss:
+$$
+R(h) = \E_{(Y, \bX)}\left[ l(Y, h(\bX))  \right]
+$$
+
+
+ 
+
+
+</div>
+
+
+ 
+#### Interpretation: Generalization Error
+
+<div class="rounded-box">
+
+Risk measures how well the hypothesis $h$ performs on unseen data --- <span class="highlight">generalization error</span>  
+
+</div>
+
+Example: indicator risk:
+$$
+\E[\I\curl{Y\neq h(\bX)}] = P(Y\neq h(\bX))
+$$
+Probability of incorrectly predicting $Y$ with $h(\bX)$ --- where $Y$ and $\bX$ are a new observation
+
+
+#### Components of a Setting
+
+A predictive problem is defined by
+
+- DGP
+- Risk function
+- Class $\Hcal$ of hypotheses
+- Some decision rule (algorithm) that selects an $\hat{h}\in\Hcal$ after seeing data
+
+#### Algorithms
+
+
 
 ### Evaluation Metrics {background="#43464B"}
+
+#### Core Metrics: Risk
+
+evaluation
+
+
+#### Regression
+
+
+#### Simulations vs. Evaluation on Real Data
 
 
 ## Simulation Design {background="#00100F"}
