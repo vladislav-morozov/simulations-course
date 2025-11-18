@@ -27,18 +27,21 @@ def run_simulation_for_seed(
     mu_sigma_params: dict[str, np.ndarray | np.floating],
 ):
     """
-    Runs Monte Carlo simulations for a specific seed and saves results to a CSV file.
+    Runs simulations for OLS vs. FE for given seed.
 
-    Parameters:
-    - seed (int): Random seed for reproducibility.
-    - n_replications (int): Number of replications per seed.
-    - n_values (np.array): Cross-sectional sample sizes to simulate.
-    - beta_mean (float): Average coefficient value for generating data.
-    - mu_sigma_params (dict[str, np.ndarray]): Dictionary containing:
+    Args:
+        seed (int): Random seed for reproducibility.
+        n_replications (int): Number of replications per seed.
+        n_values (np.array): Cross-sectional sample sizes to simulate.
+        beta_mean (float): Average coefficient value for generating data.
+        mu_sigma_params (dict[str, np.ndarray]): Dictionary containing:
             - "mu_plus" (np.ndarray): Mean for covariates when effect is +1.
             - "mu_minus" (np.ndarray): Mean for covariates when effect is -1.
             - "sigma_plus" (np.ndarray): Covariance for X when effect is +1.
             - "sigma_minus" (np.ndarray): Covariance for X when effect is -1.
+
+    Returns:
+        pd.DataFrame: Monte Carlo results for given seed.
     """
     results = []
 

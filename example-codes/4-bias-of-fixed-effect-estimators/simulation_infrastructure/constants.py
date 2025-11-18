@@ -9,6 +9,8 @@ Constants:
 
 from pathlib import Path
 
-N_REPLICATIONS = 50
-SEEDS = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000]
+import numpy as np
+
+N_REPLICATIONS = 250
+SEEDS = N_REPLICATIONS * np.arange(8)
 OUTPUT_DIR = Path() / "results"

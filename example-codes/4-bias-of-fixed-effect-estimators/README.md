@@ -29,7 +29,7 @@ For details and development of code logic, see the following lecture:
 │   ├── constants.py
 │   ├── data_generation.py
 │   ├── __init__.py
-│   ├── moment_info.py 
+│   └── moment_info.py 
 ├── exp.ipynb
 ├── gmm
 │   ├── __init__.py 
