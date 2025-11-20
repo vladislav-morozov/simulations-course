@@ -1,6 +1,6 @@
 ---
 title: "Evaluating Machine Learning Algorithms"
-subtitle: "SUBTITLE"
+subtitle: "Working with Predictive Settings"
 author: Vladislav Morozov  
 format:
   revealjs:
@@ -72,11 +72,18 @@ Setting of today: classification with class imbalance
 
 <br>
 
-Empirically know that class imbalance may cause bias towards the majority classes, leading to
+Empirically know that class imbalance may cause classifier bias towards the majority classes, leading to
 
 - Poor generalization
 - Misleading accuracy metrics
 - Potentially incorrect policy recommendations
+
+
+::: {.footer}
+
+Intuitively: if one class is 99% of the data, you can get 99% accuracy for free by always predicting that class
+
+:::
 
 
 #### Example Datasets With Different Imbalances
@@ -109,18 +116,29 @@ for row_id, col_id in product(range(N_ROWS), range(N_COLS)):
     axs[row_id, col_id].set_yticks([]) 
 ```
 
+::: {.footer}
+
+Data sampled using `sklearn.datasets.make_classification`
+
+:::
 
 #### Solutions to Class Imbalance
 
 There are some solutions:
 
 - Undersampling majority classes (throwing away data)
-- Oversample minority classes (possibly with synthetic examples)
+- Oversample minority classes (possibly with synthetic examples, e.g. SMOTE)
 - Biasing algorithms towards minority classes by modifying training (e.g. weights in objective functions)
 
 ::: {.left-color}
 
 Which of these are better?
+
+:::
+
+::: {.footer}
+
+SMOTE: Synthetic Minority Over-sampling Technique
 
 :::
 
@@ -160,6 +178,32 @@ Other goals:
 - Computational efficiency: better to have a cheaper and quicker way to produce a new prediction
 - Interpretability: why does the algorithm predict what it does?
 - Scalability: can it handle increasing loads, run in distributed manner, etc
+
+#### Monte Carlo vs. Goals of Prediction
+
+
+::: {.left-color}
+
+Monte Carlo simulations can be used to check all four criteria
+
+:::
+
+In particular: 
+
+- Predictive quality thanks to access to true labels
+- Efficiency and scalability --- easy to produce more and different kinds of data to test systems
+- Interpretability --- have true DGP, can contrast explanations with true dependence
+
+
+#### Components of a Setting
+
+A predictive problem is defined by
+
+- DGP
+- Risk function that expresses our preference
+- A machine learning algorithm: 
+  - Class $\Hcal$ of hypotheses
+  - Some decision rule that selects an $\hat{h}\in\Hcal$ after seeing data
 
 
 #### Loss and Risk
@@ -204,34 +248,36 @@ $$
 Probability of incorrectly predicting $Y$ with $h(\bX)$ --- where $Y$ and $\bX$ are a new observation
 
 
-#### Components of a Setting
-
-A predictive problem is defined by
-
-- DGP
-- Risk function
-- Class $\Hcal$ of hypotheses
-- Some decision rule (algorithm) that selects an $\hat{h}\in\Hcal$ after seeing data
-
 #### Algorithms
 
+::: {.left-color}
+
+Informally, a machine learning algorithm is a rule for picking some hypothesis from some $\Hcal$
+
+:::
+
+Algorithms differ in 
+
+- $\Hcal$ (e.g. linear functions of $\bX$, ensembles of decision trees in $\bX$, chains of affine functions and nonlinear transforms (NNs), etc.)
+- Rule for selecting from $\Hcal$: minimizing empirical risk; minimizing surrogate risk; adding or not adding a complexity penalty, etc.
 
 
 ### Evaluation Metrics {background="#43464B"}
 
 #### Core Metrics: Risk
 
-evaluation
+::: {.left-color}
 
+
+Basic metr
+
+:::
+
+
+#### How To Evaluate Risk in Monte Carlo
 
 #### Other Metrics
-
-
-### Simulations vs. Using Real Data {background="#43464B"}
-
-
-#### Simulations vs. Evaluation on Real Data
-
+ 
 
 ## Simulation Design {background="#00100F"}
 
