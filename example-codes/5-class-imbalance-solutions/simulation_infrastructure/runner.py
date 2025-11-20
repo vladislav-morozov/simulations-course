@@ -1,18 +1,33 @@
 """
 Simulation runner for evaluating prediction algorithms via Monte Carlo.
+
+Classes: 
+    - SimulationRunner: executes simulation scenario, potentially in parallel.
 """
 
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Type
 
 import pandas as pd
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from tqdm import tqdm
 
 from simulation_infrastructure.protocols import AlgorithmProtocol, DGPProtocol
 
 
 class SimulationRunner:
-    """Runs Monte Carlo simulations for a given DGP and list of algorithms."""
+    """Runs Monte Carlo simulations for a given DGP and list of algorithms.
+    
+    Attributes:
+        dgp_type (Type[DGPProtocol]): class of the Data Generating Process.
+        dgp_kwargs (dict[str, Any]): keyword arguments for initializing the DGP.
+        algorithm_types (list[Type[AlgorithmProtocol]]): list of algorithm classes.
+        algorithm_kwargs_list list[dict[str, Any]]): list of keyword argument 
+            dictionaries for initializing each algorithm, ordered in the same 
+            order as algorithm_types
+        n_simulations (int): number of Monte Carlo simulations.
+        n_workers (int): number of threads for parallel execution.
+    """
 
     def __init__(
         self,
@@ -21,19 +36,8 @@ class SimulationRunner:
         algorithm_types: list[Type[AlgorithmProtocol]],
         algorithm_kwargs_list: list[dict[str, Any]],
         n_simulations: int = 1000,
-        n_workers: int = 2,
-    ):
-        """
-        Initialize the simulation runner.
-
-        Args:
-            dgp_type: Class of the Data Generating Process.
-            dgp_kwargs: Keyword arguments for initializing the DGP.
-            algorithm_types: List of algorithm classes.
-            algorithm_kwargs_list: List of keyword argument dictionaries for initializing each algorithm.
-            n_simulations: Number of Monte Carlo simulations.
-            n_workers: Number of threads for parallel execution.
-        """
+        n_workers: int = 1,
+    ): 
         self.dgp_type = dgp_type
         self.dgp_kwargs = dgp_kwargs
         self.algorithm_types = algorithm_types
@@ -43,7 +47,11 @@ class SimulationRunner:
         self.results = []
 
     def _run_single_simulation(self, seed: int) -> dict[str, Any]:
-        """Run a single Monte Carlo simulation for all algorithms."""
+        """Run a single Monte Carlo simulation for all algorithms.
+        
+        Args:
+            seed (int): seed for data sampling
+        """
         # Initialize DGP
         dgp = self.dgp_type(**self.dgp_kwargs)
         X_train, X_test, y_train, y_test = dgp.sample(seed=seed)
@@ -58,20 +66,18 @@ class SimulationRunner:
             algo.fit(X_train, y_train)
             y_pred = algo.predict(X_test)
 
-            # Compute metrics
-            from sklearn.metrics import (
-                accuracy_score,
-                precision_score,
-                recall_score,
-            )
+
 
             accuracy = accuracy_score(y_test, y_pred)
             precision_0 = precision_score(y_test, y_pred, pos_label=0, zero_division=0)
             recall_0 = recall_score(y_test, y_pred, pos_label=0, zero_division=0)
             precision_1 = precision_score(y_test, y_pred, pos_label=1, zero_division=0)
             recall_1 = recall_score(y_test, y_pred, pos_label=1, zero_division=0)
+            f1_0 = f1_score(y_test, y_pred, pos_label=0, zero_division=0)
+            f1_1 = f1_score(y_test, y_pred, pos_label=1, zero_division=0)
 
-            sim_results[algo.name] = {
+            result_key = dgp.name + " + " + algo.name 
+            sim_results[result_key] = {
                 "n_training": dgp.n_train_samples,
                 "first_class_weight": dgp.weights[0],
                 "accuracy": accuracy,
@@ -79,12 +85,18 @@ class SimulationRunner:
                 "recall_0": recall_0,
                 "precision_1": precision_1,
                 "recall_1": recall_1,
+                "f1_0": f1_0,
+                "f1_1": f1_1,
             }
 
         return sim_results
 
     def run_all(self) -> pd.DataFrame:
-        """Run all simulations in parallel and return aggregated results."""
+        """Run all simulations in parallel and return aggregated results.
+        
+        Returns:
+            pd.DataFrame: DataFrame with simulation results.
+        """
         with ThreadPoolExecutor(max_workers=self.n_workers) as executor:
             futures = [
                 executor.submit(self._run_single_simulation, seed)
