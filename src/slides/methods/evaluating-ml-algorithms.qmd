@@ -241,7 +241,15 @@ Try a couple of degrees of imbalance
 
 #### Algorithms Considered
 
+::: {.footer}
+
+As always, I suggest that you play with the code, add your own algorithms and see the effects
+
+:::
+
 #### Approaches for Dealing with Class Imbalance
+
+
 
 
 #### Metrics
@@ -269,7 +277,32 @@ Makes
 
 ### Results {background="#43464B"}
 
-#### Results
+#### Results For Balanced Classes (50/50)
+
+|                                                                          |   Precision |   Recall |   $F_1$ |
+|:-------------------------------------------------------------------------|--------------:|-----------:|-------:|
+| No correction    |         0.907 |      0.906 |  0.906 | 
+| With SMOTE      |         0.907 |      0.906 |  0.906 | 
+| Balanced likelihood weights |         0.907 |      0.906 |  0.906 | 
+
+<br>
+
+::: {.left-color}
+
+Effectively no difference in the results
+
+:::
+
+
+#### Results with Strong Imbalance (90/10)
+
+|                                                                          |   Precision |   Recall |   $F_1$ |
+|:-------------------------------------------------------------------------|--------------:|-----------:|-------:| 
+| No correction   |         0.838 |      0.612 |  0.695 | 
+| With SMOTE            |         0.549 |      0.871 |  0.662 | 
+| Balanced likelihood weights |         0.533 |      0.876 |  0.652 |
+
+
 
 #### References 
   
