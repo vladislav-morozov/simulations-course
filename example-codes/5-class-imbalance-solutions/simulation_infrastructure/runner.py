@@ -37,9 +37,9 @@ class SimulationRunner:
         self.n_workers = n_workers
         self.results = []
 
-    def _run_single_simulation(self) -> dict[str, Any]:
+    def _run_single_simulation(self, seed) -> dict[str, Any]:
         """Run a single Monte Carlo simulation for all algorithms."""
-        X_train, X_test, y_train, y_test = self.dgp.sample()
+        X_train, X_test, y_train, y_test = self.dgp.sample(seed=seed)
         sim_results = {}
 
         for algo in self.algorithms:
@@ -73,8 +73,8 @@ class SimulationRunner:
         """Run all simulations in parallel and return aggregated results."""
         with ThreadPoolExecutor(max_workers=self.n_workers) as executor:
             futures = [
-                executor.submit(self._run_single_simulation)
-                for _ in range(self.n_simulations)
+                executor.submit(self._run_single_simulation, seed)
+                for seed in range(self.n_simulations)
             ]
             for future in tqdm(
                 futures, total=self.n_simulations, desc="Running simulations"
