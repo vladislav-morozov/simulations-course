@@ -13,7 +13,7 @@ from imblearn.pipeline import Pipeline as ImbPipeline
 from sklearn.linear_model import LogisticRegression
 
 
-class LogisticRegressionAlgorithm:
+class LogisticRegressionSK:
     """Logistic regression classifier with optional class weighting.
 
     Attributes:
