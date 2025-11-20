@@ -7,7 +7,7 @@ import numpy as np
 from typing import Protocol
  
 class DGPProtocol(Protocol): 
-    def sample(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def sample(self, seed: int | None) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Return (X_train, X_test, y_train, y_test)."""
         ...
 
