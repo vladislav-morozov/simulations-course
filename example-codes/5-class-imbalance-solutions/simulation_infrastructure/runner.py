@@ -1,10 +1,10 @@
 """
-Simulation runner for evaluating prediction algorithms via Monte Carlo. 
+Simulation runner for evaluating prediction algorithms via Monte Carlo.
 """
 
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any
- 
+from typing import Any, Type
+
 import pandas as pd
 from tqdm import tqdm
 
@@ -12,37 +12,49 @@ from simulation_infrastructure.protocols import AlgorithmProtocol, DGPProtocol
 
 
 class SimulationRunner:
-    """Runs Monte Carlo simulations for a given DGP and list of algorithms.
-    
-    Attributes:
-            dgp (DGPProtocol): data generating process that implements a sample()
-                method.
-            algorithms (list[AlgorithmProtocol]): list of algorithms to evaluate.
-                Each algorithm must implement fit() and predict() methods
-            n_simulations (int) number of Monte Carlo simulations.
-            n_workers (int): number of threads for parallel execution.
-    
-    """
+    """Runs Monte Carlo simulations for a given DGP and list of algorithms."""
 
     def __init__(
         self,
-        dgp: DGPProtocol,
-        algorithms: list[AlgorithmProtocol],
+        dgp_type: Type[DGPProtocol],
+        dgp_kwargs: dict[str, Any],
+        algorithm_types: list[Type[AlgorithmProtocol]],
+        algorithm_kwargs_list: list[dict[str, Any]],
         n_simulations: int = 1000,
         n_workers: int = 2,
-    ): 
-        self.dgp = dgp
-        self.algorithms = algorithms
+    ):
+        """
+        Initialize the simulation runner.
+
+        Args:
+            dgp_type: Class of the Data Generating Process.
+            dgp_kwargs: Keyword arguments for initializing the DGP.
+            algorithm_types: List of algorithm classes.
+            algorithm_kwargs_list: List of keyword argument dictionaries for initializing each algorithm.
+            n_simulations: Number of Monte Carlo simulations.
+            n_workers: Number of threads for parallel execution.
+        """
+        self.dgp_type = dgp_type
+        self.dgp_kwargs = dgp_kwargs
+        self.algorithm_types = algorithm_types
+        self.algorithm_kwargs_list = algorithm_kwargs_list
         self.n_simulations = n_simulations
         self.n_workers = n_workers
         self.results = []
 
-    def _run_single_simulation(self, seed) -> dict[str, Any]:
+    def _run_single_simulation(self, seed: int) -> dict[str, Any]:
         """Run a single Monte Carlo simulation for all algorithms."""
-        X_train, X_test, y_train, y_test = self.dgp.sample(seed=seed)
+        # Initialize DGP
+        dgp = self.dgp_type(**self.dgp_kwargs)
+        X_train, X_test, y_train, y_test = dgp.sample(seed=seed)
+
         sim_results = {}
 
-        for algo in self.algorithms:
+        # Initialize and fit each algorithm
+        for algo_type, algo_kwargs in zip(
+            self.algorithm_types, self.algorithm_kwargs_list
+        ):
+            algo = algo_type(**algo_kwargs)
             algo.fit(X_train, y_train)
             y_pred = algo.predict(X_test)
 
@@ -60,6 +72,8 @@ class SimulationRunner:
             recall_1 = recall_score(y_test, y_pred, pos_label=1, zero_division=0)
 
             sim_results[algo.name] = {
+                "n_training": dgp.n_train_samples,
+                "first_class_weight": dgp.weights[0],
                 "accuracy": accuracy,
                 "precision_0": precision_0,
                 "recall_0": recall_0,

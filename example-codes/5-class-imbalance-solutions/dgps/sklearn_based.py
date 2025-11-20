@@ -38,4 +38,4 @@ class SKImbalancedTwoClassesDGP:
         prop_test_set = self.n_test_samples / (
             self.n_test_samples + self.n_train_samples
         )
-        return train_test_split(X, y, test_size=prop_test_set, random_state=seed)
+        return train_test_split(X, y, test_size=prop_test_set, random_state=seed, stratify=y)
