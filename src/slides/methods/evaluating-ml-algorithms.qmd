@@ -6,7 +6,7 @@ format:
   revealjs:
     include-in-header: 
       text: |
-        <meta name="description" content="Learn how to evaluate (lecture note slides)"/> 
+        <meta name="description" content="Learn how to evaluate machine learning algorithms using Monte Carlo; including an example on classification with class imbalance (lecture note slides)"/> 
     width: 1150
     slide-number: true
     sc-sb-title: true
@@ -30,7 +30,7 @@ embed-resources: true
 include-in-header: ../../themes/mathjax.html 
 highlight-style: tango
 open-graph:
-    description: "Learn how to evaluate (lecture note slides)" 
+    description: "Learn how to evaluate machine learning algorithms using Monte Carlo; including an example on classification with class imbalance (lecture note slides)" 
 ---
 
 
@@ -62,7 +62,16 @@ By the end, you should be able to
 
  
 
-- Understand 
+- Recall  essential concepts that define a statistical/machine learning problem
+- Understand how to use Monte Carlo for evaluating predictive algorithms
+- Parallelize computation on the level of MC datasets
+
+
+#### References 
+  
+::: {.nonincremental}
+ 
+:::
 
 ### Lecture Example: Dealing with Class Imbalance {background="#43464B"}
 
@@ -326,6 +335,8 @@ Want to check out a couple of approaches for dealing with class imbalance in cla
 
 :::
 
+<br>
+
 Need to specify:
 
 - DGP(s)
@@ -495,7 +506,7 @@ Our `SimulationRunner` needs to accommodate some changes:
 
 . . . 
 
-Last point: previously handled by `SimulationOrchestrator`, but now more appropriate on level of dataset --- concern of `SimulationRunner`
+Last point: previously handled by `SimulationOrchestrator`, but now more appropriate on level of dataset 
 
 
 #### Our `SimulationRunner`
@@ -729,7 +740,30 @@ class LogisticRegressionSMOTE:
  
 ### Results {background="#43464B"}
 
+#### Towards Summarizing Results
+
+`SimulationOrchestrator` has detailed data 
+
+- On accuracy, precision, recall, $F_1$ scores
+- From each MC dataset
+
+. . .
+
+For analysis want to somehow aggregate
+
+::: {.left-color}
+
+Will report averages across MC datasets for each DGP and algorithm
+
+:::
+
+For accuracy this gives risk; for others expected versions of metrics
+
 #### Results For Balanced Classes (50/50)
+
+Here: only discuss properties related to minority class
+
+. . .
 
 |                                                                          |   Precision |   Recall |   $F_1$ |
 |:-------------------------------------------------------------------------|--------------:|-----------:|-------:|
@@ -748,21 +782,38 @@ Effectively no difference in the results
 
 #### Results with Strong Imbalance (90/10)
 
+
+ 
+
 |                                                                          |   Precision |   Recall |   $F_1$ |
 |:-------------------------------------------------------------------------|--------------:|-----------:|-------:| 
 | No correction   |         0.838 |      0.612 |  0.695 | 
 | With SMOTE            |         0.549 |      0.871 |  0.662 | 
 | Balanced likelihood weights |         0.533 |      0.876 |  0.652 |
 
+- Doing nothing: highest $F_1$ (best on that metric)
+- But bought at price of lower recall
+- Correcting: lower precision (more false `1` labels), but much better at actually detecting true `1`s (higher recall)
 
 
-#### References 
-  
-::: {.nonincremental}
- 
+#### Discussion of Results
+
+Key conclusion in our example:
+
+::: {.left-color}
+
+Techniques like SMOTE and likelihood weight correction improve detection of underrepresented class at the price of more false positives
+
 :::
  
- 
+Do you want to do this in practice? Depends:
+
+- Yes, if missing a true `1` is bad
+- No, if a false `1` is bad 
+
+. . . 
+
+A lot of scope for trying other approaches with this infrastructure
 
 ## Recap and Conclusions {background="#00100F"}
  
@@ -772,7 +823,9 @@ Effectively no difference in the results
 
 In this lecture we 
 
-- Reviewed  
+- Reviewed  essential concepts of statistical/machine learning
+- Learned to use Monte Carlo for evaluating predictive algorithms
+- Saw another variation on where to use parallelism
  
 
 
