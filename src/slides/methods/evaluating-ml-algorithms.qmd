@@ -269,37 +269,134 @@ Algorithms differ in
 ::: {.left-color}
 
 
-Basic metr
+Basic metric for evaluating any ML algorithm --- associated risk 
 
 :::
 
+For example:
+
+- Classification: accuracy, weighted accuracy, etc.
+- Regression: MSE, MAE, linex, etc.
+
+Nice things about simulations: can even evaluate such metrics for unsupervised settings
 
 #### How To Evaluate Risk in Monte Carlo
 
+Recall: risk measures performance on <span class="highlight">unseen data</span>
+
+
+::: {.left-color}
+
+In simulations: repeat for many datasets
+
+- Draw training and test sets
+- Train algorithm on training set 
+- Predict on <span class="highlight">test set</span> and compute average loss over test set 
+ 
+
+Finally, average those average losses across MC datasets to get the MC estimate of risk of algorithm
+
+:::
+
 #### Other Metrics
  
+Often care about other metrics in practice
+
+<br>
+
+Some examples:
+
+- Classification: precision, recall, aggregated scores
+- Regression: width of predictive interval
+
+. . . 
+
+Can evaluate those the same way as risk
+
 
 ## Simulation Design {background="#00100F"}
 
+
+
+#### Reminder: Setting
+
+::: {.left-color}
+
+Want to check out a couple of approaches for dealing with class imbalance in classification settings
+
+:::
+
+Need to specify:
+
+- DGP(s)
+- Approaches to evaluate 
+- Metrics
+
 #### DGP
 
-Try a couple of degrees of imbalance
+::: {.left-color}
 
-#### Algorithms Considered
+Essential feature: degree of class imbalance
+
+Will compare two pairs: 50/50 (baseline with no imbalance) and 90/10
+ 
+:::
+
+
+. . . 
+
+<br>
+
+Here:
+
+- Use `sklearn.datasets.make_classification()`-based DGP with 2 features
+- Write modular code to allow for other DGPs
+
 
 ::: {.footer}
 
-As always, I suggest that you play with the code, add your own algorithms and see the effects
+Already saw examples from the DGP at the beginning of the lecture
 
 :::
 
 #### Approaches for Dealing with Class Imbalance
+
+<br> 
+
+Will try essential representatives of three approaches:
+
+1. Doing nothing
+2. Oversampling by creating synthetic datapoints for the minority class using SMOTE
+3. Adjusting likelihood function (surrogate risk) to give more weight to minority class
+
+#### Learning Algorithms Considered
+
+
+<br>
+
+- As a starting point, only consider logistic regression with linear features
+- Can accommodate all three methods
+- Likely to work reasonably well under our DGP: fairly good linear separability
+
 
 
 
 
 #### Metrics
 
+::: {.left-color}
+
+Relevant aspect of simulation: performance on the minority class `1`
+
+:::
+
+<br>
+
+$\Rightarrow$ will focus on 
+
+- Precision: how often `1` labels are correct
+- Recall: how many of the `1`s are detected
+- $F_1$: harmonic mean of precision and recall
 
 ## Simulation Implementation and Solutions {background="#00100F"}
   
@@ -307,20 +404,329 @@ As always, I suggest that you play with the code, add your own algorithms and se
 
 #### Overall Organization Strategy
 
-Again a more complex setting with possible desire to 
+Again a more complex setting with possible desire to evaluate many DGPs and algorithms $\Rightarrow$ go with larger more modular design
 
-#### Runner Design
+```
+├── algorithms
+│   ├── __init__.py 
+│   └── logistic.py
+├── dgps
+│   ├── __init__.py 
+│   └── sklearn_based.py
+├── main.py
+└── simulation_infrastructure
+    ├── __init__.py 
+    ├── orchestrator.py
+    ├── protocols.py
+    ├── runner.py
+    └── scenarios.py
+```
 
-Do a bit differently: use the same dataset for all 
+::: {.footer}
 
-Makes
+As always, I suggest that you play with the code, add your own algorithms and see the effects
+
+:::
+
+#### Our `main.py`
+
+```{.python filename="main.py"}
+"""
+Entry point for running simulation on classification with class imbalance.
+
+Overall goal of simulation: evaluate effect of various techniques for dealing
+with unbalanced classes in binary classification problems.
+
+Usage:
+    python main.py
+
+Output:
+    Console printout of precision, recall, and F1 scores
+"""
+
+import pandas as pd
+
+from simulation_infrastructure.orchestrator import SimulationOrchestrator
+from simulation_infrastructure.scenarios import scenarios
+
+
+def main():
+    # Create and run the orchestrator
+    orchestrator = SimulationOrchestrator(scenarios, n_workers=4)
+    orchestrator.run_all()
+
+    # Print results to the console
+    combined_results = pd.concat(orchestrator.summary_results.values())
+    print(
+        combined_results.groupby(by=["algorithm", "n_training", "first_class_weight"])[
+            ["precision_1", "recall_1", "f1_1"]
+        ]
+        .mean()
+        .round(3)
+        .to_markdown()
+    )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+#### About `SimulationOrchestrator` and `scenarios`
+
+`SimulationOrchestrator` like before:
+
+- Takes in list of `SimulationScenario` objects
+- Runs them all and stores results
+
+. . . 
+
+`scenarios` a bit different:
+
+- Each `SimulationScenario`: a DGP and a <span class="highlight">list of algorithms</span>
+- `SimulationRunner` will run all scenarios on each drawn dataset (like last time)
+
+#### About `SimulationRunner`
+
+Our `SimulationRunner` needs to accommodate some changes: 
+
+- Loop over algorithms for same dataset 
+- Execute replications in parallel: here parallelize at the level of MC datasets
+- Create <span class="highlight">separate</span> instance of DGP and each algorithm in each dataset (no weird interactions across datasets)
+
+. . . 
+
+Last point: previously handled by `SimulationOrchestrator`, but now more appropriate on level of dataset --- concern of `SimulationRunner`
+
 
 #### Our `SimulationRunner`
 
-#### What `SimulationRunner` Does
+```{.python filename="simulation_infrastructure/runner.py"}
+"""
+Simulation runner for evaluating prediction algorithms via Monte Carlo.
+
+Classes: 
+    - SimulationRunner: executes simulation scenario, potentially in parallel.
+"""
+
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Type
+
+import pandas as pd
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from tqdm import tqdm
+
+from simulation_infrastructure.protocols import AlgorithmProtocol, DGPProtocol
 
 
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and list of algorithms.
+    
+    Attributes:
+        dgp_type (Type[DGPProtocol]): class of the Data Generating Process.
+        dgp_kwargs (dict[str, Any]): keyword arguments for initializing the DGP.
+        algorithm_types (list[Type[AlgorithmProtocol]]): list of algorithm classes.
+        algorithm_kwargs_list list[dict[str, Any]]): list of keyword argument 
+            dictionaries for initializing each algorithm, ordered in the same 
+            order as algorithm_types
+        n_simulations (int): number of Monte Carlo simulations.
+        n_workers (int): number of threads for parallel execution.
+    """
 
+    def __init__(
+        self,
+        dgp_type: Type[DGPProtocol],
+        dgp_kwargs: dict[str, Any],
+        algorithm_types: list[Type[AlgorithmProtocol]],
+        algorithm_kwargs_list: list[dict[str, Any]],
+        n_simulations: int = 1000,
+        n_workers: int = 1,
+    ): 
+        self.dgp_type = dgp_type
+        self.dgp_kwargs = dgp_kwargs
+        self.algorithm_types = algorithm_types
+        self.algorithm_kwargs_list = algorithm_kwargs_list
+        self.n_simulations = n_simulations
+        self.n_workers = n_workers
+        self.results = []
+
+    def _run_single_simulation(self, seed: int) -> dict[str, Any]:
+        """Run a single Monte Carlo simulation for all algorithms.
+        
+        Args:
+            seed (int): seed for data sampling
+        """
+        # Initialize DGP
+        dgp = self.dgp_type(**self.dgp_kwargs)
+        X_train, X_test, y_train, y_test = dgp.sample(seed=seed)
+
+        sim_results = {}
+
+        # Initialize and fit each algorithm
+        for algo_type, algo_kwargs in zip(
+            self.algorithm_types, self.algorithm_kwargs_list
+        ):
+            algo = algo_type(**algo_kwargs)
+            algo.fit(X_train, y_train)
+            y_pred = algo.predict(X_test)
+
+
+            accuracy = accuracy_score(y_test, y_pred)
+            precision_0 = precision_score(y_test, y_pred, pos_label=0, zero_division=0)
+            recall_0 = recall_score(y_test, y_pred, pos_label=0, zero_division=0)
+            precision_1 = precision_score(y_test, y_pred, pos_label=1, zero_division=0)
+            recall_1 = recall_score(y_test, y_pred, pos_label=1, zero_division=0)
+            f1_0 = f1_score(y_test, y_pred, pos_label=0, zero_division=0)
+            f1_1 = f1_score(y_test, y_pred, pos_label=1, zero_division=0)
+
+            result_key = dgp.name + " + " + algo.name 
+            sim_results[result_key] = {
+                "n_training": dgp.n_train_samples,
+                "first_class_weight": dgp.weights[0],
+                "accuracy": accuracy,
+                "precision_0": precision_0,
+                "recall_0": recall_0,
+                "precision_1": precision_1,
+                "recall_1": recall_1,
+                "f1_0": f1_0,
+                "f1_1": f1_1,
+            }
+
+        return sim_results
+
+    def run_all(self) -> pd.DataFrame:
+        """Run all simulations in parallel and return aggregated results.
+        
+        Returns:
+            pd.DataFrame: DataFrame with simulation results.
+        """
+        with ThreadPoolExecutor(max_workers=self.n_workers) as executor:
+            futures = [
+                executor.submit(self._run_single_simulation, seed)
+                for seed in range(self.n_simulations)
+            ]
+            for future in tqdm(
+                futures, total=self.n_simulations, desc="Running simulations"
+            ):
+                self.results.append(future.result())
+
+        # Aggregate results into a DataFrame
+        df_list = []
+        for sim_result in self.results:
+            for algo_name, metrics in sim_result.items():
+                row = {"algorithm": algo_name, **metrics}
+                df_list.append(row)
+        return pd.DataFrame(df_list)
+```
+
+#### Implementing Algorithms
+
+For our approaches:
+
+- Doing nothing: just use `sklearn.linear_model.LogisticRegression` with default `weights` parameters
+- Reweighting likelihood: use `sklearn` LR with `weights=balanced`
+- SMOTE: use `SMOTE` from `imblearn`, wrap an `imblearn.pipeline.Pipeline` as a class following a suitable `AlgorithmProtocol`
+
+#### Our Logistic Regression Algorithms
+
+```{.python filename="algorithms/logistic.py"}
+"""
+Algorithms based on logistic regression, with and without class proportion
+corrections.
+
+Classes in this module:
+    - LogisticRegressionAlgorithm: vanilla scikit-learn regression
+    - LogisticRegressionSMOTE: logistic regression with SMOTE
+"""
+
+import numpy as np
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline as ImbPipeline
+from sklearn.linear_model import LogisticRegression
+
+
+class LogisticRegressionSK:
+    """Logistic regression classifier with optional class weighting.
+
+    Attributes:
+        name (str): name for reporting purposes.
+        class_weight (str | None): optional class weights for imbalanced datasets.
+        model (sklearn.linear_model.LogisticRegression): logistic regression model.
+    """
+
+    def __init__(
+        self,
+        class_weight: str | None = None,
+        random_state: int | None = None,
+    ) -> None:
+        self.class_weight = class_weight
+        self.model = LogisticRegression(
+            class_weight=class_weight, random_state=random_state
+        )
+        self.name = f"LogisticRegression (class_weight={self.class_weight})"
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+        """Fit the logistic regression model to the training data.
+
+        Args:
+            X (np.ndarray): training features.
+            y (np.ndarray): training labels.
+        """
+        self.model.fit(X, y)
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """Predict labels for the test data.
+
+        Args:
+            X (np.ndarray): test features.
+
+        Returns:
+            np.ndarray: predicted labels.
+        """
+        return self.model.predict(X)
+
+
+class LogisticRegressionSMOTE:
+    """Logistic regression classifier with SMOTE oversampling.
+
+    Attributes:
+        name (str): name for reporting purposes.
+        model (ImbPipeline): Pipeline combining SMOTE oversampling and logistic regression.
+    """
+
+    def __init__(
+        self,
+        random_state: int | None = None,
+    ) -> None:
+        """Initialize the logistic regression with SMOTE algorithm."""
+        self.name = "Logistic Regression with SMOTE"
+        self.model = ImbPipeline(
+            [
+                ("smote", SMOTE(random_state=random_state)),
+                ("logistic", LogisticRegression(random_state=random_state)),
+            ]
+        )
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+        """Fit the logistic regression model with SMOTE to the training data.
+
+        Args:
+            X (np.ndarray): training features.
+            y (np.ndarray): training labels.
+        """
+        self.model.fit(X, y)
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """Predict labels for the test data.
+
+        Args:
+            X (np.ndarray): test features.
+
+        Returns:
+            np.ndarray: tredicted labels.
+        """
+        return self.model.predict(X)
+```
+ 
 ### Results {background="#43464B"}
 
 #### Results For Balanced Classes (50/50)
