@@ -1,0 +1,36 @@
+"""
+Entry point for running simulation on classification with class imbalance.
+
+Overall goal of simulation: evaluate effect of various techniques for dealing
+with unbalanced classes in binary classification problems.
+
+Usage:
+    python main.py
+
+Output:
+    Console printout of precision, recall, and F1 scores
+"""
+
+import pandas as pd
+
+from simulation_infrastructure.orchestrator import SimulationOrchestrator
+from simulation_infrastructure.scenarios import scenarios
+
+
+def main():
+    # Create and run the orchestrator
+    orchestrator = SimulationOrchestrator(scenarios, n_workers=4)
+    orchestrator.run_all()
+    combined_results = pd.concat(orchestrator.summary_results.values())
+    print(
+        combined_results.groupby(by=["algorithm", "n_training", "first_class_weight"])[
+            ["precision_1", "recall_1", "f1_1"]
+        ]
+        .mean()
+        .round(3)
+        .to_markdown()
+    )
+
+
+if __name__ == "__main__":
+    main()
