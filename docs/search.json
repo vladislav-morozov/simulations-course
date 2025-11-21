@@ -209,6 +209,138 @@
     ]
   },
   {
+    "objectID": "slides/methods/evaluating-ml-algorithms.html#introduction",
+    "href": "slides/methods/evaluating-ml-algorithms.html#introduction",
+    "title": "Evaluating Machine Learning Algorithms",
+    "section": "Introduction",
+    "text": "Introduction",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Machine Learning Algorithms"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-ml-algorithms.html#theory-essentials-for-evaluating-ml-algorithms",
+    "href": "slides/methods/evaluating-ml-algorithms.html#theory-essentials-for-evaluating-ml-algorithms",
+    "title": "Evaluating Machine Learning Algorithms",
+    "section": "Theory Essentials for Evaluating ML Algorithms",
+    "text": "Theory Essentials for Evaluating ML Algorithms",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Machine Learning Algorithms"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-ml-algorithms.html#simulation-design",
+    "href": "slides/methods/evaluating-ml-algorithms.html#simulation-design",
+    "title": "Evaluating Machine Learning Algorithms",
+    "section": "Simulation Design",
+    "text": "Simulation Design",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Machine Learning Algorithms"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-ml-algorithms.html#simulation-implementation-and-solutions",
+    "href": "slides/methods/evaluating-ml-algorithms.html#simulation-implementation-and-solutions",
+    "title": "Evaluating Machine Learning Algorithms",
+    "section": "Simulation Implementation and Solutions",
+    "text": "Simulation Implementation and Solutions",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Machine Learning Algorithms"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-ml-algorithms.html#recap-and-conclusions",
+    "href": "slides/methods/evaluating-ml-algorithms.html#recap-and-conclusions",
+    "title": "Evaluating Machine Learning Algorithms",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Machine Learning Algorithms"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-cis.html#introduction",
+    "href": "slides/methods/evaluating-cis.html#introduction",
+    "title": "Evaluating Confidence Intervals",
+    "section": "Introduction",
+    "text": "Introduction",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Confidence Intervals"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-cis.html#theory-essentials-for-confidence-intervals",
+    "href": "slides/methods/evaluating-cis.html#theory-essentials-for-confidence-intervals",
+    "title": "Evaluating Confidence Intervals",
+    "section": "Theory Essentials for Confidence Intervals",
+    "text": "Theory Essentials for Confidence Intervals",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Confidence Intervals"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-cis.html#simulation-implementation",
+    "href": "slides/methods/evaluating-cis.html#simulation-implementation",
+    "title": "Evaluating Confidence Intervals",
+    "section": "Simulation Implementation",
+    "text": "Simulation Implementation",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Confidence Intervals"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-cis.html#simulation-results",
+    "href": "slides/methods/evaluating-cis.html#simulation-results",
+    "title": "Evaluating Confidence Intervals",
+    "section": "Simulation Results",
+    "text": "Simulation Results",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Confidence Intervals"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-cis.html#recap-and-conclusions",
+    "href": "slides/methods/evaluating-cis.html#recap-and-conclusions",
+    "title": "Evaluating Confidence Intervals",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Confidence Intervals"
+    ]
+  },
+  {
+    "objectID": "slides/organizational/intro.html#content-and-motivation",
+    "href": "slides/organizational/intro.html#content-and-motivation",
+    "title": "Course Introduction",
+    "section": "Content and Motivation",
+    "text": "Content and Motivation",
+    "crumbs": [
+      "Course Info",
+      "Course Introduction"
+    ]
+  },
+  {
+    "objectID": "slides/organizational/intro.html#course-logistics",
+    "href": "slides/organizational/intro.html#course-logistics",
+    "title": "Course Introduction",
+    "section": "Course Logistics",
+    "text": "Course Logistics",
+    "crumbs": [
+      "Course Info",
+      "Course Introduction"
+    ]
+  },
+  {
     "objectID": "slides/methods/evaluating-causal-estimators.html#introduction",
     "href": "slides/methods/evaluating-causal-estimators.html#introduction",
     "title": "Evaluating Causal Estimators",
@@ -272,83 +404,6 @@
     "crumbs": [
       "Evaluating Methods",
       "Evaluating Causal Estimators"
-    ]
-  },
-  {
-    "objectID": "slides/organizational/intro.html#content-and-motivation",
-    "href": "slides/organizational/intro.html#content-and-motivation",
-    "title": "Course Introduction",
-    "section": "Content and Motivation",
-    "text": "Content and Motivation",
-    "crumbs": [
-      "Course Info",
-      "Course Introduction"
-    ]
-  },
-  {
-    "objectID": "slides/organizational/intro.html#course-logistics",
-    "href": "slides/organizational/intro.html#course-logistics",
-    "title": "Course Introduction",
-    "section": "Course Logistics",
-    "text": "Course Logistics",
-    "crumbs": [
-      "Course Info",
-      "Course Introduction"
-    ]
-  },
-  {
-    "objectID": "slides/methods/evaluating-cis.html#introduction",
-    "href": "slides/methods/evaluating-cis.html#introduction",
-    "title": "Evaluating Confidence Intervals",
-    "section": "Introduction",
-    "text": "Introduction",
-    "crumbs": [
-      "Evaluating Methods",
-      "Evaluating Confidence Intervals"
-    ]
-  },
-  {
-    "objectID": "slides/methods/evaluating-cis.html#theory-essentials-for-confidence-intervals",
-    "href": "slides/methods/evaluating-cis.html#theory-essentials-for-confidence-intervals",
-    "title": "Evaluating Confidence Intervals",
-    "section": "Theory Essentials for Confidence Intervals",
-    "text": "Theory Essentials for Confidence Intervals",
-    "crumbs": [
-      "Evaluating Methods",
-      "Evaluating Confidence Intervals"
-    ]
-  },
-  {
-    "objectID": "slides/methods/evaluating-cis.html#simulation-implementation",
-    "href": "slides/methods/evaluating-cis.html#simulation-implementation",
-    "title": "Evaluating Confidence Intervals",
-    "section": "Simulation Implementation",
-    "text": "Simulation Implementation",
-    "crumbs": [
-      "Evaluating Methods",
-      "Evaluating Confidence Intervals"
-    ]
-  },
-  {
-    "objectID": "slides/methods/evaluating-cis.html#simulation-results",
-    "href": "slides/methods/evaluating-cis.html#simulation-results",
-    "title": "Evaluating Confidence Intervals",
-    "section": "Simulation Results",
-    "text": "Simulation Results",
-    "crumbs": [
-      "Evaluating Methods",
-      "Evaluating Confidence Intervals"
-    ]
-  },
-  {
-    "objectID": "slides/methods/evaluating-cis.html#recap-and-conclusions",
-    "href": "slides/methods/evaluating-cis.html#recap-and-conclusions",
-    "title": "Evaluating Confidence Intervals",
-    "section": "Recap and Conclusions",
-    "text": "Recap and Conclusions",
-    "crumbs": [
-      "Evaluating Methods",
-      "Evaluating Confidence Intervals"
     ]
   },
   {
