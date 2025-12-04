@@ -2,12 +2,12 @@
 Core simulation logic for evaluating confidence intervals for variance.
 
 This module contains the following core functions:
-    - mle_variance: maximum likelihood estimator for the variance of the normal
-        distribution.
-    - asymptotic_ci_variance: construct an asymptotic confidence interval for
+    - mle_variance(): maximum likelihood estimator for the variance of the 
+        normal distribution.
+    - asymptotic_ci_variance(): construct an asymptotic confidence interval for
         the variance of the normal distribution based on the limit distribution
         of the maximum likelihood estimator for variance.
-    - run_simulations: run Monte Carlo simulations for coverage and interval
+    - run_simulations(): run Monte Carlo simulations for coverage and interval
         length of confidence intervals for the variance of the normal
         distribution based on the maximum likelihood estimator.
 """
