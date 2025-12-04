@@ -7,16 +7,18 @@
 
 This folder contains simulation code for finding and simulating a scenario where a fixed effects estimator is more biased for the average effect than a simple OLS estimator.
 
-Specifically, we consider the following potential outcomes model under normality:
+Specifically, we consider the following potential outcomes model:
 
 $$
 Y_{it}^x = \alpha_i + \beta_i x + U_{it}
 $$ 
 
-This setting is more realistic than a simple random intercept model, as it allows for treatment effect heterogeneity. 
+This setting is more realistic than a simple random intercept model, as it allows for treatment effect heterogeneity through the individual-specific coefficients $\beta_i$.
 
 The simulation in this folder showcases a scenario in which  adding fixed effects to estimation (eliminating $\alpha_i$) yields an estimator that almost always has a different sign from $\mathbb{E}[\beta_i]$. In the same scenario, a simple OLS estimator is generally very close to $\mathbb{E}[\beta_i]$.
  
+The overall conclusion is adding fixed effects might actually yield estimates that are further away from the true average effect.
+
 For details and development of code logic, see the following lecture:
 
 - [Evaluating Causal Estimators](https://vladislav-morozov.github.io/simulations-course/slides/methods/evaluating-causal-estimators.html)
@@ -29,12 +31,12 @@ For details and development of code logic, see the following lecture:
 │   ├── constants.py
 │   ├── data_generation.py
 │   ├── __init__.py
-│   └── moment_info.py 
-├── exp.ipynb
+│   └── moment_info.py  
 ├── gmm
 │   ├── __init__.py 
 │   └── solver.py
 ├── main.py
+├── requirements.txt
 ├── README.md 
 │   └── ...
 └── simulation_infrastructure
@@ -61,6 +63,6 @@ python -m pip install -r requirements.txt
 Run the simulation by executing:
 
 ```sh
-python -X gil=0 main.py
+python main.py
 ```  
  
