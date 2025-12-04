@@ -449,7 +449,7 @@ Overall goal of simulation: evaluate effect of various techniques for dealing
 with unbalanced classes in binary classification problems.
 
 Usage:
-    python main.py
+    python -X gil=0 main.py
 
 Output:
     Console printout of precision, recall, and F1 scores
