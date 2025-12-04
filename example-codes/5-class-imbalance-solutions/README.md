@@ -2,15 +2,34 @@
 
 ## Overview
 
-This folder contains simulation code for evaluating the effect of class imbalance corrections in a binary classification problem. 
-The code is extensible in terms of DGPs and classification approach. Output: accuracy, recall, $F_1$ score for each algorithm and DGP, printed to the console as a markdown table.
+Class imbalance is an important problem in classification. Strong imbalance may bias classifiers towards the majority classes, leading to:
 
-Accompanying lectures:
+- Poor generalizaiton.
+- Misleading accuracy.
+- Potentially incorrect conclusions.
+
+There are several solutions, including
+
+- Undersampling the majority class.
+- Oversampling the minority class.
+- Introducing weights in the objective function to give more weight to small classes.
+
+> Do such corrections yield better performance on the minority classes? 
+
+In this simulation we evaluate the effect of class imbalance corrections in a binary classification problem. The metrics considered are  accuracy, recall, $F_1$ score for each algorithm and DGP, printed to the console as a Markdown table.
+
+Overall, we find that techniques like SMOTE and likelihood weight correction improve detection of underrepresented class at the price of more false positives.
+
+For statistical details and code development, see the accompanying lecture: 
 
 - [Evaluating Machine Learning Algorithms](https://vladislav-morozov.github.io/simulations-course/slides/methods/evaluating-ml-algorithms.html) 
  
  
 ## File Structure
+
+
+In this simulation, we return to the larger modular format that is is extensible in terms of DGPs and classification approach. Code structure:
+
 
 ```
 ├── README.md
@@ -46,7 +65,7 @@ python -m pip install -r requirements.txt
 Run the simulation by executing:
 
 ```sh
-python main.py
+python -X gil=0 main.py
 ```  
 
 Results (accuracy, recall, $F_1$ for each algorithm) will be printed to the console.
