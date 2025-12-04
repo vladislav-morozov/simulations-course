@@ -21,12 +21,6 @@ class ResultsProcessor:
     """
 
     def __init__(self, input_path: Path, output_path: Path) -> None:
-        """Initializes the ResultProcessor with input and output paths.
-
-        Args:
-            input_path: Path to the input CSV file.
-            output_path: Path to the output directory for plots.
-        """
         # Load in and process simulation results
         self._prepare_power_data(input_path)
 
@@ -46,17 +40,16 @@ class ResultsProcessor:
         self.export_power_differences()
 
     def export_power_surfaces(self) -> None:
-        """Exports a power plot from the simulation results.
-
-        Args:
-            results: DataFrame containing the simulation results.
-        """
+        """Exports a power plot from the simulation results."""
         # Create meshgrid
-        c_mesh, rho_mesh = np.meshgrid(self.coef_val_range, self.corr_range, indexing="ij")
+        c_mesh, rho_mesh = np.meshgrid(
+            self.coef_val_range, self.corr_range, indexing="ij"
+        )
+
         # Create figure and add surface plots
         fig = plt.figure(figsize=(16, 6))
         fig.patch.set_facecolor(self.bg_color)
-        
+
         ax1 = fig.add_subplot(1, 2, 1, projection="3d")
         ax1.plot_surface(
             c_mesh,
@@ -83,7 +76,7 @@ class ResultsProcessor:
             edgecolor="peru",
             lw=0.5,
             alpha=0.34,
-        ) 
+        )
         ax2.contour(
             c_mesh,
             rho_mesh,
@@ -110,47 +103,50 @@ class ResultsProcessor:
             ax.set_ylabel(
                 "Correlation between $\\hat{\\theta_2}_1$ and $\\hat{\\theta_2}_2$",
                 color="black",
-            )   
+            )
 
-        ax1.set_title("Joint: Wald", color = "black", loc="left", fontsize = 16)
-        ax2.set_title("Multiple $t$ with Bonferroni Adjustment", color = "black", loc="left", fontsize = 16) 
-        
+        ax1.set_title("Joint: Wald", color="black", loc="left", fontsize=16)
+        ax2.set_title(
+            "Multiple $t$ with Bonferroni Adjustment",
+            color="black",
+            loc="left",
+            fontsize=16,
+        )
+
         # Adjust layout to add padding for the text
-        fig.subplots_adjust(top=0.85, wspace = 0.04, bottom=-0.14)    
+        fig.subplots_adjust(top=0.85, wspace=0.04, bottom=-0.14)
 
         # Add title section
         fig.text(
-            0.125,  
-            1.05,  
+            0.125,
+            1.05,
             "Power Functions of Wald and Adjusted Multiple $t$-Tests",
             ha="left",  # Horizontal alignment
-            va="top",   # Vertical alignment
+            va="top",  # Vertical alignment
             fontsize=18,
             color="black",
             weight="bold",
         )
 
-        # Export as SVG 
-        plt.savefig(self.output_path / "power_surfaces.svg",  bbox_inches='tight')
+        # Export as SVG
+        plt.savefig(self.output_path / "power_surfaces.svg", bbox_inches="tight")
 
     def export_power_differences(self) -> None:
-        """Exports a size plot from the simulation results.
-
-        Args:
-            results: DataFrame containing the simulation results.
-        """
+        """Exports a size plot from the simulation results."""
         # Create meshgrid
-        c_mesh, rho_mesh = np.meshgrid(self.coef_val_range, self.corr_range, indexing="ij")
-        
+        c_mesh, rho_mesh = np.meshgrid(
+            self.coef_val_range, self.corr_range, indexing="ij"
+        )
+
         # Create figure and add surface plots
         fig = plt.figure(figsize=(11, 6))
         fig.patch.set_facecolor(self.bg_color)
-        
+
         ax = fig.add_subplot(1, 1, 1, projection="3d")
         ax.plot_surface(
             c_mesh,
             -rho_mesh,
-            self.wald_results-self.bonf_results,
+            self.wald_results - self.bonf_results,
             edgecolor="peru",
             lw=0.5,
             alpha=0.3,
@@ -158,12 +154,12 @@ class ResultsProcessor:
         ax.contour(
             c_mesh,
             rho_mesh,
-            self.wald_results-self.bonf_results,
+            self.wald_results - self.bonf_results,
             zdir="y",
             offset=-self.corr_range.min(),
             cmap="coolwarm",
         )
-        
+
         ax.view_init(elev=30, azim=120, roll=0)
         # Set axes
         ax.set(
@@ -172,19 +168,22 @@ class ResultsProcessor:
             zlim=(-0.1, 1),
             facecolor=self.bg_color,
         )
-        
 
         ax.set_xlabel("c: Value of $\\theta_1=\\theta_2$", color="black")
         ax.set_ylabel(
             "Correlation between $\\hat{\\theta_2}_1$ and $\\hat{\\theta_2}_2$",
             color="black",
-        )   
-        
-        ax.set_title("Difference in Power Between Wald and Multiple $t$-test", loc="left", weight="bold") 
-        fig.subplots_adjust(top=0.85, wspace = 0.04, bottom=-0.14)    
+        )
 
-        # Export as SVG 
-        plt.savefig(self.output_path / "power_diff.svg",  bbox_inches='tight')
+        ax.set_title(
+            "Difference in Power Between Wald and Multiple $t$-test",
+            loc="left",
+            weight="bold",
+        )
+        fig.subplots_adjust(top=0.85, wspace=0.04, bottom=-0.14)
+
+        # Export as SVG
+        plt.savefig(self.output_path / "power_diff.svg", bbox_inches="tight")
 
     def _prepare_power_data(self, input_path: Path) -> None:
         """Load and prepare arrays of power functions for tests considered.
@@ -211,4 +210,3 @@ class ResultsProcessor:
             .mean()
             .unstack()
         )
-

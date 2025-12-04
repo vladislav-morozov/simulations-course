@@ -10,6 +10,7 @@ Classes:
 """
 
 import numpy as np
+
 from sim_infrastructure.protocols import DGPProtocol, TestProtocol
 
 
@@ -17,9 +18,12 @@ class SimulationRunner:
     """Runs Monte Carlo simulations for a given DGP and estimator.
 
     Attributes:
-        dgp: data-generating process with a sample() method and beta1 attribute.
-        estimator: estimator with a fit() method and beta1_hat attribute.
-        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+        dgp (DGPProtocol): data-generating process with a sample() method and
+            attributes that describe the DGP (covar_corr and common_coef_val).
+        test (TestProtocol): test with a test() method and attributes that
+            describe test name and test decision after seeing the data.
+        test_decisions (np.ndarray): array of decisions made by the test in
+            each Monte Carlo replication.
     """
 
     def __init__(
@@ -27,23 +31,17 @@ class SimulationRunner:
         dgp: DGPProtocol,
         test: TestProtocol,
     ) -> None:
-        """Initializes the simulation runner.
-
-        Args:
-            dgp: An instance of a DGP class (must implement `sample`).
-            estimator: An instance of an estimator class (must implement `fit`).
-        """
         self.dgp: DGPProtocol = dgp
         self.test: TestProtocol = test
         self.test_decisions: np.ndarray = np.empty(0)
 
     def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
-        """Runs simulations and stores estimation errors.
+        """Runs simulations and stores test decisions.
 
         Args:
             n_sim (int): number of simulations to run.
-            n_obs (int): Number of observations per simulation.
-            first_seed (int | None): Starting random seed for reproducibility.
+            n_obs (int): number of sample points in each Monte Carlo dataset.
+            first_seed (int | None): starting random seed for reproducibility.
                 Defaults to None.
         """
         # Preallocate array to hold estimation errors
@@ -61,7 +59,7 @@ class SimulationRunner:
             self.test_decisions[sim_id] = self.test.decision
 
     def summarize_results(self) -> dict:
-        """Return a summary of results
+        """Return a summary of results: test name, DGP characteristics, power.
 
         Returns:
             dict: power of current test at current DGP
