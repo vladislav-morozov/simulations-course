@@ -19,7 +19,9 @@ class LogisticRegressionSK:
     Attributes:
         name (str): name for reporting purposes.
         class_weight (str | None): optional class weights for imbalanced datasets.
-        model (sklearn.linear_model.LogisticRegression): logistic regression model.
+            Defaults to None (no weighting).
+        model (sklearn.linear_model.LogisticRegression): an sklearn logistic
+            regression model.
     """
 
     def __init__(
@@ -59,14 +61,14 @@ class LogisticRegressionSMOTE:
 
     Attributes:
         name (str): name for reporting purposes.
-        model (ImbPipeline): Pipeline combining SMOTE oversampling and logistic regression.
+        model (imblearn.pipeline.ImbPipeline): pipeline combining SMOTE 
+            oversampling and logistic regression.
     """
 
     def __init__(
         self,
         random_state: int | None = None,
     ) -> None:
-        """Initialize the logistic regression with SMOTE algorithm."""
         self.name = "Logistic Regression with SMOTE"
         self.model = ImbPipeline(
             [

@@ -15,7 +15,7 @@ class SimulationOrchestrator:
     Args:
         scenarios (list[SimulationScenario]): list of SimulationScenario objects
             that encode DGPs, algorithms, and associated arguments.
-        n_workers (int): number of threads for parallel execution.
+        n_workers (int): number of threads for parallel execution. Defaults to 1.
     """
 
     def __init__(

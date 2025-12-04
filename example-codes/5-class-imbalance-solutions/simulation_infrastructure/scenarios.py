@@ -22,7 +22,7 @@ from dgps.sklearn_based import SKImbalancedTwoClassesDGP
 class SimulationScenario:
     """A single simulation scenario: DGP, list of algorithms, and associated arguments"""
 
-    name: str  # For readability
+    name: str  # A human-readable unique name
     dgp: Type
     dgp_kwargs: dict[str, Any]
     algorithms: list[Type]
