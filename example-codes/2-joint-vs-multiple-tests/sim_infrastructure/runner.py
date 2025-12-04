@@ -2,7 +2,7 @@
 Module for executing a given Monte Carlo scenario.
 
 This module contains the SimulationRunner class, which executes a scenario
-by combining a DGP and a test. It handles data generation, estimation, testing,
+by combining a DGP and a test. It handles data generation, testing,
 and result collection.
 
 Classes:
@@ -15,7 +15,7 @@ from sim_infrastructure.protocols import DGPProtocol, TestProtocol
 
 
 class SimulationRunner:
-    """Runs Monte Carlo simulations for a given DGP and estimator.
+    """Runs Monte Carlo simulations for a given DGP and test.
 
     Attributes:
         dgp (DGPProtocol): data-generating process with a sample() method and
@@ -44,7 +44,7 @@ class SimulationRunner:
             first_seed (int | None): starting random seed for reproducibility.
                 Defaults to None.
         """
-        # Preallocate array to hold estimation errors
+        # Preallocate array to hold test decisions
         self.test_decisions = np.empty(n_sim)
 
         # Run simulation

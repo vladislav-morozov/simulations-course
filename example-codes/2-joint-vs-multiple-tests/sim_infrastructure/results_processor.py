@@ -40,7 +40,11 @@ class ResultsProcessor:
         self.export_power_differences()
 
     def export_power_surfaces(self) -> None:
-        """Exports a power plot from the simulation results."""
+        """Exports a power plot from the simulation results.
+        
+        The figure has two subplots, one for each test considered. Each subplot
+        depicts the power surface as a function of the DGP parameters.
+        """
         # Create meshgrid
         c_mesh, rho_mesh = np.meshgrid(
             self.coef_val_range, self.corr_range, indexing="ij"
@@ -132,7 +136,11 @@ class ResultsProcessor:
         plt.savefig(self.output_path / "power_surfaces.svg", bbox_inches="tight")
 
     def export_power_differences(self) -> None:
-        """Exports a size plot from the simulation results."""
+        """Export a plot with power differences between Wald and multiple tests.
+
+        The figure shows the difference in power between the two tests 
+        as a function of the DGP parameters.
+        """
         # Create meshgrid
         c_mesh, rho_mesh = np.meshgrid(
             self.coef_val_range, self.corr_range, indexing="ij"
