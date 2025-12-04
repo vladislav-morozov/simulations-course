@@ -539,8 +539,7 @@ Again have a small targeted simulation $\Rightarrow$ will structure using functi
 │   ├── constants.py
 │   ├── data_generation.py
 │   ├── __init__.py
-│   └── moment_info.py 
-├── exp.ipynb
+│   └── moment_info.py  
 ├── gmm
 │   ├── __init__.py 
 │   └── solver.py
