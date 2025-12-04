@@ -1,0 +1,851 @@
+---
+title: "Evaluating Machine Learning Algorithms"
+subtitle: "Working with Predictive Settings"
+author: Vladislav Morozov  
+format:
+  revealjs:
+    include-in-header: 
+      text: |
+        <meta name="description" content="Learn how to evaluate machine learning algorithms using Monte Carlo; including an example on classification with class imbalance (lecture note slides)"/> 
+    width: 1150
+    slide-number: true
+    sc-sb-title: true
+    incremental: true   
+    logo: ../../themes/favicon.ico
+    footer: "Evaluating Predictive Algorithms"
+    footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
+    theme: ../../themes/slides_theme.scss
+    toc: TRUE
+    toc-depth: 2
+    toc-title: Contents
+    transition: convex
+    transition-speed: fast
+slide-level: 4
+title-slide-attributes:
+    data-background-color: "#3c165cff"
+    data-footer: " "
+filters:
+  - reveal-header 
+embed-resources: true
+include-in-header: ../../themes/mathjax.html 
+highlight-style: tango
+open-graph:
+    description: "Learn how to evaluate machine learning algorithms using Monte Carlo; including an example on classification with class imbalance (lecture note slides)" 
+---
+
+
+
+
+
+
+## Introduction {background="#00100F"}
+
+```{python}
+import matplotlib.pyplot as plt
+
+from itertools import product
+
+from sklearn.datasets import make_classification
+
+BG_COLOR = "whitesmoke"
+```
+
+### Lecture Info {background="#43464B"}
+
+#### Learning Outcomes
+
+This lecture is about evaluating machine learning algorithms
+
+<br>
+
+By the end, you should be able to
+
+ 
+
+- Recall essential concepts that define a statistical/machine learning problem
+- Understand how to use Monte Carlo for evaluating predictive algorithms
+- Parallelize computation on the level of MC datasets
+
+
+#### References 
+  
+::: {.nonincremental}
+ 
+On core theory of statistical/machine learning:
+
+- @Shalev-Shwartz2014UnderstandingMachineLearning or @Mohri2018FoundationsMachineLearning
+- [My undergraduate slides](https://vladislav-morozov.github.io/econometrics-2/) 
+
+On practical implementations with common packages:
+
+- @Geron2025HandsOnMachineLearning
+
+:::
+
+### Lecture Example: Dealing with Class Imbalance {background="#43464B"}
+
+#### Problem of Class Imbalance in Classification
+
+Setting of today: classification with class imbalance
+
+<br>
+
+Empirically know that class imbalance may cause classifier bias towards the majority classes, leading to
+
+- Poor generalization
+- Misleading accuracy metrics
+- Potentially incorrect policy recommendations
+
+
+::: {.footer}
+
+Intuitively: if one class is 99% of the data, you can get 99% accuracy for free by always predicting that class
+
+:::
+
+
+#### Example Datasets With Different Imbalances
+
+::: {.nonincremental}
+
+- Two class example
+- Each row: progressively stronger class imbalance
+
+:::
+
+```{python}
+N_ROWS = 3
+N_COLS = 4
+fig, axs = plt.subplots(nrows=N_ROWS, ncols=N_COLS, figsize=(16,5))
+fig.patch.set_color(BG_COLOR)
+for row_id, col_id in product(range(N_ROWS), range(N_COLS)):
+    X, y = make_classification(
+      n_samples=300,
+      n_features=2,
+      n_redundant=0,
+      weights=[0.95 - 0.4*(N_ROWS - 1 - row_id)/(N_ROWS-1), 0.05 + 0.4*(N_ROWS - 1 - row_id)/(N_ROWS-1)],
+      class_sep=1.7,
+      flip_y=0.05,
+      random_state= 67*row_id + 237*col_id
+    )
+    axs[row_id, col_id].scatter(X[y==1, 0], X[y==1, 1], color='gold', marker='x')
+    axs[row_id, col_id].scatter(X[y==0, 0], X[y==0, 1], color='#3c165c')
+    axs[row_id, col_id].set_xticks([]) 
+    axs[row_id, col_id].set_yticks([]) 
+```
+
+::: {.footer}
+
+Data sampled using `sklearn.datasets.make_classification`
+
+:::
+
+#### Solutions to Class Imbalance
+
+There are some solutions:
+
+- Undersampling majority classes (throwing away data)
+- Oversample minority classes (possibly with synthetic examples, e.g. SMOTE)
+- Biasing algorithms towards minority classes by modifying training (e.g. weights in objective functions)
+
+::: {.left-color}
+
+Which of these are better?
+
+:::
+
+::: {.footer}
+
+SMOTE: Synthetic Minority Over-sampling Technique
+
+:::
+
+#### Goal of Today: Evaluating Solutions
+
+<br>
+
+Today:
+
+::: {.left-color}
+
+Compact simulation in low-dimensional setting comparing
+
+- Not doing anything
+- Synthetic oversampling
+- Weights in objective function
+
+:::
+
+
+
+## Theory Essentials for Evaluating ML Algorithms {background="#00100F"}
+  
+### Core Concepts {background="#43464B"}
+
+#### Goal of Statistical/Machine Learning
+
+
+<div class="rounded-box">
+
+Key goal of prediction --- predicting <span class="highlight">well</span>
+
+</div> 
+
+Other goals:
+
+- Computational efficiency: better to have a cheaper and quicker way to produce a new prediction
+- Interpretability: why does the algorithm predict what it does?
+- Scalability: can it handle increasing loads, run in distributed manner, etc
+
+#### Monte Carlo vs. Goals of Prediction
+
+
+::: {.left-color}
+
+Monte Carlo simulations can be used to check all four criteria
+
+:::
+
+In particular: 
+
+- Predictive quality thanks to access to true labels
+- Efficiency and scalability --- easy to produce more and different kinds of data to test systems
+- Interpretability --- have true DGP, can contrast explanations with true dependence
+
+
+#### Components of a Setting
+
+A predictive problem is defined by
+
+- DGP
+- Risk function that expresses our preference
+- A machine learning algorithm: 
+  - Class $\Hcal$ of hypotheses
+  - Some decision rule that selects an $\hat{h}\in\Hcal$ after seeing data
+
+
+#### Loss and Risk
+
+Quality of prediction measured with *risk* function
+
+Let $h(\bX)$ be a prediction of $Y$ given $\bX$  (<span class="highlight">hypothesis</span>) 
+
+
+<div class="rounded-box">
+
+ 
+
+Let the <span class="highlight">loss function </span>$l(y, \hat{y})$ satisfy $l(y, \hat{y})\geq 0$ and $l(y, y)=0$ for all $y, \hat{y}$.
+
+
+The <span class="highlight">risk function</span> of the hypothesis (prediction) $h(\cdot)$ is the expected loss:
+$$
+R(h) = \E_{(Y, \bX)}\left[ l(Y, h(\bX))  \right]
+$$
+
+
+ 
+
+
+</div>
+
+
+ 
+#### Interpretation: Generalization Error
+
+<div class="rounded-box">
+
+Risk measures how well the hypothesis $h$ performs on unseen data --- <span class="highlight">generalization error</span>  
+
+</div>
+
+Example: indicator risk:
+$$
+\E[\I\curl{Y\neq h(\bX)}] = P(Y\neq h(\bX))
+$$
+Probability of incorrectly predicting $Y$ with $h(\bX)$ --- where $Y$ and $\bX$ are a new observation
+
+
+#### Algorithms
+
+::: {.left-color}
+
+Informally, a machine learning algorithm is a rule for picking some hypothesis from some $\Hcal$
+
+:::
+
+Algorithms differ in 
+
+- $\Hcal$ (e.g. linear functions of $\bX$, ensembles of decision trees in $\bX$, chains of affine functions and nonlinear transforms (NNs), etc.)
+- Rule for selecting from $\Hcal$: minimizing empirical risk; minimizing surrogate risk; adding or not adding a complexity penalty, etc.
+
+
+### Evaluation Metrics {background="#43464B"}
+
+#### Core Metrics: Risk
+
+::: {.left-color}
+
+
+Basic metric for evaluating any ML algorithm --- associated risk 
+
+:::
+
+For example:
+
+- Classification: accuracy, weighted accuracy, etc.
+- Regression: MSE, MAE, linex, etc.
+
+Nice things about simulations: can even evaluate such metrics for unsupervised settings
+
+#### How To Evaluate Risk in Monte Carlo
+
+Recall: risk measures performance on <span class="highlight">unseen data</span>
+
+
+::: {.left-color}
+
+In simulations: repeat for many datasets
+
+- Draw training and test sets
+- Train algorithm on training set 
+- Predict on <span class="highlight">test set</span> and compute average loss over test set 
+ 
+
+Finally, average those average losses across MC datasets to get the MC estimate of risk of algorithm
+
+:::
+
+#### Other Metrics
+ 
+Often care about other metrics in practice
+
+<br>
+
+Some examples:
+
+- Classification: precision, recall, aggregated scores
+- Regression: width of predictive interval
+
+. . . 
+
+Can evaluate those the same way as risk
+
+
+## Simulation Design {background="#00100F"}
+
+
+
+#### Reminder: Setting
+
+::: {.left-color}
+
+Want to check out a couple of approaches for dealing with class imbalance in classification settings
+
+:::
+
+<br>
+
+Need to specify:
+
+- DGP(s)
+- Approaches to evaluate 
+- Metrics
+
+#### DGP
+
+::: {.left-color}
+
+Essential feature: degree of class imbalance
+
+Will compare two pairs: 50/50 (baseline with no imbalance) and 90/10
+ 
+:::
+
+
+. . . 
+
+<br>
+
+Here:
+
+- Use `sklearn.datasets.make_classification()`-based DGP with 2 features
+- Write modular code to allow for other DGPs
+
+
+::: {.footer}
+
+Already saw examples from the DGP at the beginning of the lecture
+
+:::
+
+#### Approaches for Dealing with Class Imbalance
+
+<br> 
+
+Will try essential representatives of three approaches:
+
+1. Doing nothing
+2. Oversampling by creating synthetic datapoints for the minority class using SMOTE
+3. Adjusting likelihood function (surrogate risk) to give more weight to minority class
+
+#### Learning Algorithms Considered
+
+
+<br>
+
+- As a starting point, only consider logistic regression with linear features
+- Can accommodate all three methods
+- Likely to work reasonably well under our DGP: fairly good linear separability
+
+
+
+
+
+#### Metrics
+
+::: {.left-color}
+
+Relevant aspect of simulation: performance on the minority class `1`
+
+:::
+
+<br>
+
+$\Rightarrow$ will focus on 
+
+- Precision: how often `1` labels are correct
+- Recall: how many of the `1`s are detected
+- $F_1$: harmonic mean of precision and recall
+
+## Simulation Implementation and Solutions {background="#00100F"}
+  
+### Implementation {background="#43464B"}
+
+#### Overall Organization Strategy
+
+Again a more complex setting with possible desire to evaluate many DGPs and algorithms $\Rightarrow$ go with larger more modular design
+
+```
+├── algorithms
+│   ├── __init__.py 
+│   └── logistic.py
+├── dgps
+│   ├── __init__.py 
+│   └── sklearn_based.py
+├── main.py
+└── simulation_infrastructure
+    ├── __init__.py 
+    ├── orchestrator.py
+    ├── protocols.py
+    ├── runner.py
+    └── scenarios.py
+```
+
+::: {.footer}
+
+As always, I suggest that you play with the code, add your own algorithms and see the effects
+
+:::
+
+#### Our `main.py`
+
+```{.python filename="main.py"}
+"""
+Entry point for running simulation on classification with class imbalance.
+
+Overall goal of simulation: evaluate effect of various techniques for dealing
+with unbalanced classes in binary classification problems.
+
+The code compares correction techniques in terms of precision, recall, and the
+F_1 score. Techniques considered:
+    - Not doing anything.
+    - SMOTE (synthetic oversampling).
+    - Introducing class weights in the criterion function.
+
+Usage:
+    python -X gil=0 main.py
+
+Output:
+    Console printout of precision, recall, and F1 scores
+"""
+
+import pandas as pd
+
+from simulation_infrastructure.orchestrator import SimulationOrchestrator
+from simulation_infrastructure.scenarios import scenarios
+
+
+def main():
+    # Create and run the orchestrator
+    orchestrator = SimulationOrchestrator(scenarios, n_workers=4)
+    orchestrator.run_all()
+    combined_results = pd.concat(orchestrator.summary_results.values())
+
+    # Print key results as a markdown table
+    print(
+        combined_results.groupby(by=["algorithm", "n_training", "first_class_weight"])[
+            ["precision_1", "recall_1", "f1_1"]
+        ]
+        .mean()
+        .round(3)
+        .to_markdown()
+    )
+
+
+if __name__ == "__main__":
+    main()
+```
+
+#### About `SimulationOrchestrator` and `scenarios`
+
+`SimulationOrchestrator` like before:
+
+- Takes in list of `SimulationScenario` objects
+- Runs them all and stores results
+
+. . . 
+
+`scenarios` a bit different:
+
+- Each `SimulationScenario`: a DGP and a <span class="highlight">list of algorithms</span>
+- `SimulationRunner` will run all scenarios on each drawn dataset (like last time)
+
+#### About `SimulationRunner`
+
+Our `SimulationRunner` needs to accommodate some changes: 
+
+- Loop over algorithms for same dataset 
+- Execute replications in parallel: here parallelize at the level of MC datasets
+- Create <span class="highlight">separate</span> instance of DGP and each algorithm in each dataset (no weird interactions across datasets)
+
+. . . 
+
+Last point: previously handled by `SimulationOrchestrator`, but now more appropriate on level of dataset 
+
+
+#### Our `SimulationRunner`
+
+```{.python filename="simulation_infrastructure/runner.py"}
+"""
+Simulation runner for evaluating prediction algorithms via Monte Carlo.
+
+Classes:
+    - SimulationRunner: executes simulation scenario, potentially in parallel.
+"""
+
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Type
+
+import pandas as pd
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from tqdm import tqdm
+
+from simulation_infrastructure.protocols import AlgorithmProtocol, DGPProtocol
+
+
+class SimulationRunner:
+    """Runs Monte Carlo simulations for a given DGP and list of algorithms.
+
+    Attributes:
+        dgp_type (Type[DGPProtocol]): class of the Data Generating Process.
+        dgp_kwargs (dict[str, Any]): keyword arguments for initializing the DGP.
+        algorithm_types (list[Type[AlgorithmProtocol]]): list of algorithm classes.
+        algorithm_kwargs_list list[dict[str, Any]]): list of keyword argument
+            dictionaries for initializing each algorithm, ordered in the same
+            order as algorithm_types
+        n_simulations (int): number of Monte Carlo simulations. Defaults to 1000.
+        n_workers (int): number of threads for parallel execution. Defaults to 1.
+    """
+
+    def __init__(
+        self,
+        dgp_type: Type[DGPProtocol],
+        dgp_kwargs: dict[str, Any],
+        algorithm_types: list[Type[AlgorithmProtocol]],
+        algorithm_kwargs_list: list[dict[str, Any]],
+        n_simulations: int = 1000,
+        n_workers: int = 1,
+    ):
+        self.dgp_type = dgp_type
+        self.dgp_kwargs = dgp_kwargs
+        self.algorithm_types = algorithm_types
+        self.algorithm_kwargs_list = algorithm_kwargs_list
+        self.n_simulations = n_simulations
+        self.n_workers = n_workers
+        self.results = []
+
+    def _run_single_simulation(self, seed: int) -> dict[str, Any]:
+        """Run a single Monte Carlo simulation for all algorithms.
+
+        Args:
+            seed (int): seed for data sampling
+        """
+        # Initialize DGP
+        dgp = self.dgp_type(**self.dgp_kwargs)
+        X_train, X_test, y_train, y_test = dgp.sample(seed=seed)
+
+        sim_results = {}
+
+        # Initialize and fit each algorithm
+        for algo_type, algo_kwargs in zip(
+            self.algorithm_types, self.algorithm_kwargs_list
+        ):
+            algo = algo_type(**algo_kwargs)
+            algo.fit(X_train, y_train)
+            y_pred = algo.predict(X_test)
+
+            accuracy = accuracy_score(y_test, y_pred)
+            precision_0 = precision_score(y_test, y_pred, pos_label=0, zero_division=0)
+            recall_0 = recall_score(y_test, y_pred, pos_label=0, zero_division=0)
+            precision_1 = precision_score(y_test, y_pred, pos_label=1, zero_division=0)
+            recall_1 = recall_score(y_test, y_pred, pos_label=1, zero_division=0)
+            f1_0 = f1_score(y_test, y_pred, pos_label=0, zero_division=0)
+            f1_1 = f1_score(y_test, y_pred, pos_label=1, zero_division=0)
+
+            result_key = dgp.name + " + " + algo.name
+            sim_results[result_key] = {
+                "n_training": dgp.n_train_samples,
+                "first_class_weight": dgp.weights[0],
+                "accuracy": accuracy,
+                "precision_0": precision_0,
+                "recall_0": recall_0,
+                "precision_1": precision_1,
+                "recall_1": recall_1,
+                "f1_0": f1_0,
+                "f1_1": f1_1,
+            }
+
+        return sim_results
+
+    def run_all(self) -> pd.DataFrame:
+        """Run all simulations in parallel and return aggregated results.
+
+        Returns:
+            pd.DataFrame: DataFrame with simulation results.
+        """
+        with ThreadPoolExecutor(max_workers=self.n_workers) as executor:
+            futures = [
+                executor.submit(self._run_single_simulation, seed)
+                for seed in range(self.n_simulations)
+            ]
+            for future in tqdm(
+                futures, total=self.n_simulations, desc="Running simulations"
+            ):
+                self.results.append(future.result())
+
+        # Aggregate results into a DataFrame
+        df_list = []
+        for sim_result in self.results:
+            for algo_name, metrics in sim_result.items():
+                row = {"algorithm": algo_name, **metrics}
+                df_list.append(row)
+        return pd.DataFrame(df_list)
+```
+
+#### Implementing Algorithms
+
+For our approaches:
+
+- Doing nothing: just use `sklearn.linear_model.LogisticRegression` with default `weights` parameters
+- Reweighting likelihood: use `sklearn` LR with `weights=balanced`
+- SMOTE: use `SMOTE` from `imblearn`, wrap an `imblearn.pipeline.Pipeline` as a class following a suitable `AlgorithmProtocol`
+
+#### Our Logistic Regression Algorithms
+
+```{.python filename="algorithms/logistic.py"}
+"""
+Algorithms based on logistic regression, with and without class proportion
+corrections.
+
+Classes in this module:
+    - LogisticRegressionAlgorithm: vanilla scikit-learn regression
+    - LogisticRegressionSMOTE: logistic regression with SMOTE
+"""
+
+import numpy as np
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline as ImbPipeline
+from sklearn.linear_model import LogisticRegression
+
+
+class LogisticRegressionSK:
+    """Logistic regression classifier with optional class weighting.
+
+    Attributes:
+        name (str): name for reporting purposes.
+        class_weight (str | None): optional class weights for imbalanced datasets.
+            Defaults to None (no weighting).
+        model (sklearn.linear_model.LogisticRegression): an sklearn logistic
+            regression model.
+    """
+
+    def __init__(
+        self,
+        class_weight: str | None = None,
+        random_state: int | None = None,
+    ) -> None:
+        self.class_weight = class_weight
+        self.model = LogisticRegression(
+            class_weight=class_weight, random_state=random_state
+        )
+        self.name = f"LogisticRegression (class_weight={self.class_weight})"
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+        """Fit the logistic regression model to the training data.
+
+        Args:
+            X (np.ndarray): training features.
+            y (np.ndarray): training labels.
+        """
+        self.model.fit(X, y)
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """Predict labels for the test data.
+
+        Args:
+            X (np.ndarray): test features.
+
+        Returns:
+            np.ndarray: predicted labels.
+        """
+        return self.model.predict(X)
+
+
+class LogisticRegressionSMOTE:
+    """Logistic regression classifier with SMOTE oversampling.
+
+    Attributes:
+        name (str): name for reporting purposes.
+        model (imblearn.pipeline.ImbPipeline): pipeline combining SMOTE 
+            oversampling and logistic regression.
+    """
+
+    def __init__(
+        self,
+        random_state: int | None = None,
+    ) -> None:
+        self.name = "Logistic Regression with SMOTE"
+        self.model = ImbPipeline(
+            [
+                ("smote", SMOTE(random_state=random_state)),
+                ("logistic", LogisticRegression(random_state=random_state)),
+            ]
+        )
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+        """Fit the logistic regression model with SMOTE to the training data.
+
+        Args:
+            X (np.ndarray): training features.
+            y (np.ndarray): training labels.
+        """
+        self.model.fit(X, y)
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """Predict labels for the test data.
+
+        Args:
+            X (np.ndarray): test features.
+
+        Returns:
+            np.ndarray: tredicted labels.
+        """
+        return self.model.predict(X)
+```
+ 
+### Results {background="#43464B"}
+
+#### Towards Summarizing Results
+
+`SimulationOrchestrator` has detailed data 
+
+- On accuracy, precision, recall, $F_1$ scores
+- From each MC dataset
+
+. . .
+
+For analysis want to somehow aggregate
+
+::: {.left-color}
+
+Will report averages across MC datasets for each DGP and algorithm
+
+:::
+
+For accuracy this gives risk; for others expected versions of metrics
+
+#### Results For Balanced Classes (50/50)
+
+Here: only discuss properties related to minority class
+
+. . .
+
+|                                                                          |   Precision |   Recall |   $F_1$ |
+|:-------------------------------------------------------------------------|--------------:|-----------:|-------:|
+| No correction    |         0.907 |      0.906 |  0.906 | 
+| With SMOTE      |         0.907 |      0.906 |  0.906 | 
+| Balanced likelihood weights |         0.907 |      0.906 |  0.906 | 
+
+<br>
+
+::: {.left-color}
+
+Effectively no difference in the results
+
+:::
+
+
+#### Results with Strong Imbalance (90/10)
+
+
+ 
+
+|                                                                          |   Precision |   Recall |   $F_1$ |
+|:-------------------------------------------------------------------------|--------------:|-----------:|-------:| 
+| No correction   |         0.838 |      0.612 |  0.695 | 
+| With SMOTE            |         0.549 |      0.871 |  0.662 | 
+| Balanced likelihood weights |         0.533 |      0.876 |  0.652 |
+
+- Doing nothing: highest $F_1$ (best on that metric)
+- But bought at price of lower recall
+- Correcting: lower precision (more false `1` labels), but much better at actually detecting true `1`s (higher recall)
+
+
+#### Discussion of Results
+
+Key conclusion in our example:
+
+::: {.left-color}
+
+Techniques like SMOTE and likelihood weight correction improve detection of underrepresented class at the price of more false positives
+
+:::
+ 
+Do you want to do this in practice? Depends:
+
+- Yes, if missing a true `1` is bad
+- No, if a false `1` is bad 
+
+. . . 
+
+A lot of scope for trying other approaches with this infrastructure
+
+## Recap and Conclusions {background="#00100F"}
+ 
+#### Recap
+
+<br>
+
+In this lecture we 
+
+- Reviewed  essential concepts of statistical/machine learning
+- Learned to use Monte Carlo for evaluating predictive algorithms
+- Saw another variation on where to use parallelism
+ 
+
+
+#### References {.allowframebreaks visibility="uncounted"}
+
+::: {#refs}
+:::

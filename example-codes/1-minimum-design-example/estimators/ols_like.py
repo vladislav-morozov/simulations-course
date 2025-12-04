@@ -2,8 +2,10 @@
 Module for OLS-like estimators.
 
 This module contains classes for estimating simple model
-    y = b0 + b1 * x + u
-with OLS-like methods. All estimators implement the EstimatorProtocol interface.
+    Y = b0 + b1 * X + U
+with OLS-like methods.
+
+All estimators implement the EstimatorProtocol interface.
 
 Classes:
     SimpleOLS: ordinary least squares estimator.
@@ -23,8 +25,7 @@ class SimpleOLS:
         beta1_hat (float): Estimated slope. NaN until fit is called.
     """
 
-    def __init__(self) -> None:
-        """Initializes the OLS estimator with no estimates."""
+    def __init__(self) -> None: 
         self.beta0_hat: float = np.nan
         self.beta1_hat: float = np.nan
 
@@ -52,8 +53,7 @@ class SimpleRidge:
         reg_param (float): Strength of regularization. Defaults to 0.01.
     """
 
-    def __init__(self, reg_param: float = 0.01) -> None:
-        """Initializes the OLS estimator with no estimates."""
+    def __init__(self, reg_param: float = 0.01) -> None: 
         self.beta0_hat: float = np.nan
         self.beta1_hat: float = np.nan
         self.reg_param = reg_param
@@ -81,17 +81,14 @@ class LassoWrapper:
         model (sklearn.linear_model.Lasso): a scikit-learn Lasso instance.
         beta0_hat (float): Estimated intercept. Initialized as np.nan.
         beta1_hat (float): Estimated slope. Initialized as np.nan.
+        reg_param (float): Regularization strength (alpha). Defaults to 1.0.
     """
 
     def __init__(self, reg_param: float = 1.0) -> None:
-        """Initializes the Lasso wrapper with a scikit-learn Lasso model.
-
-        Args:
-            reg_param (float): Regularization strength (alpha). Defaults to 1.0.
-        """
         self.model = SklearnLasso(alpha=reg_param)
         self.beta0_hat: float = np.nan
         self.beta1_hat: float = np.nan
+        self.reg_param = reg_param
 
     def fit(self, x: np.ndarray, y: np.ndarray) -> None:
         """Fits the Lasso model to the provided data.

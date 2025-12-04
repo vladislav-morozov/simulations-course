@@ -1,0 +1,880 @@
+---
+title: "Evaluating Causal Estimators"
+subtitle: "Working with Causal Frameworks; Simulations for Counterexamples"
+author: Vladislav Morozov  
+format:
+  revealjs:
+    include-in-header: 
+      text: |
+        <meta name="description" content="Learn how to evaluate causal estimators using Monte Carlo simulations, with worked examples on the issues of fixed effect estimators (lecture note slides)"/> 
+    width: 1150
+    slide-number: true
+    sc-sb-title: true
+    incremental: true   
+    logo: ../../themes/favicon.ico
+    footer: "Evaluating Causal Estimators"
+    footer-logo-link: "https://vladislav-morozov.github.io/simulations-course/"
+    theme: ../../themes/slides_theme.scss
+    toc: TRUE
+    toc-depth: 2
+    toc-title: Contents
+    transition: convex
+    transition-speed: fast
+slide-level: 4
+title-slide-attributes:
+    data-background-color: "#3c165cff"
+    data-footer: " "
+filters:
+  - reveal-header 
+embed-resources: true
+include-in-header: ../../themes/mathjax.html 
+highlight-style: tango
+open-graph:
+    description: "Learn how to evaluate causal estimators using Monte Carlo simulations, with worked examples on the issues of fixed effect estimators (lecture note slides)" 
+---
+
+
+
+
+
+
+## Introduction {background="#00100F"}
+  
+
+### Lecture Info {background="#43464B"}
+
+#### Learning Outcomes
+
+This lecture is about evaluating causal estimators
+
+<br>
+
+By the end, you should be able to
+
+ 
+
+- Understand the core aspects of evaluating causal estimators by simulations 
+- Use simulations as a tool for constructing (counter)examples
+- Use process-based parallelism
+
+
+#### References 
+  
+::: {.nonincremental}
+
+Intros to causal inference:
+
+- @Cunningham2021CausalInferenceMixtape (more basic)
+- @Morgan2014CounterfactualsCausalInference (more general with many discussions)
+
+On fixed effect estimation:
+
+- [My slides](https://vladislav-morozov.github.io/econometrics-2/slides/panel/fe.html) 
+- Chapter 17 in @Hansen2022Econometrics
+
+:::
+ 
+
+
+## Motivation: Fixed Effects and Simulations as Counterexamples {background="#00100F"}
+ 
+
+
+### Background on Fixed Effect Estimation {background="#43464B"}
+
+#### Setting: Panel Data
+
+Suppose that we have data on
+
+- Some outcome $Y_{it}$
+- Some treatment $\bX_{it}$ (possibly vector)
+
+. . . 
+
+::: {.left-color}
+
+Interested in causal effect of $\bX_{it}$  on $Y_{it}$
+
+:::
+
+<br>
+
+
+Data is <span class="highlight">panel</span>: 
+
+- Two dimensions ($i$ and $t$)
+- E.g. units $i=1, \dots, N$ over time $t=1, \dots, T$
+
+
+
+#### Reminder: Random Intercept/Fixed Effect Estimation
+
+::: {.left-color}
+
+One way to estimate effects of treatment on $Y_{it}$ is using <span class="highlight">random intercept/fixed effect</span> estimators
+
+:::
+
+Simple example: one-way FE estimator:
+
+1. Construct
+$$\small 
+\tilde{Y}_{it} = Y_{it} - \dfrac{1}{T}\sum_{s=1}^T Y_{is}, \quad \tilde{\bX}_{it} = \bX_{it} - \dfrac{1}{T}\sum_{s=1}^T \bX_{is},
+$$
+
+2. The one-way FE estimator is the  OLS estimator in regression of $\tilde{Y}_{it}$ on $\tilde{\bX}_{it}$
+
+
+
+#### Causal Model Underlying FE
+
+
+::: {.left-color}
+
+Remember: properties of causal estimator only meaningful if one specifies an underlying causal model
+
+:::
+
+. . .  
+
+For one-way FE estimator: typical setting is linear <span class="highlight">potential outcomes</span> model
+
+$$
+Y_{it}^{\bx} = \alpha_i + \bbeta'\bx + U_{it}
+$$ {#eq-fe-causal-model}
+
+- $\alpha_i$ --- the "random intercept"/unit FE
+- $\beta$ --- determines <span class="highlight">common</span> treatment effect of $x$ 
+ 
+#### Properties Under Random Intercept Model
+
+::: {.rounded-box}
+
+Under
+
+
+- FE causal model ([-@eq-fe-causal-model])
+- Strict exogeneity: $\E[U_{it}|X_{i1}, \dots, X_{iT}]=0$
+ 
+
+the one-way random intercept estimator $\hat{\bbeta}^{FE}$ satisfies
+$$
+\begin{aligned}
+ \E[\hat{\bbeta}^{FE}]  & = \bbeta, \\
+ \sqrt{N}(\hat{\bbeta}^{FE} - \bbeta) & \xrightarrow{d} N(0, \avar(\hat{\bbeta}^{FE}))
+\end{aligned}
+$$
+
+
+:::
+
+
+### Fixed Effect Estimators and Heterogeneous Coefficients  {background="#43464B"}
+
+#### Discussion of FE Estimator
+
+- Typical motivation for using it: "controlling unobserved heterogeneity"
+- Unobserved heterogeneity included:
+    - Unit-specific effects $\alpha_i$
+    - Can also time effects $\gamma_t$ and other versions
+
+::: {.left-color}
+
+If model correctly specified, suitable FE estimator will recover $\bbeta$
+
+::: 
+
+#### A More Realistic Causal Model
+ 
+But model ([-@eq-fe-causal-model]) not internally consistent:
+
+::: {.nonincremental}
+
+- Why unobserved heterogeneity only in intercepts $\alpha_i$?
+- Why not <span class="highlight">heterogeneous treatment effects</span>?
+
+:::
+
+. . . 
+
+More realistic to assume causal model
+$$
+Y_{it}^{\bx} = \alpha_i + \bbeta_{i}'\bx + U_{it}
+$$ {#eq-causal-hetero}
+Now $\bbeta_i$ --- also unit-specific
+
+::: {.footer}
+
+Can also consider even more general models with $\bbeta_{it}$
+
+:::
+
+#### Question: What Does the FE Estimator Do?
+
+Suppose model ([-@eq-causal-hetero]) is true, but we still apply $\hat{\bbeta}^{FE}$
+
+::: {.left-color}
+
+What is $\hat{\bbeta}^{FE}$ actually estimating?
+
+:::
+
+<br>
+
+- Important to separate estimator from underlying causal model!
+- Can carry out FE estimation even if true model is not a random intercept model
+ 
+#### Estimand of FE Estimator Under Model  ([-@eq-causal-hetero])
+
+Can show that
+$$ \small
+\hat{\bbeta}^{FE} \xrightarrow{p} \E\left[ \left( \E\left[ \tilde{\bX}_i'\tilde{\bX}_i \right]\right)^{-1} \tilde{\bX}'_i\tilde{\bX}_i\bbeta_i \right]
+$$ {#eq-fe-limit-hetero}
+where $\tilde{\bX}_i'$ --- matrix with $\tilde{\bX}_{it}'$ as rows
+
+- FE estimator  $\xrightarrow{p}$ weighted average of individual effects
+- In general
+$$ \small
+\mathrm{plim}_{N\to\infty} \hat{\bbeta}^{FE} \neq \E[\bbeta_i]
+$$
+
+#### Simulation Question of Today
+ 
+
+::: {.rounded-box}
+
+It is possible that "controlling for heterogeneity"  with FE estimators <span class="highlight">can lead to more bias</span>  than not doing anything about heterogeneity?
+
+::: 
+
+- This matters because FE estimators are used *a lot*
+- Well-suited for simulations:
+    - Theory hard due to $\hat{\bbeta}^{FE}$ depending on transforms and inverses of $\bX_{it}$ 
+    - In simulations: can try to numerically find a single example 
+
+
+## Theory Essentials for Evaluating Causal Estimators {background="#00100F"}
+ 
+#### Potential Outcomes Framework
+
+- Key feature of causal settings: some causal process
+- Typically expressed using <span class="highlight">potential outcomes</spam>
+
+. . . 
+
+::: {.left-color}
+
+$$
+Y_i^x = \phi(x, U_i)
+$$
+= "If unit $i$ with unobserved characteristics $U_i$ receives treatment $x$, their outcome is $Y_i^x$"
+
+:::
+
+$\phi$ may be known or (fully/partially) unknown
+
+::: {.footer}
+
+Same type of approach can be used with panel or time series settings. Also can consider settings where treatment of others matters
+
+:::
+
+#### Treatment Effects
+
+Potential outcomes allow defining <span class="highlight">causal effects</spam>: 
+
+::: {.left-color}
+
+Causal effect of moving from treatment $\bx_1$ to $\bx_2$ for unit $i$ is defined as
+$$
+\phi(\bx_2, U_i) - \phi(\bx_1, U_i)
+$$
+
+:::
+
+- Typically different between units (because of different values of $U_i$)
+- Intuition: "exogenously/dictatorially" changing $\bx$ of unit $i$ --- difference in outcome attributable only to change in $\bx$
+
+#### Causal Parameters of Interest
+
+Usually interested in some <span class="highlight">distributional features</spam> of causal effects:
+
+- Average effects
+- Variance of effects (or higher-order moments)
+- Distribution of causal effects
+- Differences between distributions of potential outcomes (distributional/quantile treatment effects)
+
+
+Sometimes can learn individual treatment effects themselves
+
+
+#### Settings for Studying Causal Estimators
+
+<br>
+
+Two scenarios for studying a causal estimator:
+
+- How well it performs in setting it was designed for --- theoretically guaranteed to be consistent for parameter of interest
+- Robustness: how well/badly it performs in settings they are not designed for
+
+#### Relevance For Simulations
+
+In simulations:
+
+- Always need to fully specify $\phi(\cdot, \cdot)$ 
+- Sample = data you would observe in practice (e.g. $Y_i$ and $\bX_i$, but not $U_i$)
+- True target parameters need to be computed from $\phi(\cdot, \cdot)$ and distribution of $U_i$
+
+
+
+#### Metrics of Interest
+ 
+
+Three metrics you typically see when evaluating causal estimators:
+
+::: {.left-color}
+
+- Bias
+- Variance
+- Full sampling distribution
+
+:::
+
+. . .
+ 
+Distribution: usually for inference purposes (good normal approximation $\Rightarrow$ good performance of usual asymptotic intervals)
+
+
+
+## Specifying the Simulations {background="#00100F"}
+ 
+#### Recap of Simulation Setting
+
+So far: 
+
+- Causal model of form
+$$
+Y_{it}^{\bx} = \alpha_i + \bbeta_i'\bx + U_{it} 
+$$
+- Estimator to study: one-way FE estimator (the one that eliminates the $\alpha_i$)
+
+. . .
+
+Question is robustness:
+
+::: {.left-color}
+
+Can FE estimator be somehow worse than not eliminating $\alpha_i$ at all?
+
+:::
+
+#### Things To Specify
+
+<br>
+
+- DGP: coefficients process, treatments, $U_{it}$
+- What "worse" means
+- What "not eliminating $\alpha_i$" means
+- Causal parameter of interest
+
+#### Choosing a Simple Setting
+
+::: {.left-color}
+
+Again: want simplest possible example
+
+:::
+
+<br>
+
+Specify model in form
+$$
+\begin{aligned}
+Y_{it} & = \alpha_i + (\beta + \alpha_i) X_{it} + U_{it}, \quad i=1, \dots, N, \quad t=1, 2
+\end{aligned}
+$$ 
+
+- Shortest genuine panel with $T=2$
+- Coefficients controlled by $\alpha_i$
+
+#### Specifying Coefficient Distribution
+ 
+Now just need to specify $\beta$ and distribution of $\alpha_i$ 
+
+<br> 
+
+- Set $\alpha_i =  \pm 1$ with equal probability
+- Set $\beta=-0.25$ ($\Rightarrow \E[\beta_i]=-0.25$)
+
+. . .
+
+$\Rightarrow$ two types of units: 
+
+- 50% with $\beta_i = -1.25$ 
+- 50% with $\beta_i=0.75$
+
+
+#### Estimators Compared
+
+Obvious that we need to include one-way random intercept/FE estimator
+
+<br>
+
+. . .
+
+And
+
+- Need something that does not eliminate $\alpha_i$
+- Simple baseline: OLS 
+- OLS: just regressing $Y_{it}$ on $(1, X_{it})$ without any transformations 
+ 
+#### Causal Parameter of Interest
+
+::: {.left-color}
+
+Remember: causal parameter must be specified based on the causal model, not on the estimator
+
+:::
+
+In our case
+
+- FE estimator often "justified" with the excuse that it still estimates "average effects"
+- "Average effects" often understood in the sense of ATE, not the weighted average ([-@eq-fe-limit-hetero])
+- $\Rightarrow$ <span class="highlight">parameter of interest is $\E[\beta_i]$ </span> --- can be used to compute ATE of any change in $x$
+
+#### Goal and Metric
+ 
+Want a dramatic example for things going wrong the FE vis-à-vis $\E[\beta_i]$
+
+- Want OLS (doing nothing about heterogeneity) to be ~unbiased for $\E[\beta_i]$
+- Want FE (doing something, but wrong) to have the wrong sign 
+
+
+. . .
+
+Potential metric: distributions of estimators and their relation to $\E[\beta_i]$
+
+::: {.footer}
+
+Might be hard to get OLS exactly unbiased, depending on strict exogeneity
+
+:::
+
+
+#### How To Specify DGPs 
+
+Good place to start looking --- moment conditions that characterize limits of estimators
+
+- OLS consistent if
+$$ \small
+\mathbb{E}[X_{it}(\alpha_i + \alpha_i X_{it}+ U_{it})]  = 0, \quad t=1, 2
+$$ {#eq-moment-ols}
+- FE inconsistent (why?) if
+$$  \small
+ \mathbb{E}[(X_{i2}- X_{i1})(\alpha_i (X_{i2}- X_{i1})+ U_{it})] \neq 0 
+$$ {#eq-moment-fe}
+
+Distribution of $(X_{it}, U_{it})$ must be same for both estimators
+
+#### Distribution for $U_{it}$
+
+Moment conditions tell us
+
+- Both estimators have "~same dependence" on properties of $U_{it}$
+- $\Rightarrow$ differences in bias likely shouldn't depend on $U_{it}$ much
+- $\Rightarrow$ can just make a very simple assumption again
+
+
+::: {.left-color}
+
+Assume that $U_{it}$ is standard normal and independent of everything else
+
+:::
+ 
+#### Covariate Distribution
+
+- Can try simple normal distributions again
+- Different distributions given different $\alpha_i$ --- some sort of implicit (self-)selection mechanism
+$$  \small
+\begin{aligned}
+\begin{pmatrix} X_{i1} \\ X_{i2} \end{pmatrix}\Bigg| \curl{\alpha_i = + 1}  & \sim N\left( \begin{pmatrix} \mu_{1+} \\ \mu_{2+} \end{pmatrix}, \begin{pmatrix} \sigma_{1+}^2 & \rho_+ \sigma_{1+} \sigma_{2+} \\ \rho_+ \sigma_{1+} \sigma_{2+} & \sigma_{2+}^2 \end{pmatrix} \right)  \\
+\begin{pmatrix} X_{i1} \\ X_{i2} \end{pmatrix}\Bigg| \curl{\alpha_i = - 1}  & \sim N\left( \begin{pmatrix} \mu_{1-} \\ \mu_{2-} \end{pmatrix}, \begin{pmatrix} \sigma_{1-}^2 & \rho_- \sigma_{1-} \sigma_{2-} \\ \rho_- \sigma_{1-} \sigma
+_{2-} & \sigma_{2-}^2 \end{pmatrix} \right)
+\end{aligned}
+$$
+
+::: {.footer}
+
+In some settings import to explicitly model selection into treatment
+
+:::
+
+#### Finding Parameters 
+
+- Now have full distribution of $(\alpha_i, X_i, U_i)$
+- $\Rightarrow$ can compute expectations in ([-@eq-moment-ols])-([-@eq-moment-fe])!
+- Can now solve as system of equations for the $\mu$s, $\rho$s, and $\sigma$s
+
+. . . 
+
+::: {.left-color}
+
+Will solve numerically as part of DGP generation
+
+:::
+
+## Simulation Implementation and Results{background="#00100F"}
+ 
+
+
+### Implementation {background="#43464B"}
+
+
+#### Code Organization
+
+Again have a small targeted simulation $\Rightarrow$ will structure using functions
+
+```
+├── dgp
+│   ├── constants.py
+│   ├── data_generation.py
+│   ├── __init__.py
+│   └── moment_info.py  
+├── gmm
+│   ├── __init__.py 
+│   └── solver.py
+├── main.py
+├── README.md 
+│   └── ...
+└── simulation_infrastructure
+    ├── constants.py
+    ├── __init__.py
+    ├── plotting.py 
+    └── runner_functions.py
+```
+
+::: {.footer}
+
+Again have code with tighter coupling but less infrastructure to manage
+
+:::
+
+#### New Things This Time
+
+Will structure some things differently this time to give broader perspective
+
+- Different runner structure: both estimators applied on the same dataset (not separately like before)
+- Parameters of DGP found by optimization before starting Monte Carlo
+- Different approach to parallelism (process-based)
+
+#### Our `main.py`
+
+```{.python filename="main.py"}
+"""
+Entry point for running simulation on bias of FE estimators under heterogeneity.
+
+Outcomes generated according to the following potential outcomes model:
+    Y_{it}^x = alpha_i + beta_i * x + U_{it}
+
+Goal of simulation: construct an example of a distribution under which:
+    1. The OLS estimator in regression of Y_{it} on X_{it} is unbiased for
+       average coefficient value E[beta_i]
+    2. The one-way random intercept/fixed effects estimator has the wrong sign
+       relative to E[beta_i] with high probability
+
+Usage:
+    python main.py
+
+Output:
+    Kernel density plots of distributions of the two estimators
+"""
+
+import os
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
+import pandas as pd
+from tqdm import tqdm
+
+from dgp.constants import (
+    BETA_MEAN,
+    N_VALUES,
+)
+from dgp.moment_info import (
+    constraints,
+    param_initial_guess,
+    process_mu_sigma_params,
+    sim_moment_conditions,
+)
+from gmm.solver import GMMSolver
+from simulation_infrastructure.constants import (
+    N_REPLICATIONS,
+    OUTPUT_DIR,
+    SEEDS,
+)
+from simulation_infrastructure.plotting import plot_kdes
+from simulation_infrastructure.runner_functions import run_simulation_for_seed
+
+# Ensure output directory exists
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+
+def main() -> None:
+    """Main function to run simulations in parallel and combine results."""
+
+    # Select parameters of DGP by enforcing desired moment conditions
+    solver_dgp_params = GMMSolver(
+        sim_moment_conditions,
+        param_initial_guess,
+        constraints,
+        process_func=process_mu_sigma_params,
+    )
+    solver_dgp_params.minimize()
+    mu_sigma_params = solver_dgp_params.process_solution()
+
+    # Run simulations in parallel
+    all_results = []
+    with ProcessPoolExecutor() as executor:
+        futures = {
+            executor.submit(
+                run_simulation_for_seed,
+                seed,
+                N_REPLICATIONS,
+                N_VALUES,
+                BETA_MEAN,
+                mu_sigma_params,
+            )
+            for seed in SEEDS
+        }
+        # Collect results as they complete, with a progress bar
+        for future in tqdm(
+            as_completed(futures), total=len(futures), desc="Running simulations"
+        ):
+            result = future.result()
+            all_results.append(result)
+
+    # Combine results and export plots
+    sim_results = pd.concat(all_results)
+    plot_kdes(sim_results, OUTPUT_DIR)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+#### Finding DGP Parameters
+  
+Construct parameters $(\mu_{\cdot}, \sigma_{\cdot}, \rho_{\cdot})$ by GMM
+
+- Program conditions ([-@eq-moment-ols])-([-@eq-moment-fe])!
+- Set left hand side of condition ([-@eq-moment-fe]) to be equal to 1000 (which is not 0)
+- Apply a custom `GMMSolver` to find some valid parameter values
+
+
+
+Then  just collect found parameter and pass to data generator function
+
+::: {.footer}
+
+Try varying target values of moment and comparing  resulting estimator distributions
+
+:::
+
+#### Different Approach to Parallelism
+
+- Key package in using FE estimators --- `pyfixest`
+- But: only available up to Python 3.12 (for now)
+
+. . .
+
+Still want to use parallelism to use multiple cores
+
+- But 3.12 has GIL (see @Antao2023FastPythonHigh), can't use thread-based approach like before
+
+. . .
+
+::: {.left-color}
+
+Here: use *process*-based approach: spawn a fully separate Python process that does part of the work, then combine results
+
+:::
+
+#### Simulation Runner Function
+
+```{.python filename="simulation_infrastructure.runner_functions"}
+"""
+This module contains functions to run Monte Carlo simulations on the bias
+of fixed effects and OLS estimators in a heterogeneous coefficient setting.
+
+The key run_simulation_for_seed() function is set up to allow for parallel
+execution of simulation iterations.
+
+Functions:
+    - run_simulation_for_seed(): runs Monte Carlo for a given seed and returns
+        the results
+"""
+
+import numpy as np
+import pandas as pd
+import pyfixest as pf
+
+from dgp.data_generation import generate_data
+
+
+def run_simulation_for_seed(
+    seed: int,
+    n_replications: int,
+    n_values: np.ndarray,
+    beta_mean: float,
+    mu_sigma_params: dict[str, np.ndarray | np.floating],
+) -> pd.DataFrame:
+    """
+    Runs simulations for OLS vs. FE for given seed.
+
+    Args:
+        seed (int): Random seed for reproducibility.
+        n_replications (int): Number of replications per seed.
+        n_values (np.array): Cross-sectional sample sizes to simulate.
+        beta_mean (float): Average coefficient value for generating data.
+        mu_sigma_params (dict[str, np.ndarray]): Dictionary containing:
+            - "mu_plus" (np.ndarray): Mean for covariates when effect is +1.
+            - "mu_minus" (np.ndarray): Mean for covariates when effect is -1.
+            - "sigma_plus" (np.ndarray): Covariance for X when effect is +1.
+            - "sigma_minus" (np.ndarray): Covariance for X when effect is -1.
+
+    Returns:
+        pd.DataFrame: Monte Carlo results for given seed.
+    """
+    results = []
+
+    for n_units in n_values:
+        for replication in range(n_replications):
+            # Generate data
+            data = generate_data(
+                n_units,
+                beta_mean,
+                mu_sigma_params,
+                seed=seed + replication,
+            )
+
+            fit_no_effect = pf.feols(
+                "outcome ~ covariate", data=data, drop_intercept=True
+            )
+            fit_effect = pf.feols("outcome ~ covariate|Unit", data=data)
+
+            # Collect results
+            results.append(
+                {
+                    "seed": seed,
+                    "replication": replication,
+                    "n_units": n_units,
+                    "model": "No Fixed Effects",
+                    "coef_est": fit_no_effect.coef().iloc[0],
+                    "ci_lower": fit_no_effect.confint().iloc[0, 0],
+                }
+            )
+            results.append(
+                {
+                    "seed": seed,
+                    "replication": replication,
+                    "n_units": n_units,
+                    "model": "With Fixed Effects",
+                    "coef_est": fit_effect.coef().iloc[0],
+                    "ci_lower": fit_effect.confint().iloc[0, 0],
+                }
+            )
+
+    # Return results as a dataframe
+    return pd.DataFrame(results)
+```
+
+#### Different Approach to Scenarios
+
+Another difference: 
+
+::: {.left-color}
+
+Both FE and OLS estimators applied to same dataset in each step
+
+:::
+
+Before: separate scenario for each estimator
+
+
+. . .
+
+- Computational time difference is small if data generation is cheap
+- <span class="highlight">Trade-off</span>: quicker more cumbersome runners if want to apply array of estimators on each dataset (internal iteration over estimators)
+
+### Results {background="#43464B"}
+
+#### How to Visualize Results
+
+Our simulation
+
+- Computes values of estimators in each dataset
+- Stores them all 
+
+. . . 
+
+<br>
+
+::: {.left-color}
+
+In line with our goal, most appropriate summary --- visualize distributions of estimators vs. $\E[\beta_i]$
+
+:::
+
+Allows us to see how often they sign $\neq$ sign of $\E[\beta-i]$
+
+#### Visualizing Simulation Results
+
+Recall: $\E[\beta_i] = -0.25$ (dotted vertical line)
+![](../../../example-codes/4-bias-of-fixed-effect-estimators/results/kde_results.svg)
+
+#### Simulation Results: Discussion
+
+Results exactly as wanted:
+
+::: {.left-color}
+
+Accounting for the (correctly specified!) random intercept $\alpha_i$ leads to much worse performance than not accounting for any coefficient heterogeneity
+
+:::
+
+- With $N\geq 200$ FE estimator always has sign $\neq$ sign of $\E[\beta_i]$
+- OLS estimator -- fairly reasonable
+
+#### Broader Practical Conclusion
+
+Our simulation: example of what <span span="highlight">could</span> go wrong
+
+<br>
+
+Two practical conclusions:
+
+::: {.rounded-box}
+
+1. Adding more fixed effects can produce unpredictable changes in point estimates (fragility of "robustness checks")
+2. Better to use methods that can handle coefficient heterogeneity (e.g. mean group estimator) if want $\E[\beta_i]$
+
+:::
+
+## Recap and Conclusions {background="#00100F"}
+ 
+#### Recap
+
+<br>
+
+In this lecture we 
+
+- Reviewed potential outcomes framework
+- Discussed core metrics for evaluating causal estimators
+- Saw another variation on structure code files
+- Used simulations as a tool for constructing  a (counter)example
+ 
+
+
+#### References {.allowframebreaks visibility="uncounted"}
+
+::: {#refs}
+:::

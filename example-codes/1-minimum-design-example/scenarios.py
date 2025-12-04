@@ -2,12 +2,12 @@
 Module for defining simulation scenarios.
 
 This module contains scenarios for simulations on the simple model:
-    y = b0 + b1 * x + u
+    Y = b0 + b1 * X + U
 The scenarios evaluate several OLS-like estimators under static and dynamic DGPs
 with two different sample sizes.
 
 Classes:
-    SimpleOLS: ordinary least squares estimator.
+    SimulationScenario: data class for holding scenario data.
 
 Variables:
     scenarios (list): list of scenarios to un.
@@ -26,7 +26,7 @@ from protocols import DGPProtocol, EstimatorProtocol
 class SimulationScenario:
     """A single simulation scenario: DGP, estimator, and sample size."""
 
-    name: str  # For readability
+    name: str  # Name used for storing results
     dgp: type[DGPProtocol]
     dgp_params: dict  # E.g. betas go here
     estimator: type[EstimatorProtocol]
@@ -50,7 +50,7 @@ estimators = [
 ]
 sample_sizes = [50, 200]
 
-# Generate all combinations
+# Generate all possible combinations
 scenarios = [
     SimulationScenario(
         name=f"{dgp_class.__name__.lower()}_{dgp_descr}_{estimator_class.__name__.lower()}_T{size}",

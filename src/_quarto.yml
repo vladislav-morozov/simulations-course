@@ -44,6 +44,12 @@ website:
         - slides/general-principles/code-modular.qmd
         - slides/general-principles/code-organization.qmd
         - slides/general-principles/code-orchestration.qmd
+      - section: "Evaluating Methods"
+        contents: 
+        - slides/methods/evaluating-tests.qmd
+        - slides/methods/evaluating-cis.qmd
+        - slides/methods/evaluating-causal-estimators.qmd
+        - slides/methods/evaluating-ml-algorithms.qmd
 
 execute:
   freeze: auto  # re-render only when source changes

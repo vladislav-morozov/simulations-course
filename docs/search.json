@@ -4,7 +4,7 @@
     "href": "project-info.html",
     "title": "Course Project Information",
     "section": "",
-    "text": "The course project is the cornerstone of your learning experience in this module. Its key objective is to evaluate a statistical method (or a set of related methods) through Monte Carlo simulations. Students are required to design, execute, and analyze simulations to assess the method’s performance in a given context.\nThe project is designed to help you develop three key skills:\n\nDesigning and interpreting simulations to evaluate statistical methods.\nOrganizing and sharing technical work in a reproducible and professional manner.\nCommunicating findings effectively through writing and presentations.\n\nYour grade for the course will be based entirely on this project. For deadlines, group sign-ups, and submission details, please refer to eCampus.\nBroadly, the project involves the following key steps:\n\nMethod selection: choose a method\nSimulation design: develop and implement simulations to evaluate the method’s properties (e.g., bias, variance, coverage, efficiency, model selection abilities, etc.) across relevant scenarios.\nAnalysis and interpretation: analyze simulation results and discuss their implications.\nDocumentation: produce a term paper and deliver a presentation, accompanied by fully reproducible code.\n\n\n\n\n\n\nThe expected statistical level aligns with modern methods covered in advanced textbooks (e.g. Chernozhukov et al. 2024; Gaillac and L’Hour 2025; Wager 2024). Projects based on recent papers are also welcome if they are feasible within the course timeframe.\nYou are free to choose a topic from any branch of statistics:\n\nCausal inference;\nPrediction;\nInference.\n\nThe question of your project does not have to be groundbreaking, as the emphasis is more on the technical soundness. However, I would still recommend trying more “modern” things, as these will likely provide more learning value and relevance to your future work.\n\n\n\nA strong project topic is specific and follows this pattern:\n\nOne (or more) method(s) are evaluated in one (or more) scenario(s) to answer a specific question.\n\nA few simple examples to help explain the idea:\n\nEvaluating the Callaway and Sant’Anna (2021) estimator.\n\n\nQuestion: Callaway and Sant’Anna (2021) estimator is designed to estimate average treatment effects in settings with staggered treatment timing and heterogeneous effects. How does it perform in terms of bias and variance across different sample sizes and treatment effect distributions?\nApproach: simulate data with varying sample sizes, treatment effect heterogeneity, and treatment patterns. Tabulate bias, variance, and coverage rates.\n\n\nEfficiency Loss: Callaway and Sant’Anna (2021) vs. Two-Way Fixed Effects\n\n\nQuestion: In settings where the two-way fixed effects (TWFE) estimator is consistent, how much efficiency is lost by using the Callaway and Sant’Anna (2021) estimator instead?\nApproach: Design DGPs where TWFE is consistent (e.g. no staggered adoption). Vary sample sizes, treatment effect distributions, and error structures to quantify efficiency trade-offs.\n\n\nBias in Cross-Validation for Model Selection\n\n\nQuestion: Cross-validation (CV) is the de facto standard for model selection in predictive settings. However, CV is inherently biased, as \\(K\\)-fold CV gives an unbiased estimator for the performance of the algorithm when faced with share \\((K-1)/K\\) of the training data. However, the final selected algorithm gets retrained on the full dataset. How large is the bias in risk, and does model selection based on biased risk estimates lead to meaningfully worse predictive performance?\nApproach: Simulate prediction tasks with varying signal-to-noise ratios, sample sizes, and model complexities. For a given sample size \\(N\\), compare cross-validation-based model selection based to selection based on a new validation sample of size \\(N\\).\n\n\n\n\n\n\n\n\nYou will work in groups of three students. Form your groups independently, but notify the instructor if you need help finding teammates.\n\n\n\n\n\nLength: Maximum 20 pages (excluding bibliography and appendix).\n\nNote: 20 pages is an upper limit, not a target. Focus on clarity and conciseness.\n\nFormatting: Use 12pt font, 1.5-line spacing, and 2.5 cm margins.\nAppendix: Use for long tables, additional figures, or supplementary material.\n\n\n\n\n\nSubmit your code as a GitHub repository (private or public). Add the instructor as a collaborator using their institutional email, if using a private repo.\nInclude all files necessary for full replication, along with a README with clear instructions.\n\n\n\n\n\nYour final grade will be based on two components:\n\n\n\n\n\n\n\n\n\n\nCriteria\nWeight\nDetails\n\n\n\n\nMethod Description\n15%\nClearly describe the method, its context, and key contributions from the literature.\n\n\nWriting Quality\n25%\nWrite in a clear and structured manner. State explicitly what question your simulation project is answering.\n\n\nCode Organization and Replicability\n25%\nWrite modular, well-documented, and easy to replicate code.\n\n\nSimulation Design\n20%\nDesign data-generating processes that are informative and relevant to the question.\n\n\nAnalysis and Interpretation\n15%\nRigorously interpret simulation results. Discuss limitations and implications.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCriteria\nWeight\nDetails\n\n\n\n\nContent Understanding\n60%\nDemonstrate a comprehensive understanding of the method and simulation design.\n\n\nClarity and Delivery\n40%\nPresent in an organized, accessible manner. Use legible slides.",
+    "text": "The course project is the cornerstone of your learning experience in this module. Its key objective is to evaluate a statistical method (or a set of related methods) through Monte Carlo simulations. You are required to design, execute, and analyze simulations to assess the method’s performance in a given context.\nThe project is designed to help you develop four key skills:\n\nDesigning and interpreting simulations to evaluate statistical methods.\nOrganizing and sharing technical work in a reproducible and professional manner.\nCommunicating findings effectively through writing and presentations.\nStaying resilient and adapting to changes in open-ended technical projects.\n\nYour grade for the course will be based entirely on this project. For deadlines, group sign-ups, and submission details, please refer to eCampus.\nBroadly, the project involves the following key steps:\n\nMethod selection: choose a method\nSimulation design: develop and implement simulations to evaluate the method’s properties (e.g., bias, variance, coverage, efficiency, model selection abilities, etc.) across relevant scenarios.\nAnalysis and interpretation: analyze simulation results and discuss their implications.\nDocumentation: produce a term paper and deliver a presentation, accompanied by fully reproducible code.",
     "crumbs": [
       "Course Info",
       "Course Project Information"
@@ -15,7 +15,7 @@
     "href": "project-info.html#about-the-project",
     "title": "Course Project Information",
     "section": "",
-    "text": "The course project is the cornerstone of your learning experience in this module. Its key objective is to evaluate a statistical method (or a set of related methods) through Monte Carlo simulations. Students are required to design, execute, and analyze simulations to assess the method’s performance in a given context.\nThe project is designed to help you develop three key skills:\n\nDesigning and interpreting simulations to evaluate statistical methods.\nOrganizing and sharing technical work in a reproducible and professional manner.\nCommunicating findings effectively through writing and presentations.\n\nYour grade for the course will be based entirely on this project. For deadlines, group sign-ups, and submission details, please refer to eCampus.\nBroadly, the project involves the following key steps:\n\nMethod selection: choose a method\nSimulation design: develop and implement simulations to evaluate the method’s properties (e.g., bias, variance, coverage, efficiency, model selection abilities, etc.) across relevant scenarios.\nAnalysis and interpretation: analyze simulation results and discuss their implications.\nDocumentation: produce a term paper and deliver a presentation, accompanied by fully reproducible code.",
+    "text": "The course project is the cornerstone of your learning experience in this module. Its key objective is to evaluate a statistical method (or a set of related methods) through Monte Carlo simulations. You are required to design, execute, and analyze simulations to assess the method’s performance in a given context.\nThe project is designed to help you develop four key skills:\n\nDesigning and interpreting simulations to evaluate statistical methods.\nOrganizing and sharing technical work in a reproducible and professional manner.\nCommunicating findings effectively through writing and presentations.\nStaying resilient and adapting to changes in open-ended technical projects.\n\nYour grade for the course will be based entirely on this project. For deadlines, group sign-ups, and submission details, please refer to eCampus.\nBroadly, the project involves the following key steps:\n\nMethod selection: choose a method\nSimulation design: develop and implement simulations to evaluate the method’s properties (e.g., bias, variance, coverage, efficiency, model selection abilities, etc.) across relevant scenarios.\nAnalysis and interpretation: analyze simulation results and discuss their implications.\nDocumentation: produce a term paper and deliver a presentation, accompanied by fully reproducible code.",
     "crumbs": [
       "Course Info",
       "Course Project Information"
@@ -25,8 +25,8 @@
     "objectID": "project-info.html#choosing-a-topic",
     "href": "project-info.html#choosing-a-topic",
     "title": "Course Project Information",
-    "section": "",
-    "text": "The expected statistical level aligns with modern methods covered in advanced textbooks (e.g. Chernozhukov et al. 2024; Gaillac and L’Hour 2025; Wager 2024). Projects based on recent papers are also welcome if they are feasible within the course timeframe.\nYou are free to choose a topic from any branch of statistics:\n\nCausal inference;\nPrediction;\nInference.\n\nThe question of your project does not have to be groundbreaking, as the emphasis is more on the technical soundness. However, I would still recommend trying more “modern” things, as these will likely provide more learning value and relevance to your future work.\n\n\n\nA strong project topic is specific and follows this pattern:\n\nOne (or more) method(s) are evaluated in one (or more) scenario(s) to answer a specific question.\n\nA few simple examples to help explain the idea:\n\nEvaluating the Callaway and Sant’Anna (2021) estimator.\n\n\nQuestion: Callaway and Sant’Anna (2021) estimator is designed to estimate average treatment effects in settings with staggered treatment timing and heterogeneous effects. How does it perform in terms of bias and variance across different sample sizes and treatment effect distributions?\nApproach: simulate data with varying sample sizes, treatment effect heterogeneity, and treatment patterns. Tabulate bias, variance, and coverage rates.\n\n\nEfficiency Loss: Callaway and Sant’Anna (2021) vs. Two-Way Fixed Effects\n\n\nQuestion: In settings where the two-way fixed effects (TWFE) estimator is consistent, how much efficiency is lost by using the Callaway and Sant’Anna (2021) estimator instead?\nApproach: Design DGPs where TWFE is consistent (e.g. no staggered adoption). Vary sample sizes, treatment effect distributions, and error structures to quantify efficiency trade-offs.\n\n\nBias in Cross-Validation for Model Selection\n\n\nQuestion: Cross-validation (CV) is the de facto standard for model selection in predictive settings. However, CV is inherently biased, as \\(K\\)-fold CV gives an unbiased estimator for the performance of the algorithm when faced with share \\((K-1)/K\\) of the training data. However, the final selected algorithm gets retrained on the full dataset. How large is the bias in risk, and does model selection based on biased risk estimates lead to meaningfully worse predictive performance?\nApproach: Simulate prediction tasks with varying signal-to-noise ratios, sample sizes, and model complexities. For a given sample size \\(N\\), compare cross-validation-based model selection based to selection based on a new validation sample of size \\(N\\).",
+    "section": "Choosing a Topic",
+    "text": "Choosing a Topic\n\nScope\nThe expected statistical level aligns with modern methods covered in advanced textbooks (e.g. Chernozhukov et al. 2024; Gaillac and L’Hour 2025; Wager 2024). Projects based on recent papers are also welcome if they are feasible within the course timeframe.\nYou are free to choose a topic from any branch of statistics:\n\nCausal inference;\nPrediction;\nInference.\n\nThe question of your project does not have to be groundbreaking, as the emphasis is more on the technical soundness. However, I would still recommend trying more “modern” things, as these will likely provide more learning value and relevance to your future work.\n\n\nWhat Makes a Good Topic?\nA strong project topic is specific and follows this pattern:\n\nOne (or more) method(s) are evaluated in one (or more) scenario(s) to answer a specific question.\n\nA few simple examples to help explain the idea:\n\nEvaluating the Callaway and Sant’Anna (2021) estimator.\n\n\nQuestion: Callaway and Sant’Anna (2021) estimator is designed to estimate average treatment effects in settings with staggered treatment timing and heterogeneous effects. How does it perform in terms of bias and variance across different sample sizes and treatment effect distributions?\nApproach: simulate data with varying sample sizes, treatment effect heterogeneity, and treatment patterns. Tabulate bias, variance, and coverage rates.\n\n\nEfficiency Loss: Callaway and Sant’Anna (2021) vs. Two-Way Fixed Effects\n\n\nQuestion: In settings where the two-way fixed effects (TWFE) estimator is consistent, how much efficiency is lost by using the Callaway and Sant’Anna (2021) estimator instead?\nApproach: Design DGPs where TWFE is consistent (e.g. no staggered adoption). Vary sample sizes, treatment effect distributions, and error structures to quantify efficiency trade-offs.\n\n\nBias in Cross-Validation for Model Selection\n\n\nQuestion: Cross-validation (CV) is the de facto standard for model selection in predictive settings. However, CV is inherently biased, as \\(K\\)-fold CV gives an unbiased estimator for the performance of the algorithm when faced with share \\((K-1)/K\\) of the training data. However, the final selected algorithm gets retrained on the full dataset. How large is the bias in risk, and does model selection based on biased risk estimates lead to meaningfully worse predictive performance?\nApproach: Simulate prediction tasks with varying signal-to-noise ratios, sample sizes, and model complexities. For a given sample size \\(N\\), compare cross-validation-based model selection based to selection based on a new validation sample of size \\(N\\).",
     "crumbs": [
       "Course Info",
       "Course Project Information"
@@ -36,8 +36,8 @@
     "objectID": "project-info.html#format",
     "href": "project-info.html#format",
     "title": "Course Project Information",
-    "section": "",
-    "text": "You will work in groups of three students. Form your groups independently, but notify the instructor if you need help finding teammates.\n\n\n\n\n\nLength: Maximum 20 pages (excluding bibliography and appendix).\n\nNote: 20 pages is an upper limit, not a target. Focus on clarity and conciseness.\n\nFormatting: Use 12pt font, 1.5-line spacing, and 2.5 cm margins.\nAppendix: Use for long tables, additional figures, or supplementary material.\n\n\n\n\n\nSubmit your code as a GitHub repository (private or public). Add the instructor as a collaborator using their institutional email, if using a private repo.\nInclude all files necessary for full replication, along with a README with clear instructions.",
+    "section": "Format",
+    "text": "Format\n\nGroup Work\nGroup formation:\n\nYou will work in groups of three students.\nForm your groups independently, but notify the instructor if you need help finding teammates.\n\nThe key component of the project phase is group meetings. These meetings will by default take place during lecture hours. Every group should meet with the instructor at least once every two weeks. The sign-up details will be provided on eCampus.\nThese meetings are your opportunity to:\n\nDiscuss progress and challenges.\nGet feedback on your project direction.\nFigure our directions for improvement.\n\nThe general idea is to rapidly iterate on the project based on the feedback and discussions in the meetings.\nOpen-ended technical projects often evolve as you work on them. Be prepared for a continuous learning process, including:\n\nRefining your code and simulation design (e.g. implementation, refactoring).\nDeepening your understanding of statistical methods and their real-world context.\nLearning more technical tools as challenges arise.\nAdjusting your evaluation approach as needed.\nShifting scope if earlier approaches prove ineffective.\n\nCollaboration within your group is key.\nYou can think of this stage as an agile (learning) experience:\n\nRegular check-ins to assess progress.\nRapid adjustments based on feedback.\nLearning just what you need for the next step.\nCollaborating on both technical work and knowledge sharing.\n\nThe aim is to produce a final project that reflects your learning and iteration throughout the course.\n\n\nTerm Paper\n\nLength: Maximum 20 pages (excluding bibliography and appendix).\n\nNote: 20 pages is an upper limit, not a target. Focus on clarity and conciseness.\n\nFormatting: Use 12pt font, 1.5-line spacing, and 2.5 cm margins.\nAppendix: Use for long tables, additional figures, or supplementary material.\n\n\n\nReplication Code\n\nSubmit your code as a GitHub repository (private or public). Add the instructor as a collaborator using their institutional email, if using a private repo.\nInclude all files necessary for full replication, along with a README with clear instructions.",
     "crumbs": [
       "Course Info",
       "Course Project Information"
@@ -47,8 +47,8 @@
     "objectID": "project-info.html#evaluation-criteria",
     "href": "project-info.html#evaluation-criteria",
     "title": "Course Project Information",
-    "section": "",
-    "text": "Your final grade will be based on two components:\n\n\n\n\n\n\n\n\n\n\nCriteria\nWeight\nDetails\n\n\n\n\nMethod Description\n15%\nClearly describe the method, its context, and key contributions from the literature.\n\n\nWriting Quality\n25%\nWrite in a clear and structured manner. State explicitly what question your simulation project is answering.\n\n\nCode Organization and Replicability\n25%\nWrite modular, well-documented, and easy to replicate code.\n\n\nSimulation Design\n20%\nDesign data-generating processes that are informative and relevant to the question.\n\n\nAnalysis and Interpretation\n15%\nRigorously interpret simulation results. Discuss limitations and implications.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCriteria\nWeight\nDetails\n\n\n\n\nContent Understanding\n60%\nDemonstrate a comprehensive understanding of the method and simulation design.\n\n\nClarity and Delivery\n40%\nPresent in an organized, accessible manner. Use legible slides.",
+    "section": "Evaluation Criteria",
+    "text": "Evaluation Criteria\nYour final grade will be based on two components:\n\n1. Term Paper and Replication Code (70%)\n\n\n\n\n\n\n\n\nCriteria\nWeight\nDetails\n\n\n\n\nMethod Description\n15%\nClearly describe the method, its context, and key contributions from the literature.\n\n\nWriting Quality\n25%\nWrite in a clear and structured manner. State explicitly what question your simulation project is answering.\n\n\nCode Organization and Replicability\n25%\nWrite modular, well-documented, and easy to replicate code.\n\n\nSimulation Design\n20%\nDesign data-generating processes that are informative and relevant to the question.\n\n\nAnalysis and Interpretation\n15%\nRigorously interpret simulation results. Discuss limitations and implications.\n\n\n\n\n\n2. Presentation (30%)\n\n\n\n\n\n\n\n\nCriteria\nWeight\nDetails\n\n\n\n\nContent Understanding\n60%\nDemonstrate a comprehensive understanding of the method and simulation design.\n\n\nClarity and Delivery\n40%\nPresent in an organized, accessible manner. Use legible slides.",
     "crumbs": [
       "Course Info",
       "Course Project Information"
@@ -209,6 +209,116 @@
     ]
   },
   {
+    "objectID": "slides/methods/evaluating-ml-algorithms.html#introduction",
+    "href": "slides/methods/evaluating-ml-algorithms.html#introduction",
+    "title": "Evaluating Machine Learning Algorithms",
+    "section": "Introduction",
+    "text": "Introduction\n\nimport matplotlib.pyplot as plt\n\nfrom itertools import product\n\nfrom sklearn.datasets import make_classification\n\nBG_COLOR = \"whitesmoke\"",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Machine Learning Algorithms"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-ml-algorithms.html#theory-essentials-for-evaluating-ml-algorithms",
+    "href": "slides/methods/evaluating-ml-algorithms.html#theory-essentials-for-evaluating-ml-algorithms",
+    "title": "Evaluating Machine Learning Algorithms",
+    "section": "Theory Essentials for Evaluating ML Algorithms",
+    "text": "Theory Essentials for Evaluating ML Algorithms",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Machine Learning Algorithms"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-ml-algorithms.html#simulation-design",
+    "href": "slides/methods/evaluating-ml-algorithms.html#simulation-design",
+    "title": "Evaluating Machine Learning Algorithms",
+    "section": "Simulation Design",
+    "text": "Simulation Design",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Machine Learning Algorithms"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-ml-algorithms.html#simulation-implementation-and-solutions",
+    "href": "slides/methods/evaluating-ml-algorithms.html#simulation-implementation-and-solutions",
+    "title": "Evaluating Machine Learning Algorithms",
+    "section": "Simulation Implementation and Solutions",
+    "text": "Simulation Implementation and Solutions",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Machine Learning Algorithms"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-ml-algorithms.html#recap-and-conclusions",
+    "href": "slides/methods/evaluating-ml-algorithms.html#recap-and-conclusions",
+    "title": "Evaluating Machine Learning Algorithms",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Machine Learning Algorithms"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-cis.html#introduction",
+    "href": "slides/methods/evaluating-cis.html#introduction",
+    "title": "Evaluating Confidence Intervals",
+    "section": "Introduction",
+    "text": "Introduction\n\nimport matplotlib.pyplot as plt\nimport numpy as np\n\nfrom scipy.stats import chi2\nBG_COLOR = \"whitesmoke\"\nTHEME_COLOR = \"#3c165c\"",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Confidence Intervals"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-cis.html#theory-essentials-for-confidence-intervals",
+    "href": "slides/methods/evaluating-cis.html#theory-essentials-for-confidence-intervals",
+    "title": "Evaluating Confidence Intervals",
+    "section": "Theory Essentials for Confidence Intervals",
+    "text": "Theory Essentials for Confidence Intervals",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Confidence Intervals"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-cis.html#simulation-implementation",
+    "href": "slides/methods/evaluating-cis.html#simulation-implementation",
+    "title": "Evaluating Confidence Intervals",
+    "section": "Simulation Implementation",
+    "text": "Simulation Implementation",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Confidence Intervals"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-cis.html#simulation-results",
+    "href": "slides/methods/evaluating-cis.html#simulation-results",
+    "title": "Evaluating Confidence Intervals",
+    "section": "Simulation Results",
+    "text": "Simulation Results",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Confidence Intervals"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-cis.html#recap-and-conclusions",
+    "href": "slides/methods/evaluating-cis.html#recap-and-conclusions",
+    "title": "Evaluating Confidence Intervals",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Confidence Intervals"
+    ]
+  },
+  {
     "objectID": "slides/organizational/intro.html#content-and-motivation",
     "href": "slides/organizational/intro.html#content-and-motivation",
     "title": "Course Introduction",
@@ -228,6 +338,138 @@
     "crumbs": [
       "Course Info",
       "Course Introduction"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#introduction",
+    "href": "slides/methods/evaluating-causal-estimators.html#introduction",
+    "title": "Evaluating Causal Estimators",
+    "section": "Introduction",
+    "text": "Introduction",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#motivation-fixed-effects-and-simulations-as-counterexamples",
+    "href": "slides/methods/evaluating-causal-estimators.html#motivation-fixed-effects-and-simulations-as-counterexamples",
+    "title": "Evaluating Causal Estimators",
+    "section": "Motivation: Fixed Effects and Simulations as Counterexamples",
+    "text": "Motivation: Fixed Effects and Simulations as Counterexamples",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#theory-essentials-for-evaluating-causal-estimators",
+    "href": "slides/methods/evaluating-causal-estimators.html#theory-essentials-for-evaluating-causal-estimators",
+    "title": "Evaluating Causal Estimators",
+    "section": "Theory Essentials for Evaluating Causal Estimators",
+    "text": "Theory Essentials for Evaluating Causal Estimators",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#specifying-the-simulations",
+    "href": "slides/methods/evaluating-causal-estimators.html#specifying-the-simulations",
+    "title": "Evaluating Causal Estimators",
+    "section": "Specifying the Simulations",
+    "text": "Specifying the Simulations",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#simulation-implementation-and-results",
+    "href": "slides/methods/evaluating-causal-estimators.html#simulation-implementation-and-results",
+    "title": "Evaluating Causal Estimators",
+    "section": "Simulation Implementation and Results",
+    "text": "Simulation Implementation and Results",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-causal-estimators.html#recap-and-conclusions",
+    "href": "slides/methods/evaluating-causal-estimators.html#recap-and-conclusions",
+    "title": "Evaluating Causal Estimators",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Causal Estimators"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#introduction",
+    "href": "slides/methods/evaluating-tests.html#introduction",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Introduction",
+    "text": "Introduction\n\nimport matplotlib.pyplot as plt\nimport numpy as np\n\nfrom scipy.stats import chi2\nBG_COLOR = \"whitesmoke\"\nTHEME_COLOR = \"#3c165c\"",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#theory-essentials-for-hypothesis-testings",
+    "href": "slides/methods/evaluating-tests.html#theory-essentials-for-hypothesis-testings",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Theory Essentials for Hypothesis Testings",
+    "text": "Theory Essentials for Hypothesis Testings",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#preparing-simulation-joint-vs.-multiple-tests",
+    "href": "slides/methods/evaluating-tests.html#preparing-simulation-joint-vs.-multiple-tests",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Preparing Simulation: Joint vs. Multiple Tests",
+    "text": "Preparing Simulation: Joint vs. Multiple Tests",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#implementing-our-simulation",
+    "href": "slides/methods/evaluating-tests.html#implementing-our-simulation",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Implementing Our Simulation",
+    "text": "Implementing Our Simulation",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#simulation-results",
+    "href": "slides/methods/evaluating-tests.html#simulation-results",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Simulation Results",
+    "text": "Simulation Results",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
+    ]
+  },
+  {
+    "objectID": "slides/methods/evaluating-tests.html#recap-and-conclusions",
+    "href": "slides/methods/evaluating-tests.html#recap-and-conclusions",
+    "title": "Evaluating Hypothesis Tests",
+    "section": "Recap and Conclusions",
+    "text": "Recap and Conclusions",
+    "crumbs": [
+      "Evaluating Methods",
+      "Evaluating Hypothesis Tests"
     ]
   },
   {
@@ -345,14 +587,14 @@
     "href": "index.html",
     "title": "Fundamentals of Monte Carlo Simulations in Data Science",
     "section": "",
-    "text": "Instructor: Vladislav Morozov\nEmail: morozov [at] uni-bonn.de\nOffice Location: Adenauerallee 24-42, IFS, Statistics Section\nOffice Hours: Virtual, by appointment\nCourse Website: eCampus and this website\nMeeting times: Room 0.042: 14:00-16:00, Wednesdays; 08:30-10:00, Fridays\nSchedule Changes and Holidays: See eCampus and BASIS\n\nLevel: master’s\nPrerequisites: coursework in econometrics and statistics\nCourse source code: \nSimulations in: \n\n\n    View slides in full screen\n       \n      \n    \n  \n\n\n\n\n\n\nHow do we know if a new causal inference method actually estimates the effects of interest? Does a machine learning algorithm generalize well across different sample sizes? What happens when a statistical tool is applied outside its original setting?\nSimulations provide answers to such questions. These “laboratories” of econometrics and statistics allow us to test methods in controlled environments, building confidence in their real-world applicability.\nThis research module focuses on the design, implementation, and interpretation of Monte Carlo simulations. It prepares students to write a rigorous master’s thesis in econometrics and statistics, while equipping them with the skills to critically evaluate methods in diverse data science contexts, applied and theoretical. The focus is mainly practical and numerical, with the in-class simulations built in Python.\n\n\n\nThis course covers the following points:\n\nThe role of simulations in evaluating statistical methods.\nPrinciples of well-designed simulations:\n\nTheoretical foundations\nBest practices for implementation.\n\nContext-specific applications:\n\nEvaluating confidence intervals and hypothesis tests.\nAssessing predictive algorithms.\nEvaluating causal estimators.\n\n\nThis course is offered as a part of the Research Module in Econometrics and Statistics.\n\n\n\n\n\n\nThis course is self-contained with respect to simulations, and the lecture materials serve as the primary reference. For some further references and philosophical perspectives, one may also consult\n\nDormann, Carsten F., and Aaron M. Ellison. 2025. Statistics by Simulation: A Synthetic Data Approach. Princeton University Press.\n\n\n\n\nFor the course project, students are encouraged to analyze methods at the level of modern advanced textbooks. The choice of topic is flexible, subject to feasibility. The following texts may inspire project ideas:\n\nChernozhukov, Victor, Christian Hansen, Nathan Kallus, Martin Spindler, and Vasilis Syrgkanis. 2024. Applied Causal Inference Powered by ML and AI.\nGaillac, Christophe, and Jeremy L’Hour. 2025. Machine Learning for Econometrics. Oxford University Press.\nWager, Stefan. 2024. Causal Inference: A Statistical Learning Approach.\n\n\n\n\nThe course project requires students to document their findings in a term paper and present their results effectively. The following resources provide guidance on scientific writing and presentation skills:\n\nAlley, Michael. 2013. The Craft of Scientific Presentations: Critical Steps to Succeeed and Critical Errors to Avoid. 2. ed. Springer.\nNikolov, Plamen. 2022. Writing Tips for Economics Research Papers: 2021-2022 Edition. https://doi.org/10.2139/ssrn.4114601\nSchimel, Joshua, ed. 2012. Writing Science: How to Write Papers That Get Cited and Proposals That Get Funded. Oxford University Press.\n\n\n\n\n\n\n\nThe course grade is based on the course project. Students will create, run, and evaluate simulations for a statistical method of their choice. Grading criteria include:\n\nRigorous interpretation and analysis of the simulation results,\nOrganization, replicability, and documentation of the simulation code,\nClarity of the public presentation and submitted project text.\n\nSee the course project page for more detailed information.\n\n\n\nAttendance and Participation:\nRegular attendance and active participation are strongly encouraged.\nAcademic Integrity:\nStudents must adhere to the university’s policies on academic integrity and plagiarism. Any violations will be subject to disciplinary action.\nAccommodations:\nIf you require any accommodations due to a disability or other circumstances, please contact the relevant office as soon as possible."
+    "text": "Instructor: Vladislav Morozov\nEmail: morozov [at] uni-bonn.de\nOffice Location: Adenauerallee 24-42, IFS, Statistics Section\nOffice Hours: Virtual, by appointment\nCourse Website: eCampus and this website\nMeeting times: Room 0.042: 14:00-16:00, Wednesdays; 08:30-10:00, Fridays\nSchedule Changes and Holidays: See eCampus and BASIS\nDOI: \nLevel: master’s\nPrerequisites: coursework in econometrics and statistics\nCourse source code: \nSimulations in: \n\n\n    View slides in full screen\n       \n      \n    \n  \n\n\n\n\n\n\nHow do we know if a new causal inference method actually estimates the effects of interest? Does a machine learning algorithm generalize well across different sample sizes? What happens when a statistical tool is applied outside its original setting?\nSimulations provide answers to such questions. These “laboratories” of econometrics and statistics allow us to test methods in controlled environments, building confidence in their real-world applicability.\nThis research module focuses on the design, implementation, and interpretation of Monte Carlo simulations. It prepares students to write a rigorous master’s thesis in econometrics and statistics, while equipping them with the skills to critically evaluate methods in diverse data science contexts, applied and theoretical. The focus is mainly practical and numerical, with the in-class simulations built in Python.\n\n\n\nThis course covers the following points:\n\nThe role of simulations in evaluating statistical methods.\nPrinciples of well-designed simulations:\n\nTheoretical foundations\nBest practices for implementation.\n\nContext-specific applications:\n\nEvaluating confidence intervals and hypothesis tests.\nAssessing predictive algorithms.\nEvaluating causal estimators.\n\n\nThis course is offered as a part of the Research Module in Econometrics and Statistics.\n\n\n\n\n\n\nThis course is self-contained with respect to simulations, and the lecture materials serve as the primary reference. For some further references and philosophical perspectives, one may also consult\n\nDormann, Carsten F., and Aaron M. Ellison. 2025. Statistics by Simulation: A Synthetic Data Approach. Princeton University Press.\n\n\n\n\nFor the course project, students are encouraged to analyze methods at the level of modern advanced textbooks. The choice of topic is flexible, subject to feasibility. The following texts may inspire project ideas:\n\nChernozhukov, Victor, Christian Hansen, Nathan Kallus, Martin Spindler, and Vasilis Syrgkanis. 2024. Applied Causal Inference Powered by ML and AI.\nGaillac, Christophe, and Jeremy L’Hour. 2025. Machine Learning for Econometrics. Oxford University Press.\nWager, Stefan. 2024. Causal Inference: A Statistical Learning Approach.\n\n\n\n\nThe course project requires students to document their findings in a term paper and present their results effectively. The following resources provide guidance on scientific writing and presentation skills:\n\nAlley, Michael. 2013. The Craft of Scientific Presentations: Critical Steps to Succeeed and Critical Errors to Avoid. 2. ed. Springer.\nNikolov, Plamen. 2022. Writing Tips for Economics Research Papers: 2021-2022 Edition. https://doi.org/10.2139/ssrn.4114601\nSchimel, Joshua, ed. 2012. Writing Science: How to Write Papers That Get Cited and Proposals That Get Funded. Oxford University Press.\n\n\n\n\n\n\n\nThe course grade is based on the course project. Students will create, run, and evaluate simulations for a statistical method of their choice. Grading criteria include:\n\nRigorous interpretation and analysis of the simulation results,\nOrganization, replicability, and documentation of the simulation code,\nClarity of the public presentation and submitted project text.\n\nSee the course project page for more detailed information.\n\n\n\nAttendance and Participation:\nRegular attendance and active participation are strongly encouraged.\nAcademic Integrity:\nStudents must adhere to the university’s policies on academic integrity and plagiarism. Any violations will be subject to disciplinary action.\nAccommodations:\nIf you require any accommodations due to a disability or other circumstances, please contact the relevant office as soon as possible."
   },
   {
     "objectID": "index.html#course-information",
     "href": "index.html#course-information",
     "title": "Fundamentals of Monte Carlo Simulations in Data Science",
     "section": "",
-    "text": "Instructor: Vladislav Morozov\nEmail: morozov [at] uni-bonn.de\nOffice Location: Adenauerallee 24-42, IFS, Statistics Section\nOffice Hours: Virtual, by appointment\nCourse Website: eCampus and this website\nMeeting times: Room 0.042: 14:00-16:00, Wednesdays; 08:30-10:00, Fridays\nSchedule Changes and Holidays: See eCampus and BASIS\n\nLevel: master’s\nPrerequisites: coursework in econometrics and statistics\nCourse source code: \nSimulations in: \n\n\n    View slides in full screen"
+    "text": "Instructor: Vladislav Morozov\nEmail: morozov [at] uni-bonn.de\nOffice Location: Adenauerallee 24-42, IFS, Statistics Section\nOffice Hours: Virtual, by appointment\nCourse Website: eCampus and this website\nMeeting times: Room 0.042: 14:00-16:00, Wednesdays; 08:30-10:00, Fridays\nSchedule Changes and Holidays: See eCampus and BASIS\nDOI: \nLevel: master’s\nPrerequisites: coursework in econometrics and statistics\nCourse source code: \nSimulations in: \n\n\n    View slides in full screen"
   },
   {
     "objectID": "index.html#course-content",
