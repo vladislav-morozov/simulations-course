@@ -21,7 +21,8 @@ open-graph:
 **Course Website:** eCampus and this website\
 **Meeting times:** Room 0.042: 14:00-16:00, Wednesdays; 08:30-10:00, Fridays \
 **Schedule Changes and Holidays**: See eCampus and BASIS\
-<!-- **DOI**: [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.15463535-gold)](https://doi.org/10.5281/zenodo.15463535) -->
+**DOI**: [![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.17543412-gold)](https://doi.org/10.5281/zenodo.17543412)
+ 
 
 **Level:** master's \
 **Prerequisites:** coursework in econometrics and statistics
