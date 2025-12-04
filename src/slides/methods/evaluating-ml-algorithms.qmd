@@ -62,7 +62,7 @@ By the end, you should be able to
 
  
 
-- Recall  essential concepts that define a statistical/machine learning problem
+- Recall essential concepts that define a statistical/machine learning problem
 - Understand how to use Monte Carlo for evaluating predictive algorithms
 - Parallelize computation on the level of MC datasets
 
@@ -71,6 +71,15 @@ By the end, you should be able to
   
 ::: {.nonincremental}
  
+On core theory of statistical/machine learning:
+
+- @Shalev-Shwartz2014UnderstandingMachineLearning or @Mohri2018FoundationsMachineLearning
+- [My undergraduate slides](https://vladislav-morozov.github.io/econometrics-2/) 
+
+On practical implementations with common packages:
+
+- @Geron2025HandsOnMachineLearning
+
 :::
 
 ### Lecture Example: Dealing with Class Imbalance {background="#43464B"}
