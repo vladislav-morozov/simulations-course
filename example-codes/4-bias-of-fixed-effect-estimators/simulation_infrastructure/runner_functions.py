@@ -1,15 +1,13 @@
 """
-This module contains functions to run Monte Carlo simulations for different
-seeds and return results in a manner compatible with process parallelism.
+This module contains functions to run Monte Carlo simulations on the bias
+of fixed effects and OLS estimators in a heterogeneous coefficient setting.
+
+The key run_simulation_for_seed() function is set up to allow for parallel
+execution of simulation iterations.
 
 Functions:
-    - run_simulation_for_seed(seed: int,
-                            n_replications: int,
-                            n_values: list[int],
-                            beta_mean: float,
-                            mu_sigma_params: dict[str, np.ndarray],
-                            output_dir: str):
-        Runs Monte Carlo for a given seed and returns the results
+    - run_simulation_for_seed(): runs Monte Carlo for a given seed and returns
+        the results
 """
 
 import numpy as np
@@ -25,7 +23,7 @@ def run_simulation_for_seed(
     n_values: np.ndarray,
     beta_mean: float,
     mu_sigma_params: dict[str, np.ndarray | np.floating],
-):
+) -> pd.DataFrame:
     """
     Runs simulations for OLS vs. FE for given seed.
 

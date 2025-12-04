@@ -26,6 +26,8 @@ For details and development of code logic, see the following lecture:
 
 ## File Structure
 
+This simulation uses a simple function-based code structure in the spirit of the first lecture (see [Good Simulation Code I: Starting With Functions](https://vladislav-morozov.github.io/simulations-course/slides/general-principles/code-basic.html)). 
+
 ``` 
 ├── dgp
 │   ├── constants.py

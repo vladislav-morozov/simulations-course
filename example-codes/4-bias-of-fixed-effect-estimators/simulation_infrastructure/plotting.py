@@ -2,7 +2,7 @@
 Plotting functions for simulation results.
 
 This module contains the following functions:
-    - plot_kdes: densities of estimators for each value of N
+    - plot_kdes(): plot densities of estimators for each value of N
 
 """
 
@@ -48,7 +48,9 @@ def plot_kdes(sim_results: pd.DataFrame, output_dir: Path):
 
         for y in est_names:
             a = sns.kdeplot(
-                sim_results_for_n.loc[sim_results_for_n["model"] == y, "coef_est"].squeeze(),
+                sim_results_for_n.loc[
+                    sim_results_for_n["model"] == y, "coef_est"
+                ].squeeze(),
                 ax=ax,
                 bw_adjust=2,
                 label=y,
