@@ -1,15 +1,15 @@
 """
 Entry point for running simulations for comparing power of a joint Wald test
-vs. a multiple t-test. 
+vs. a multiple t-test.
 
 This module contains scenarios for comparing power functions of tests under model:
-    Y = theta0  + theta1*x1 + theta2*x2 + u
+    Y = theta0  + theta1*X1 + theta2*X2 + U
+
 The null being tested is
-    H0: theta1=theta2=0
+    H0: theta1 = theta2 = 0
 
 Scenarios considered: normal DGP with varying values of coefficients and varying
 values of correlation between x1 and x2.
-    
 
 Usage:
     python -X gil=0 main.py

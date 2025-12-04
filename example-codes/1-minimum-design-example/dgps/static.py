@@ -1,9 +1,11 @@
 """
 Module for static data-generating processes (DGPs).
 
-This module contains classes for generating static (non-time-series) data,
-such as the StaticNormalDGP, which implements a model with single outcome and
-single covariate
+This module contains classes for generating static (non-time-series) data in
+the model:
+    Y = b0 + b1 * X + U
+
+All classes implement the DGPProtocol.
 
 Classes:
     StaticNormalDGP: A DGP for static linear models with normal variables.
@@ -16,17 +18,11 @@ class StaticNormalDGP:
     """A data-generating process (DGP) for a static linear model
 
     Attributes:
-        beta0 (float): Intercept term.
-        beta1 (float): Slope coefficient.
+        beta0 (float): Intercept term. Defaults on 0.0.
+        beta1 (float): Slope coefficient. Defaults to 0.5.
     """
 
     def __init__(self, beta0: float = 0.0, beta1: float = 0.5) -> None:
-        """Initializes the DGP with intercept and slope.
-
-        Args:
-            beta0 (float): Intercept term. Defaults to 0.0.
-            beta1 (float): Slope coefficient. Defaults to 1.0.
-        """
         self.beta0: float = beta0
         self.beta1: float = beta1
 

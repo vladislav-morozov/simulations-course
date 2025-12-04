@@ -1,5 +1,4 @@
 """
-
 This module defines the moment conditions determining the simulation DGP.
 
 The moment conditions encode
@@ -29,8 +28,7 @@ import numpy as np
 
 
 def sim_moment_conditions(params: np.ndarray) -> np.ndarray:
-    """
-    Moment conditions for consistency of OLS and inconsistency of FE estimators.
+    """Moment conditions for consistency of OLS and inconsistency of FE estimators.
 
     Args:
         params (np.ndarray): Parameter values.
@@ -62,8 +60,7 @@ def sim_moment_conditions(params: np.ndarray) -> np.ndarray:
 
 
 def process_mu_sigma_params(params: np.ndarray) -> dict:
-    """
-    Extracts mu and sigma matrices from the parameters vector.
+    """Extracts mu and sigma matrices from the parameters vector.
 
     Args:
         params (np.ndarray): Estimated parameter values.

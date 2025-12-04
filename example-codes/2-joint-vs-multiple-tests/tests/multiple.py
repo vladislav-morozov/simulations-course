@@ -1,5 +1,5 @@
 """
-Module for multiple tests for joint hypothesis.
+Module for multiple tests for testing joint hypotheses.
 
 Classes:
     BonferronigMultipleTWithOLS: OLS-based multiple t-test that all non-intercept
@@ -13,10 +13,11 @@ from statsmodels.stats.multitest import multipletests
 
 
 class BonferronigMultipleTWithOLS:
-    """Class for applying multiple t-test to test null of zero coefficients.
+    """Class for applying a multiple t-test to test a null of zero coefficients.
 
     Tailored to linear model
         Y_i = theta0 + theta1 X_{i1} + ... + thetap X_{ip} + U_i
+
     Tests the null:
         H0: theta1 = ... = thetap = 0
 
@@ -44,6 +45,6 @@ class BonferronigMultipleTWithOLS:
         p_vals_t = lin_reg_fit.pvalues.iloc[1:]
         t_test_corrected_bonf = multipletests(
             p_vals_t,
-            method="bonferroni",  # Bonferroni
+            method="bonferroni", 
         )
         self.decision = t_test_corrected_bonf[0].sum() > 0

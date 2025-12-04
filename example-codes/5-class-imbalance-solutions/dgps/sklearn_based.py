@@ -1,3 +1,9 @@
+"""Module for data generating procsses derived from scikit-learn functions.
+
+Classes:
+    - SKImbalancedTwoClassesDGP: binary classification with possible imbalance.
+"""
+
 import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
@@ -9,10 +15,11 @@ class SKImbalancedTwoClassesDGP:
     Based on sklearn.datasets.make_classification().
 
     Attributes:
-        n_train_samples (int): number of points in training set
-        n_test_samples (int): number of points in test set
-        weights (list[float] | np.ndarray): class weights
-        num_features (int): number of classification features
+        n_train_samples (int): number of points in training set. Defaults to 600.
+        n_test_samples (int): number of points in test set. Defaults to 200.
+        weights (list[float] | np.ndarray): class weights. Defaults to [0.9, 0.1]
+        num_features (int): number of classification features. Defaults to 2.
+        name (str): "SK unbalanced"
     """
 
     def __init__(

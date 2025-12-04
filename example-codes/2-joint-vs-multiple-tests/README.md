@@ -3,6 +3,7 @@
 ## Overview
 
 This folder contains simulation code for comparing a joint test with a multiple test with corrected critical values.
+
 The driving question is:
 
 > Why do we always use joint test (e.g. Wald) instead of multiple test (e.g. multiple $t$-test with Bonferroni-type corrections) when faced with a joint hypothesis?
@@ -18,6 +19,9 @@ We evaluate power of a joint and a multiple test for testing the null
 $$
 H_0: \theta_1 =\theta_2 =0.
 $$
+
+In the context of our setting, we find that neither of the approaches dominates. However, the possible power advantages of joint tests dwarf the possible advantages of multiple tests. Overall, we conclude that joint tests are a "safer" option to use.
+
  
 For details and development of code logic, see the following lecture:
 
@@ -49,7 +53,7 @@ The prototypical `BivariateLinearModel` is evaluated on a grid of values for coe
 │   └── linear.py 
 ├── main.py
 ├── results
-│   ├── ...
+│   └── ...
 ├── sim_infrastructure
 │   ├── __init__.py 
 │   ├── orchestrators.py

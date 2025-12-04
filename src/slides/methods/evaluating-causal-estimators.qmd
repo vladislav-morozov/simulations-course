@@ -539,8 +539,7 @@ Again have a small targeted simulation $\Rightarrow$ will structure using functi
 │   ├── constants.py
 │   ├── data_generation.py
 │   ├── __init__.py
-│   └── moment_info.py 
-├── exp.ipynb
+│   └── moment_info.py  
 ├── gmm
 │   ├── __init__.py 
 │   └── solver.py
@@ -574,15 +573,14 @@ Will structure some things differently this time to give broader perspective
 """
 Entry point for running simulation on bias of FE estimators under heterogeneity.
 
-Causal model:
+Outcomes generated according to the following potential outcomes model:
     Y_{it}^x = alpha_i + beta_i * x + U_{it}
 
-
-Goal of simulation: construct an example of distribution under which:
+Goal of simulation: construct an example of a distribution under which:
     1. The OLS estimator in regression of Y_{it} on X_{it} is unbiased for
-        average coefficient value E[beta_i]
+       average coefficient value E[beta_i]
     2. The one-way random intercept/fixed effects estimator has the wrong sign
-       relative to $E[beta_i]$ with high probability
+       relative to E[beta_i] with high probability
 
 Usage:
     python main.py
@@ -601,8 +599,6 @@ from dgp.constants import (
     BETA_MEAN,
     N_VALUES,
 )
-
-# from utils.combine_results import combine_results
 from dgp.moment_info import (
     constraints,
     param_initial_guess,
@@ -634,7 +630,6 @@ def main() -> None:
     )
     solver_dgp_params.minimize()
     mu_sigma_params = solver_dgp_params.process_solution()
- 
 
     # Run simulations in parallel
     all_results = []
@@ -706,6 +701,18 @@ Here: use *process*-based approach: spawn a fully separate Python process that d
 #### Simulation Runner Function
 
 ```{.python filename="simulation_infrastructure.runner_functions"}
+"""
+This module contains functions to run Monte Carlo simulations on the bias
+of fixed effects and OLS estimators in a heterogeneous coefficient setting.
+
+The key run_simulation_for_seed() function is set up to allow for parallel
+execution of simulation iterations.
+
+Functions:
+    - run_simulation_for_seed(): runs Monte Carlo for a given seed and returns
+        the results
+"""
+
 import numpy as np
 import pandas as pd
 import pyfixest as pf
@@ -719,7 +726,7 @@ def run_simulation_for_seed(
     n_values: np.ndarray,
     beta_mean: float,
     mu_sigma_params: dict[str, np.ndarray | np.floating],
-):
+) -> pd.DataFrame:
     """
     Runs simulations for OLS vs. FE for given seed.
 

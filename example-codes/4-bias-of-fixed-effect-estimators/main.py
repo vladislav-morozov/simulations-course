@@ -1,13 +1,12 @@
 """
 Entry point for running simulation on bias of FE estimators under heterogeneity.
 
-Causal model:
+Outcomes generated according to the following potential outcomes model:
     Y_{it}^x = alpha_i + beta_i * x + U_{it}
 
-
-Goal of simulation: construct an example of distribution under which:
+Goal of simulation: construct an example of a distribution under which:
     1. The OLS estimator in regression of Y_{it} on X_{it} is unbiased for
-        average coefficient value E[beta_i]
+       average coefficient value E[beta_i]
     2. The one-way random intercept/fixed effects estimator has the wrong sign
        relative to E[beta_i] with high probability
 
@@ -28,8 +27,6 @@ from dgp.constants import (
     BETA_MEAN,
     N_VALUES,
 )
-
-# from utils.combine_results import combine_results
 from dgp.moment_info import (
     constraints,
     param_initial_guess,
@@ -61,7 +58,6 @@ def main() -> None:
     )
     solver_dgp_params.minimize()
     mu_sigma_params = solver_dgp_params.process_solution()
- 
 
     # Run simulations in parallel
     all_results = []

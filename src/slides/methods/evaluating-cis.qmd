@@ -398,56 +398,104 @@ Contrast with the modular approach of the previous two examples
 """
 Core simulation logic for evaluating confidence intervals for variance.
 
-This module contains the core functions:
-- mle_variance: maximum likelihood estimation of variance.
-- asymptotic_ci_variance: construction of asymptotic confidence intervals.
-- run_simulations: running Monte Carlo simulations for coverage and interval length.
+This module contains the following core functions:
+    - mle_variance(): maximum likelihood estimator for the variance of the 
+        normal distribution.
+    - asymptotic_ci_variance(): construct an asymptotic confidence interval for
+        the variance of the normal distribution based on the limit distribution
+        of the maximum likelihood estimator for variance.
+    - run_simulations(): run Monte Carlo simulations for coverage and interval
+        length of confidence intervals for the variance of the normal
+        distribution based on the maximum likelihood estimator.
 """
 
 import numpy as np
 
 from scipy.stats import norm
 
-def mle_variance(data: np.ndarray) -> np.floating:
-    """Estimate the variance of a normal distribution using MLE."""
-    return np.var(data, ddof=0)  # MLE for variance is the sample variance with ddof=0
 
-def asymptotic_ci_variance(data: np.ndarray, alpha: float = 0.05) -> tuple[float, float]:
-    """Construct an asymptotic (Wald-type) confidence interval for the variance."""
-    n = len(data)
-    var_hat = mle_variance(data)
-    se = np.sqrt(2 * var_hat**2 / n)
+def mle_variance(data: np.ndarray) -> np.floating:
+    """Estimate the variance of a normal distribution using maximum likelihood.
+
+    Args:
+        data (np.ndarray): 1D array with samples.
+
+    Returns:
+        np.floating: maximum likelihood estimator for variance of the normal
+            distribution.
+    """
+    # MLE for variance is the sample variance with ddof=0
+    return np.var(data, ddof=0)
+
+
+def asymptotic_ci_variance(
+    data: np.ndarray, alpha: float = 0.05
+) -> tuple[float, float]:
+    """Construct an asymptotic (Wald-type) confidence interval for the variance.
+
+    Lower bound of the confidence interval truncated to zero if necessary.
+
+    Args:
+        data (np.ndarray): 1D array with samples.
+        alpha (float, optional): 1-alpha is the desired nominal coverage.
+            Defaults to 0.05 (fir 95% nominal intervals.)
+
+    Returns:
+        tuple[float, float]: lower and upper limits of the confidence interval.
+    """
+    n_obs = len(data)
+
+    # Run maximum likelihood
+    variance_est = mle_variance(data)
+    variance_std_error = np.sqrt(2 * variance_est**2 / n_obs)
+
+    # Construct intervals, ensuring non-negative lower bound
     z_crit = norm.ppf(1 - alpha / 2)
-    lower = max(0, var_hat - z_crit * se)  # Ensure lower bound is non-negative
-    upper = var_hat + z_crit * se
+    lower = max(0, variance_est - z_crit * variance_std_error)
+    upper = variance_est + z_crit * variance_std_error
     return lower, upper
 
+
 def run_simulations(
-    true_vars: np.ndarray, 
+    true_vars: np.ndarray,
     n_simulations: int = 1000,
     n_obs_list: list[int] = [20, 100],
     alpha: float = 0.05,
     seed: int = 1,
 ) -> dict[int, dict[float, dict]]:
     """
-    Run Monte Carlo simulations for each true variance and sample size.
+    Simulate confindence intervals properties for given variances and sample sizes.
+
+    Runs a separate simulation round for each combination of (true_variance,
+    n_obs), sampling n_obs points from a N(0, true_variance) distribution.
+
+    For each scenario the simulation computes:
+        - Coverage;
+        - Array of all estimation errors of the maximum likelihood estimator.
+        - Array of lenghts of all confidence intervals.
 
     Args:
-        true_vars (np.ndarray): true variance values to simulate.
-        n_simulations (int): number of Monte Carlo simulations per true variance.
-        n_obs_list (list[int]): list of sample sizes to simulate.
-        alpha (float): significance level for confidence intervals.
-        seed (int): Random seed for reproducibility.
+        true_vars (np.ndarray): true variance values characterizing the DGPs.
+        n_simulations (int): number of Monte Carlo simulations per each
+            scenario. Defaults to 1000.
+        n_obs_list (list[int]): sample sizes characterizing the DGPs. Defaults to
+            to [20, 100]
+        alpha (float, optional): 1-alpha is the desired nominal coverage.
+            Defaults to 0.05 (fir 95% nominal intervals.)
+        seed (int): Random seed for reproducibility. Defaults to 1.
 
     Returns:
-        Nested dictionary: {n_obs: {true_var: {'coverage': ..., 'errors': ..., 'lengths': ...}}}
+        Nested dictionary: {n_obs: {true_var: {'coverage': ..., 'errors': ...,
+            'lengths': ...}}}. Coverages are reported as a single float, averaged
+            across Monte Carlo draws. Estimation errors and confidence interval
+            lengths are arrays.
     """
     rng = np.random.default_rng(seed)
     results = {n_obs: {} for n_obs in n_obs_list}
 
     # Loop over sample sizes
     for n_obs in n_obs_list:
-        # Loop over true variables
+        # Loop over true variance values
         for true_var in true_vars:
             errors = []
             lengths = []
@@ -462,13 +510,13 @@ def run_simulations(
 
                 # Construct CI and check if variance belongs to it
                 ci_lower, ci_upper = asymptotic_ci_variance(data, alpha)
-                lengths.append((ci_upper - ci_lower) / true_var) 
+                lengths.append((ci_upper - ci_lower) / true_var)
                 coverage.append(ci_lower <= true_var <= ci_upper)
- 
+
             results[n_obs][true_var] = {
-                'coverage': np.mean(coverage),
-                'errors': np.array(errors),
-                'lengths': np.array(lengths)
+                "coverage": np.mean(coverage),
+                "errors": np.array(errors),
+                "lengths": np.array(lengths),
             }
 
     return results
@@ -480,8 +528,8 @@ def run_simulations(
 """
 Entry point for running simulations and generating plots.
 
-Simulation 3: evaluating confidence intervals for variance of the normal
-distribution based on the maximum likelihood estimator. Simultions consider
+Simulation 3: evaluating confidence intervals for the variance of the normal
+distribution based on the maximum likelihood estimator. Simulations consider
 coverage and (scaled) length properties as true variance decreases to zero.
 
 This script:
@@ -497,7 +545,7 @@ import numpy as np
 from sim_infrastructure.core import run_simulations
 from sim_infrastructure.plotting import plot_coverage_and_lengths, plot_error_kdes
 
-# Simulation parameters: note upper case for constants
+# Simulation parameters: note using upper case for constants
 TRUE_VARS = np.logspace(-3, 1, 50)
 N_OBS_LIST = [20, 100]
 N_SIMS = 50000

@@ -893,12 +893,12 @@ For many datasets:
 
 
 
-```{.python filename="sim_infrastructure/runner.py" code-line-numbers="73"} 
+```{.python filename="sim_infrastructure/runner.py"} 
 """
 Module for executing a given Monte Carlo scenario.
 
 This module contains the SimulationRunner class, which executes a scenario
-by combining a DGP and a test. It handles data generation, estimation, testing,
+by combining a DGP and a test. It handles data generation, testing,
 and result collection.
 
 Classes:
@@ -906,16 +906,20 @@ Classes:
 """
 
 import numpy as np
+
 from sim_infrastructure.protocols import DGPProtocol, TestProtocol
 
 
 class SimulationRunner:
-    """Runs Monte Carlo simulations for a given DGP and estimator.
+    """Runs Monte Carlo simulations for a given DGP and test.
 
     Attributes:
-        dgp: data-generating process with a sample() method and beta1 attribute.
-        estimator: estimator with a fit() method and beta1_hat attribute.
-        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+        dgp (DGPProtocol): data-generating process with a sample() method and
+            attributes that describe the DGP (covar_corr and common_coef_val).
+        test (TestProtocol): test with a test() method and attributes that
+            describe test name and test decision after seeing the data.
+        test_decisions (np.ndarray): array of decisions made by the test in
+            each Monte Carlo replication.
     """
 
     def __init__(
@@ -923,26 +927,20 @@ class SimulationRunner:
         dgp: DGPProtocol,
         test: TestProtocol,
     ) -> None:
-        """Initializes the simulation runner.
-
-        Args:
-            dgp: An instance of a DGP class (must implement `sample`).
-            estimator: An instance of an estimator class (must implement `fit`).
-        """
         self.dgp: DGPProtocol = dgp
         self.test: TestProtocol = test
         self.test_decisions: np.ndarray = np.empty(0)
 
     def simulate(self, n_sim: int, n_obs: int, first_seed: int | None = None) -> None:
-        """Runs simulations and stores estimation errors.
+        """Runs simulations and stores test decisions.
 
         Args:
             n_sim (int): number of simulations to run.
-            n_obs (int): Number of observations per simulation.
-            first_seed (int | None): Starting random seed for reproducibility.
+            n_obs (int): number of sample points in each Monte Carlo dataset.
+            first_seed (int | None): starting random seed for reproducibility.
                 Defaults to None.
         """
-        # Preallocate array to hold estimation errors
+        # Preallocate array to hold test decisions
         self.test_decisions = np.empty(n_sim)
 
         # Run simulation
@@ -957,17 +955,18 @@ class SimulationRunner:
             self.test_decisions[sim_id] = self.test.decision
 
     def summarize_results(self) -> dict:
-        """Return a summary of results
+        """Return a summary of results: test name, DGP characteristics, power.
 
         Returns:
             dict: power of current test at current DGP
         """
         return {
             "test": self.test.name,
-            "covar_corr": self.dgp.covar_corr,
+            "rho": self.dgp.covar_corr,
             "common_coef_val": self.dgp.common_coef_val,
             "power": self.test_decisions.mean(),
         }
+
 ```
 
 ::: {.footer}
@@ -981,7 +980,7 @@ Notice how the `SimulationRunner` summarizes its result: that's the power functi
 
 ```{.python filename="tests/joint.py"}
 """
-Module for joint tests for joint hypothesis.
+Module for joint tests for joint hypothesie.
 
 Classes:
     WaldWithOLS: OLS-based Wald test that all non-intercept coefficients are zero.
@@ -997,6 +996,7 @@ class WaldWithOLS:
 
     Tailored to linear model
         Y_i = theta0 + theta1 X_{i1} + ... + thetap X_{ip} + U_i
+        
     Tests the null:
         H0: theta1 = ... = thetap = 0
 
@@ -1045,7 +1045,7 @@ class WaldWithOLS:
 
 ```{.python filename="tests/multiple.py"}
 """
-Module for multiple tests for joint hypothesis.
+Module for multiple tests for testing joint hypotheses.
 
 Classes:
     BonferronigMultipleTWithOLS: OLS-based multiple t-test that all non-intercept
@@ -1059,10 +1059,11 @@ from statsmodels.stats.multitest import multipletests
 
 
 class BonferronigMultipleTWithOLS:
-    """Class for applying multiple t-test to test null of zero coefficients.
+    """Class for applying a multiple t-test to test a null of zero coefficients.
 
     Tailored to linear model
         Y_i = theta0 + theta1 X_{i1} + ... + thetap X_{ip} + U_i
+
     Tests the null:
         H0: theta1 = ... = thetap = 0
 
@@ -1090,10 +1091,9 @@ class BonferronigMultipleTWithOLS:
         p_vals_t = lin_reg_fit.pvalues.iloc[1:]
         t_test_corrected_bonf = multipletests(
             p_vals_t,
-            method="bonferroni",  # Bonferroni
+            method="bonferroni", 
         )
         self.decision = t_test_corrected_bonf[0].sum() > 0
-
 ```
 
 ### Scenarios and Orchestrator {background="#43464B"}
@@ -1180,7 +1180,7 @@ class BivariateLinearModel:
         covar_corr (float): Correlation coefficient between covariates
     """
 
-    def __init__(self, common_coef_val: float, covar_corr: float) -> None:  
+    def __init__(self, common_coef_val: float, covar_corr: float) -> None:
         self.common_coef_val: float = common_coef_val
         self.covar_corr: float = covar_corr
 
@@ -1236,7 +1236,8 @@ class BivariateLinearModel:
 Module for defining simulation scenarios.
 
 This module contains scenarios for comparing power functions of tests under model:
-    Y = theta0  + theta1*x1 + theta2*x2 + u
+    Y = theta0  + theta1*X1 + theta2*X2 + U
+
 The null being tested is
     H0: theta1=theta2=0
 
@@ -1247,11 +1248,10 @@ Variables:
     scenarios (list): list of scenarios to un.
 """
 
-import numpy as np
-
 from dataclasses import dataclass
 from itertools import product
 
+import numpy as np
 
 from dgps.linear import BivariateLinearModel
 from sim_infrastructure.protocols import DGPProtocol, TestProtocol
@@ -1265,9 +1265,9 @@ class SimulationScenario:
 
     name: str  # For readability
     dgp: type[DGPProtocol]
-    dgp_params: dict  # E.g. betas go here
+    dgp_params: dict  # E.g. thetas go here
     test: type[TestProtocol]
-    test_params: dict  # E.g. reg_params go here
+    test_params: dict  #
     sample_size: int
     n_simulations: int = 500
     first_seed: int = 1
@@ -1295,7 +1295,7 @@ sample_sizes = [200]
 # Generate all combinations
 scenarios = [
     SimulationScenario(
-        name="", # will identify results through info from SimulationRunner
+        name="",
         dgp=dgp_class,
         dgp_params=dgp_params,
         test=test_class,
@@ -1348,32 +1348,48 @@ from sim_infrastructure.scenarios import SimulationScenario
 
 
 class SimulationOrchestratorParallel:
-    """Parallelized simulation orchestrator class."""
+    """Parallelized simulation orchestrator class.
+
+    Attributes:
+        scenarios (list[SimulationScenario]): information about simulation
+            scenario: DGP and estimator type, associated parameters, number of
+            simulations to run, sample size, first seed.
+        summary_results (list): simulation results for each scenario, as
+            returned by corresponding simulation runner.
+    """
 
     def __init__(self, scenarios: list[SimulationScenario]) -> None:
         self.scenarios = scenarios
         self.summary_results = []
 
-    def run_single_scenario(self, scenario):
-        """Run a single scenario and return the result dictionary."""
+    def _run_single_scenario(self, scenario: SimulationScenario):
+        """Run a single scenario and return the results."""
+
         dgp = scenario.dgp(**scenario.dgp_params)
         estimator = scenario.test(**scenario.test_params)
+
         runner = SimulationRunner(dgp, estimator)
         runner.simulate(
             n_sim=scenario.n_simulations,
             n_obs=scenario.sample_size,
             first_seed=scenario.first_seed,
         )
+
         return runner.summarize_results()
 
-    def run_all(self, max_workers=None):
-        """Run all scenarios in parallel using ThreadPoolExecutor."""
+    def run_all(self, max_workers: int | None = None):
+        """Run all scenarios with thread-based parallelism.
+        Args:
+            max_workers (int | None, optional): number of threads to use in 
+                execution. Defaults to None.
+        """
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             # Submit all scenarios to the executor
             futures = {
-                executor.submit(self.run_single_scenario, scenario): scenario
+                executor.submit(self._run_single_scenario, scenario): scenario
                 for scenario in self.scenarios
             }
+
             # Collect results as they complete, with a progress bar
             for future in tqdm(
                 as_completed(futures), total=len(futures), desc="Running simulations"
@@ -1404,6 +1420,26 @@ Sadly, <span class="highlight">no general approaches</span> for making graphs â€
 #### Resulting `main.py`
 
 ```{.python filename="main.py"}
+"""
+Entry point for running simulations for comparing power of a joint Wald test
+vs. a multiple t-test.
+
+This module contains scenarios for comparing power functions of tests under model:
+    Y = theta0  + theta1*X1 + theta2*X2 + U
+
+The null being tested is
+    H0: theta1 = theta2 = 0
+
+Scenarios considered: normal DGP with varying values of coefficients and varying
+values of correlation between x1 and x2.
+
+Usage:
+    python -X gil=0 main.py
+
+Output:
+    Power surface comparison plots saved under PLOT_FOLDER
+"""
+
 from pathlib import Path
 
 import pandas as pd

@@ -5,7 +5,7 @@
 Suppose that we are working with a sample from a normal distribution with unknown variance $\sigma^2$. We estimate $\sigma^2$ using the corresponding maximum likelihood estimator $\hat{\sigma}^2$.
 
 
-Out goal is to conduct inference on $\sigma^2$ by constructing a suitable confidence interval. The easiest way to construct a confidence interval based on $\hat{\sigma}^2$ is using the fact that it's asymptotically normally distributed. 
+Our goal is to conduct inference on $\sigma^2$ by constructing a suitable confidence interval. The easiest way to construct a confidence interval based on $\hat{\sigma}^2$ is using the fact that it's asymptotically normally distributed. 
 
 The key issue is that the normal distribution is symmetric, while the distribution of estimation errors $\hat{\sigma}^2-\sigma^2$ is inherently asymmetric:
 

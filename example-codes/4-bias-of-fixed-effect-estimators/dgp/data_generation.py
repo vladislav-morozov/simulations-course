@@ -2,13 +2,7 @@
 Functions for data generation for FE model.
 
 Functions:
-    - generate_data(
-            num_units: int,
-            beta_mean: float,
-            params: dict[str, np.ndarray],
-            seed: int = None,
-        ) -> pd.DataFrame:
-        Generates (Y, X) panel data follow DGP in the lecture.
+    - generate_data(): generates (Y, X) panel data follow DGP in the lecture.
 """
 
 import numpy as np

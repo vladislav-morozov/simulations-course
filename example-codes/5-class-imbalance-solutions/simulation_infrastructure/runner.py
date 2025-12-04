@@ -1,7 +1,7 @@
 """
 Simulation runner for evaluating prediction algorithms via Monte Carlo.
 
-Classes: 
+Classes:
     - SimulationRunner: executes simulation scenario, potentially in parallel.
 """
 
@@ -17,16 +17,16 @@ from simulation_infrastructure.protocols import AlgorithmProtocol, DGPProtocol
 
 class SimulationRunner:
     """Runs Monte Carlo simulations for a given DGP and list of algorithms.
-    
+
     Attributes:
         dgp_type (Type[DGPProtocol]): class of the Data Generating Process.
         dgp_kwargs (dict[str, Any]): keyword arguments for initializing the DGP.
         algorithm_types (list[Type[AlgorithmProtocol]]): list of algorithm classes.
-        algorithm_kwargs_list list[dict[str, Any]]): list of keyword argument 
-            dictionaries for initializing each algorithm, ordered in the same 
+        algorithm_kwargs_list list[dict[str, Any]]): list of keyword argument
+            dictionaries for initializing each algorithm, ordered in the same
             order as algorithm_types
-        n_simulations (int): number of Monte Carlo simulations.
-        n_workers (int): number of threads for parallel execution.
+        n_simulations (int): number of Monte Carlo simulations. Defaults to 1000.
+        n_workers (int): number of threads for parallel execution. Defaults to 1.
     """
 
     def __init__(
@@ -37,7 +37,7 @@ class SimulationRunner:
         algorithm_kwargs_list: list[dict[str, Any]],
         n_simulations: int = 1000,
         n_workers: int = 1,
-    ): 
+    ):
         self.dgp_type = dgp_type
         self.dgp_kwargs = dgp_kwargs
         self.algorithm_types = algorithm_types
@@ -48,7 +48,7 @@ class SimulationRunner:
 
     def _run_single_simulation(self, seed: int) -> dict[str, Any]:
         """Run a single Monte Carlo simulation for all algorithms.
-        
+
         Args:
             seed (int): seed for data sampling
         """
@@ -66,8 +66,6 @@ class SimulationRunner:
             algo.fit(X_train, y_train)
             y_pred = algo.predict(X_test)
 
-
-
             accuracy = accuracy_score(y_test, y_pred)
             precision_0 = precision_score(y_test, y_pred, pos_label=0, zero_division=0)
             recall_0 = recall_score(y_test, y_pred, pos_label=0, zero_division=0)
@@ -76,7 +74,7 @@ class SimulationRunner:
             f1_0 = f1_score(y_test, y_pred, pos_label=0, zero_division=0)
             f1_1 = f1_score(y_test, y_pred, pos_label=1, zero_division=0)
 
-            result_key = dgp.name + " + " + algo.name 
+            result_key = dgp.name + " + " + algo.name
             sim_results[result_key] = {
                 "n_training": dgp.n_train_samples,
                 "first_class_weight": dgp.weights[0],
@@ -93,7 +91,7 @@ class SimulationRunner:
 
     def run_all(self) -> pd.DataFrame:
         """Run all simulations in parallel and return aggregated results.
-        
+
         Returns:
             pd.DataFrame: DataFrame with simulation results.
         """

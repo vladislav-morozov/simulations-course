@@ -10,6 +10,7 @@ Classes:
 """
 
 import numpy as np
+
 from protocols import DGPProtocol, EstimatorProtocol
 
 
@@ -17,22 +18,19 @@ class SimulationRunner:
     """Runs Monte Carlo simulations for a given DGP and estimator.
 
     Attributes:
-        dgp: data-generating process with a sample() method and beta1 attribute.
-        estimator: estimator with a fit() method and beta1_hat attribute.
-        errors: array of estimation errors (beta1_hat - beta1) for each simulation.
+        dgp (DGPProtocol): data-generating process with a sample() method and
+            beta1 attribute.
+        estimator (EstimatorProtocol): estimator with a fit() method and
+            beta1_hat attribute.
+        errors np.ndarray): array of estimation errors (beta1_hat - beta1) for
+            each Monte Carlo draw.
     """
 
     def __init__(
         self,
         dgp: DGPProtocol,
         estimator: EstimatorProtocol,
-    ) -> None:
-        """Initializes the simulation runner.
-
-        Args:
-            dgp: An instance of a DGP class (must implement `sample`).
-            estimator: An instance of an estimator class (must implement `fit`).
-        """
+    ) -> None: 
         self.dgp: DGPProtocol = dgp
         self.estimator: EstimatorProtocol = estimator
         self.errors: np.ndarray = np.empty(0)

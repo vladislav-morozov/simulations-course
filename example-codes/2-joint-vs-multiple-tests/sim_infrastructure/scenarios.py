@@ -2,7 +2,8 @@
 Module for defining simulation scenarios.
 
 This module contains scenarios for comparing power functions of tests under model:
-    Y = theta0  + theta1*x1 + theta2*x2 + u
+    Y = theta0  + theta1*X1 + theta2*X2 + U
+
 The null being tested is
     H0: theta1=theta2=0
 
@@ -13,11 +14,10 @@ Variables:
     scenarios (list): list of scenarios to un.
 """
 
-import numpy as np
-
 from dataclasses import dataclass
 from itertools import product
 
+import numpy as np
 
 from dgps.linear import BivariateLinearModel
 from sim_infrastructure.protocols import DGPProtocol, TestProtocol
@@ -31,9 +31,9 @@ class SimulationScenario:
 
     name: str  # For readability
     dgp: type[DGPProtocol]
-    dgp_params: dict  # E.g. betas go here
+    dgp_params: dict  # E.g. thetas go here
     test: type[TestProtocol]
-    test_params: dict  # E.g. reg_params go here
+    test_params: dict  #
     sample_size: int
     n_simulations: int = 500
     first_seed: int = 1

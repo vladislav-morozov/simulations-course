@@ -1,5 +1,5 @@
 """
-Module for joint tests for joint hypothesis.
+Module for joint tests for joint hypothesie.
 
 Classes:
     WaldWithOLS: OLS-based Wald test that all non-intercept coefficients are zero.
@@ -15,6 +15,7 @@ class WaldWithOLS:
 
     Tailored to linear model
         Y_i = theta0 + theta1 X_{i1} + ... + thetap X_{ip} + U_i
+        
     Tests the null:
         H0: theta1 = ... = thetap = 0
 

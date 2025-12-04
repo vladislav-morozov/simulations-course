@@ -3,7 +3,7 @@ Implements a simple generic Generalized Method of Moments (GMM) class.
 
 Classes:
     - GMMSolver: Estimates parameters by minimizing weighted squared distance
-        of moment conditions to zero
+        of moment conditions to zero.
 """
 
 from typing import Callable
@@ -18,16 +18,17 @@ class GMMSolver:
     minimizing the weighted squared distance of moment conditions from zero.
 
     Attributes:
-        moment_conditions (Callable[[np.ndarray], np.ndarray]):
-            Function returning moment conditions given parameter values.
-        constraints (list[dict[str, str | Callable]] | None):
-            List of constraints for parameter optimization.
-        initial_guess (np.ndarray):
-            Initial parameter values for the optimization.
-        weighting_matrix (np.ndarray):
-            Weighting matrix for the GMM objective function. Defaults to identity.
+        moment_conditions (Callable[[np.ndarray], np.ndarray]): function
+            returning moment conditions given parameter values.
+        constraints (list[dict[str, str | Callable]] | None): list of
+            constraints for parameter optimization. Defaults to None.
+        initial_guess (np.ndarray): initial parameter values for the
+            optimization.
+        weighting_matrix (np.ndarray): weighting matrix for the GMM objective
+            function. Defaults to the identity matrix.
         process_func (Callable[[np.ndarray], dict[str, np.array| np.float]] | None):
-            Function that processes the optimized parameters into a meaningful format.
+            function that processes the optimized parameters into a meaningful format.
+            Defaults to NOne.
         estimated_params (np.ndarray | None):
             The estimated parameters after optimization.
     """
@@ -53,9 +54,9 @@ class GMMSolver:
         self.estimated_params: np.ndarray = np.empty(self.initial_guess.shape)
 
     def _gmm_objective(self, params: np.ndarray) -> float:
-        """
-        Computes the GMM objective function:
-        m(θ)ᵀ W m(θ), where m(θ) are the moment conditions.
+        """Computes the GMM objective function:
+                m(θ)ᵀ W m(θ)
+        where m(θ) are the moment conditions.
 
         Args:
             params (np.ndarray): Current parameter estimates.
@@ -67,9 +68,7 @@ class GMMSolver:
         return float(moments.T @ self.weighting_matrix @ moments)
 
     def minimize(self) -> None:
-        """
-        Runs the GMM estimation by minimizing the GMM objective function.
-        """
+        """Runs the GMM estimation by minimizing the GMM objective function."""
         result = minimize(
             self._gmm_objective, self.initial_guess, constraints=self.constraints
         )
@@ -80,8 +79,7 @@ class GMMSolver:
         self.estimated_params = result.x
 
     def process_solution(self) -> dict[str, np.ndarray | np.floating]:
-        """
-        Processes the estimated parameters into a meaningful format.
+        """Processes the estimated parameters into a meaningful format.
 
         Returns:
             dict[str, Any]: Processed output, depends on user-supplied processing function.
