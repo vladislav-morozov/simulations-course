@@ -213,7 +213,7 @@
     "href": "slides/methods/evaluating-ml-algorithms.html#introduction",
     "title": "Evaluating Machine Learning Algorithms",
     "section": "Introduction",
-    "text": "Introduction\n\nimport matplotlib.pyplot as plt\n\nfrom itertools import product\n\nfrom sklearn.datasets import make_classification\n\nBG_COLOR = \"whitesmoke\"",
+    "text": "Introduction",
     "crumbs": [
       "Evaluating Methods",
       "Evaluating Machine Learning Algorithms"
@@ -268,7 +268,7 @@
     "href": "slides/methods/evaluating-cis.html#introduction",
     "title": "Evaluating Confidence Intervals",
     "section": "Introduction",
-    "text": "Introduction\n\nimport matplotlib.pyplot as plt\nimport numpy as np\n\nfrom scipy.stats import chi2\nBG_COLOR = \"whitesmoke\"\nTHEME_COLOR = \"#3c165c\"",
+    "text": "Introduction",
     "crumbs": [
       "Evaluating Methods",
       "Evaluating Confidence Intervals"
@@ -411,7 +411,7 @@
     "href": "slides/methods/evaluating-tests.html#introduction",
     "title": "Evaluating Hypothesis Tests",
     "section": "Introduction",
-    "text": "Introduction\n\nimport matplotlib.pyplot as plt\nimport numpy as np\n\nfrom scipy.stats import chi2\nBG_COLOR = \"whitesmoke\"\nTHEME_COLOR = \"#3c165c\"",
+    "text": "Introduction",
     "crumbs": [
       "Evaluating Methods",
       "Evaluating Hypothesis Tests"

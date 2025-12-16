@@ -40,15 +40,7 @@ open-graph:
 
 ## Introduction {background="#00100F"}
  
-  
-```{python}
-import matplotlib.pyplot as plt
-import numpy as np
 
-from scipy.stats import chi2
-BG_COLOR = "whitesmoke"
-THEME_COLOR = "#3c165c"
-```
 
 ### Lecture Info {background="#43464B"}
 
@@ -65,6 +57,16 @@ By the end, you should be able to
 - Add parallel execution and result handling to our simulation code 
 - Use simulations to evaluate test power
  
+
+   
+```{python}
+import matplotlib.pyplot as plt
+import numpy as np
+
+from scipy.stats import chi2
+BG_COLOR = "whitesmoke"
+THEME_COLOR = "#3c165c"
+```
 
 
 #### References on Hypothesis Testing

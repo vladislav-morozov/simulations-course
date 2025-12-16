@@ -40,16 +40,6 @@ open-graph:
 
 ## Introduction {background="#00100F"}
 
-```{python}
-import matplotlib.pyplot as plt
-
-from itertools import product
-
-from sklearn.datasets import make_classification
-
-BG_COLOR = "whitesmoke"
-```
-
 ### Lecture Info {background="#43464B"}
 
 #### Learning Outcomes
@@ -65,6 +55,18 @@ By the end, you should be able to
 - Recall essential concepts that define a statistical/machine learning problem
 - Understand how to use Monte Carlo for evaluating predictive algorithms
 - Parallelize computation on the level of MC datasets
+
+
+
+```{python}
+import matplotlib.pyplot as plt
+
+from itertools import product
+
+from sklearn.datasets import make_classification
+
+BG_COLOR = "whitesmoke"
+```
 
 
 #### References 
