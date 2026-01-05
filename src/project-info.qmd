@@ -132,10 +132,37 @@ You can think of this stage as an agile (learning) experience:
 The aim is to produce a final project that reflects your learning and iteration throughout the course.
  
 ### Term Paper
-- Length: Maximum 20 pages (excluding bibliography and appendix).
+
+- Length: Maximum 20 pages (excluding bibliogr
+aphy and appendix).
   - *Note:* 20 pages is an upper limit, not a target. Focus on clarity and conciseness.
 - Formatting: Use 12pt font, 1.5-line spacing, and 2.5 cm margins.
 - Appendix: Use for long tables, additional figures, or supplementary material.
+
+### Presentation
+
+
+Each group will deliver a presentation on their project. Format:
+
+- Up to 20 minutes of length. Can be shorter if preferred and you communicate all the necessary aspects in less time.
+- After presentation: up to 10 minutes of Q&A on any aspect of the project. 
+
+In terms of contents, your presentation should cover the following key aspects:
+
+- Brief broad introduction: which area of statistics are we dealing with? What methods are you studying and what problems do they solve?
+- The specific question studied: what does your project do? Why do you study this question? What's the importance? 
+- Simulation design: the *essential* characteristics of your simulation design; why those designs, what do they represent (in a stylized way)?
+- Summary of results: the main findings of your simulations + discuss their implications and highlight any interesting patterns or surprises that emerged from your analysis.
+- Further directions: how can you make the project deeper? 
+
+
+
+The presentation should be accessible to your fellow students and the instructor.  When making your presentation, think about your audience on presentation day: people broadly familiar with core causal inference, ML, and simulation topics, but not necessarily familiar with your specific topic.
+Focus on the motivation, intuition, and results, rather than implementation details. For example, when talking about DGPs, focus on the intuition, rather than just describing the distributions used.  
+
+
+ 
+Use clear, legible slides with visuals. Highlight key points and avoid clutter to keep the audience engaged and focused on the main message. 
 
 ### Replication Code
 
