@@ -1,1 +1,1 @@
-Sitemap: https://vladislav-morozov.github.io/simulations-course/sitemap.xml
+Sitemap: https://vladislav-morozov.eu/simulations-course/sitemap.xml
