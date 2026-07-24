@@ -18,7 +18,7 @@ diagram:
 website:
   title: "Fundamentals of Monte Carlo Simulations in Data Science"
   favicon: themes/favicon.ico
-  site-url: https://vladislav-morozov.github.io/simulations-course/
+  site-url: https://vladislav-morozov.eu/simulations-course/
   repo-url: https://github.com/vladislav-morozov/simulations-course/
   repo-subdir: "src" 
   repo-actions: [edit, issue]
@@ -27,7 +27,7 @@ website:
     search: true 
     tools:
       - icon: person-arms-up
-        href: https://vladislav-morozov.github.io/
+        href: https://vladislav-morozov.eu/
       - icon: github
         href: https://github.com/vladislav-morozov/
       - icon: linkedin
